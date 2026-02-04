@@ -13,10 +13,36 @@ REQUIREMENTS:
     - Requires config.py and utils.py in the same directory.
 """
 
+import sys 
+import os 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import time
 import config
 import utils
 from selenium.webdriver.common.by import By
+
+# ============================ #
+# CALLING FUNCTION LOGIN 
+# ============================ #
+def realizar_login(driver, wait):
+
+    """
+    AUXILIARY FUNCTION TO PERFORM ONLY THE LOGIN STEPS.
+    IT CAN BE CALLED FROM OTHER SCRIPTS.
+    """
+    print("RUNNING LOGIN FROM SHARED MODULE");
+    try :
+        utils.escribir_texto(driver, config.XPATH_INPUT_USUARIO, config.USUARIO_VALIDO)
+        utils.escribir_texto(driver, config.XPATH_INPUT_PASS, config.PASS_VALIDO)
+        driver.hide_keyboard()
+        utils.click_boton(driver, config.XPATH_BTN_ACEPTAR)
+
+        time.sleep(4)
+        print(" ✅ SHARE LOGIN SUCCESSFUL");
+        return True
+    except Exception as e:
+        print(f"❌ ERROR SHARE LOGIN: {e}")
+        return False
 
 
 # =============================================== #
@@ -142,8 +168,11 @@ def test_4_usuario_no_registrado():
         utils.cerrar_driver(driver)
 
 # === RUN === #
+
 if __name__ == "__main__":
     # COMMENT ON THE LINES OF THE TESTS THAT ALREADY WORK TO SAVE TIME.
     test_1_login_exitoso()
     test_2_pass_incorrecto()
     test_4_usuario_no_registrado()
+    driver, wait = utils.iniciar_driver()
+    realizar_login(driver,wait)
