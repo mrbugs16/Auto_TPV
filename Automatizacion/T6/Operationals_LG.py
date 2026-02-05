@@ -1,30 +1,56 @@
 """
-FILENAME: Operacionales_LG.py
+FILENAME: Operationals_LG.py
 DESCRIPTION:
     Automated test suite focused on the LOGIN (Authentication) module.
     Executes critical access validations on the POS terminal.
 
 TEST CASES COVERED:
-    1. Iniciar sesión con credenciales válidas
-    2. Incorrect Password Validation.
-    4. Unregistered User Validation.
+    · TEST 1: LOG IN WITH VALID CREDENTIALS.
+    · TEST 2: INCORRECT PASSWORD VALIDATION.
+    · TEST 4: UNREGISTERED USER VALIDATION.
 
 REQUIREMENTS:
     - Requires config.py and utils.py in the same directory.
 """
 
+import sys 
+import os 
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import time
 import config
 import utils
 from selenium.webdriver.common.by import By
 
+# ============================ #
+# CALLING FUNCTION LOGIN 
+# ============================ #
+def realizar_login(driver, wait):
+
+    """
+    AUXILIARY FUNCTION TO PERFORM ONLY THE LOGIN STEPS.
+    IT CAN BE CALLED FROM OTHER SCRIPTS.
+    """
+    print("RUNNING LOGIN FROM SHARED MODULE");
+    try :
+        utils.escribir_texto(driver, config.XPATH_INPUT_USUARIO, config.USUARIO_VALIDO)
+        utils.escribir_texto(driver, config.XPATH_INPUT_PASS, config.PASS_VALIDO)
+        driver.hide_keyboard()
+        utils.click_boton(driver, config.XPATH_BTN_ACEPTAR)
+
+        time.sleep(4)
+        print(" ✅ SHARE LOGIN SUCCESSFUL");
+        return True
+    except Exception as e:
+        print(f"❌ ERROR SHARE LOGIN: {e}")
+        return False
+
 
 # =============================================== #
-# TEST 1: INICIAR SESIÓN CON CREDENCIALES VÁLIDAS #
+# TEST 1: LOG IN WITH VALID CREDENTIALS 
 # =============================================== #
 def test_1_login_exitoso():
     print("\n" + "=" * 60)
-    print("TEST 1: INICIAR SESIÓN CON CREDENCIALES VÁLIDAS")
+    print("TEST 1: LOG IN WITH VALID CREDENTIALS")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -47,11 +73,11 @@ def test_1_login_exitoso():
 
 
 # ================================================ #
-# TEST 2: INICIAR SESIÓN CON CONTRASEÑA INCORRECTA #
+# TEST 2: INCORRECT PASSWORD VALIDATION 
 # ================================================ #
 def test_2_pass_incorrecto():
     print("\n" + "=" * 60)
-    print("TEST 2: INICIAR SESIÓN CON CONTRASEÑA INCORRECTA")
+    print("TEST 2: INCORRECT PASSWORD VALIDATION")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -75,11 +101,11 @@ def test_2_pass_incorrecto():
         utils.cerrar_driver(driver)
 
 # =============================================== #
-# TEST 4: INICIAR SESIÓN CON CUENTA NO REGISTRADA #
+# TEST 4: UNREGISTERED USER VALIDATION 
 # =============================================== #
 def test_4_usuario_no_registrado():
     print("\n" + "=" * 60)
-    print("TEST 4: INICIAR SESIÓN CON CUENTA NO REGISTRADA ")
+    print("TEST 4: UNREGISTERED USER VALIDATION ")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -111,7 +137,7 @@ def test_4_usuario_no_registrado():
                 t_text = e.get_attribute("text")
                 t_desc = e.get_attribute("content-desc")
 
-                #
+                
                 if t_text or t_desc:
 
                     txt_log = t_text if t_text else "null"
@@ -141,9 +167,11 @@ def test_4_usuario_no_registrado():
     finally:
         utils.cerrar_driver(driver)
 
-# === RUN === #
+# === EXECUTION === #
 if __name__ == "__main__":
-    # COMMENT ON THE LINES OF THE TESTS THAT ALREADY WORK TO SAVE TIME.
+    
     test_1_login_exitoso()
     test_2_pass_incorrecto()
     test_4_usuario_no_registrado()
+    driver, wait = utils.iniciar_driver()
+    realizar_login(driver,wait)
