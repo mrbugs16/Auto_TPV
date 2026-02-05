@@ -1,11 +1,12 @@
 """
-FILENAME: RegistrateAhora_RA.py
+FILENAME: Operationals_RA.py
 DESCRIPTION:
     VALIDATE REGISTRATION PROCESS. 
 CONTENTS:
-    - TEST 1: ACCESO A PANTALLA DE REGISTRO.
-    - TEST 2: REGISTRO EXITOSO DE USUARIO.
-"""
+    · TEST 1: ACCESS TO REGISTRATION SCREEN.
+    · TEST 2: SUCCESSFUL USER REGISTRATION.
+    · TEST 3: VALIDATION OF EMPTY FIELDS.
+""" 
 
 import sys
 import os
@@ -15,14 +16,14 @@ if ruta_proyecto not in sys.path:
 import time
 import config
 import utils
-import T6.Operacionales_LG 
+import T6.Operationals_LG 
 
 # ====================================== 
-# TEST 1: ACCESO A PANTALLA DE REGISTRO  
+# TEST 1: ACCESS TO REGISTRATION SCREEN  
 # ====================================== 
 def test_1_acceso_pantalla():
     print("\n" + "=" * 60)
-    print("TEST 1: ACCESO A PANTALLA REGISTRO")
+    print("TEST 1: ACCESS TO REGISTRATION SCREEN")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -30,7 +31,7 @@ def test_1_acceso_pantalla():
     try:
         
         print("👉 OPERACIONALES_LG FILE...")
-        login_exitoso = T6.Operacionales_LG.realizar_login(driver, wait)
+        login_exitoso = T6.Operationals_LG.realizar_login(driver, wait)
 
         if not login_exitoso:
             raise Exception("LOGIN FAILED.")
@@ -55,16 +56,16 @@ def test_1_acceso_pantalla():
 
 
 # ========================================== #
-# TEST 2: REGISTRO EXITOSO DE USUARIO  
+# TEST 2: SUCCESSFUL USER REGISTRATION  
 # ========================================== #
 def test_2_registro_exitoso():
     print("\n" + "=" * 60)
-    print("TEST 2: REGISTRO EXITOSO DE USUARIO")
+    print("TEST 2: SUCCESSFUL USER REGISTRATION")
     print("=" * 60)
     driver, wait = utils.iniciar_driver()
     
     try:
-        # --- LOGIN ---
+        # --- LOGIN --- #
         print("OPERACIONALES_LG FILE...")
         login_exitoso = T6.Operacionales_LG.realizar_login(driver, wait)
         if not login_exitoso:
@@ -106,18 +107,18 @@ def test_2_registro_exitoso():
         utils.cerrar_driver(driver)
 
 # ==========================================
-# TEST 3: VALIDACIÓN DE CAMPOS VACÍOS
+# TEST 3: VALIDATION OF EMPTY FIELDS
 # ==========================================
 def test_3_campos_vacios():
     print("\n" + "=" * 60)
-    print("TEST 3: VALIDACIÓN DE CAMPOS VACÍOS")
+    print("TEST 3: VALIDATION OF EMPTY FIELDS")
     print("=" * 60)
     
     driver, wait = utils.iniciar_driver()
     
     try:
         print("OPERACIONALES_LG FILE...")
-        login_exitoso = T6.Operacionales_LG.realizar_login(driver, wait)
+        login_exitoso = T6.Operationals_LG.realizar_login(driver, wait)
 
         if not login_exitoso:
             raise Exception("LOGIN FAILED.")
@@ -155,13 +156,8 @@ def test_3_campos_vacios():
     finally:
         utils.cerrar_driver(driver)
                 
-
-
-    
-
-
 # === EXECUTION === #
 if __name__ == "__main__":
-    #test_1_acceso_pantalla()
-    #test_2_registro_exitoso()
+    test_1_acceso_pantalla()
+    test_2_registro_exitoso()
     test_3_campos_vacios()
