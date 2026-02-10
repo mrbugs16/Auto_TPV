@@ -31,11 +31,19 @@ XPATH_WEB_PASS = '//input[@type="password"]'
 XPATH_WEB_WRONG_USER = '//input[@type="email" or @type="text"]'  
 XPATH_WEB_WRONG_PASS = '//input[@type="password"]'
 XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "Login")]'
+XPATH_WEB_TXT_INGRESA_AQUI = "//*[contains(text(), 'Ingresa aquí')]"
+XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
+XPATH_WEB_BTN_ENVIAR = "//*[contains(text(), 'Enviar')]"
+
+# === MENSAJES DE SISTEMA (WEB) ===
+XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
+XPATH_MSJ_EXITO_RCV = "//*[contains(text(), 'Se ha enviado un mail')]"
 # === DATA WEB === #
 WEB_USUARIO_PRUEBA = "eamartin"
 WEB_PASS_PRUEBA = "Patito4."
 WEB_WRONGUSER = "usuariofake"
 WEB_WRONGPASS = "contrasenafake"
+
 
 # === DATA T6 === #
 USUARIO_VALIDO = "david.santos@ijuba.solutions"

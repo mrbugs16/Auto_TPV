@@ -1,5 +1,5 @@
 """
-FILENAME: Login_Auth.py
+FILENAME: AUTH.py
 DESCRIPTION: TESTING AUTHENTICATION ON WEB PLATFORM
 """
 import sys
@@ -25,6 +25,7 @@ def test_login1():
         print(f"NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
         driver.get(config.URL_MEMPHIS_WEB)
         time.sleep(3)
+
         print("WRITING USERNAME...")
         utils.escribir_texto(driver, config.XPATH_WEB_USER, config.WEB_USUARIO_PRUEBA)
         print("WRITING PASSWORD...")
@@ -55,6 +56,7 @@ def test_login2():
         print(f"NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
         driver.get(config.URL_MEMPHIS_WEB)
         time.sleep(3)
+
         print("WRITING WRONG USERNAME...")
         utils.escribir_texto(driver, config.XPATH_WEB_WRONG_USER, config.WEB_WRONGUSER)
         print("WRITING WRONG PASSWORD...")
@@ -84,6 +86,7 @@ def test_login3():
         print(f"NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
         driver.get(config.URL_MEMPHIS_WEB)
         time.sleep(3)
+
         print("WRITING GOOD USERNAME...")
         utils.escribir_texto(driver, config.XPATH_WEB_USER, config.WEB_USUARIO_PRUEBA)
         print("WRITING WRONG PASSWORD...")
@@ -113,6 +116,7 @@ def test_login4():
         print(f"NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
         driver.get(config.URL_MEMPHIS_WEB)
         time.sleep(3)
+
         print("WRITING GOOD USERNAME...")
         utils.escribir_texto(driver, config.XPATH_WEB_USER, config.WEB_USUARIO_PRUEBA)
         print("CLICKING LOGIN...")
@@ -140,6 +144,7 @@ def test_login5():
         print(f"NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
         driver.get(config.URL_MEMPHIS_WEB)
         time.sleep(3)
+        
         print("WRITING PASSWORD...")
         utils.escribir_texto(driver, config.XPATH_WEB_PASS, config.WEB_PASS_PRUEBA)
         print("CLICKING LOGIN...")
@@ -153,8 +158,8 @@ def test_login5():
         driver.quit()
 
 if __name__ == "__main__":
-    #test_login1() 
-    #test_login2()
-    #test_login3()
-    #test_login4()
+    test_login1() 
+    test_login2()
+    test_login3()
+    test_login4()
     test_login5()

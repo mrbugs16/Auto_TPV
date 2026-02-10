@@ -10,12 +10,20 @@ from appium.options.android import UiAutomator2Options
 from selenium.webdriver.support.ui import WebDriverWait
 import config
 import time
+import os 
 
 # === WEB IMPORTS === #
 from selenium import webdriver as webdriver_selenium # Renombramos para no confundir con appium
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 
+def tomar_screenshot(driver, nombre_archivo):
+    carpeta = "evidencias"
+    if not os.path.exists(carpeta):
+        os.makedirs(carpeta)
+    ruta = os.path.join(carpeta, f"{nombre_archivo}.png")
+    driver.save_screenshot(ruta)
+    print(f"✔ SCREENSHOT TAKEN: {ruta}")
 
 def iniciar_driver():
     print("🚀 STARTING MOBILE AUTOMATION...")
@@ -70,3 +78,4 @@ def iniciar_driver_web(): # Corregido: Usar ':' y no ';'
     wait = WebDriverWait(driver, 15)
     
     return driver, wait
+
