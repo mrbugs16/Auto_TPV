@@ -170,8 +170,6 @@ def test_4_usuario_no_registrado():
 # === EXECUTION === #
 if __name__ == "__main__":
     
-    test_1_login_exitoso()
-    test_2_pass_incorrecto()
-    test_4_usuario_no_registrado()
-    driver, wait = utils.iniciar_driver()
-    realizar_login(driver,wait)
+    #test_1_login_exitoso()
+    #test_2_pass_incorrecto()
+    test_4_usuario_no_registrado() 
