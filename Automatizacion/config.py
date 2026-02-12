@@ -1,13 +1,13 @@
 """
 FILENAME: config.py
 DESCRIPTION:
-    Global configuration hub for the POS automation project.
-    Stores constants reusable across multiple test scripts to ensure modularity.
+    GLOBAL CONFIGURATION HUB FOR THE POS AUTOMATION PROJECT.
+    STORES CONSTANTS REUSABLE ACROSS MULTIPLE TEST SCRIPTS TO ENSURE MODULARITY.
 
 CONTENTS:
-    - Appium Capabilities (T6 Device Configuration).
-    - Test Credentials (QA Users & Passwords).
-    - Selector Repository (Centralized XPaths).
+    - APPIUM CAPABILITIES (T6 DEVICE CONFIGURATION).
+    - TEST CREDENTIALS (QA USERS & PASSWORDS).
+    - SELECTOR REPOSITORY (CENTRALIZED XPATHS).
 """
 
 # === SETTINGS === #
@@ -34,15 +34,65 @@ XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "
 XPATH_WEB_TXT_INGRESA_AQUI = "//*[contains(text(), 'Ingresa aquí')]"
 XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
 XPATH_WEB_BTN_ENVIAR = "//*[contains(text(), 'Enviar')]"
+XPATH_WEB_BTN_REGISTRA_AHORA = '//android.widget.Button[@content-desc="Regístrate ahora"]'
+XPATH_REGISTRA_AHORA_ALT1 = '//*[contains(@content-desc, "Regístrate")]'
+XPATH_REGISTRA_AHORA_ALT2 = '//*[contains(@content-desc, "gístrate")]'
 
 # === MENSAJES DE SISTEMA (WEB) ===
 XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
 XPATH_MSJ_EXITO_RCV = "//*[contains(text(), 'Se ha enviado un mail')]"
+
 # === DATA WEB === #
 WEB_USUARIO_PRUEBA = "eamartin"
 WEB_PASS_PRUEBA = "Patito4."
 WEB_WRONGUSER = "usuariofake"
 WEB_WRONGPASS = "contrasenafake"
+
+# === DATA RA === #
+RA_NOMBRE = "Antonio"
+RA_APELLIDO = "Garcia"
+RA_SEGUNDOAPELLIDO = "Garcia"
+RA_EMAIL = "usuariofake@prueba.com"
+RA_PASS = "contrasenafake"
+
+# === DATA RA_010 === #
+RA_010_NOMBRE = "Santiago"
+RA_010_APELLIDO = "martinez"
+RA_010_SEGUNDO_APELLIDO = "martinez"
+RA_010_EMAIL = "sss@gmail.com"
+RA_010_PASS = "Memphis@2030"
+
+# === DATA RA_013 === #
+RA_013_EMAIL = "david.santos@ijuba.solutions"
+
+# === XPATHS RA === #
+XPATH_RA_NOMBRE = '//android.widget.EditText[1]'
+XPATH_RA_APELLIDO = '//android.widget.EditText[2]'
+XPATH_RA_SEGUNDOAPELLIDO = '//android.widget.EditText[3]'
+XPATH_RA_EMAIL = '//android.widget.EditText[4]'
+XPATH_RA_PASS = '//android.widget.EditText[5]'
+XPATH_RA_CONFIRMAR_PASS = '//android.widget.EditText[6]'
+XPATH_RA_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
+XPATH_RA_BTN_ATRAS = '//android.widget.Button[1]'  # Usually the first button/imagebutton in the header
+
+# === VALIDATION ERROR MESSAGES RA === #
+XPATH_RA_ERROR_NOMBRE = '//*[contains(@text, "Ingresa un nombre") or contains(@content-desc, "Ingresa un nombre")]'
+XPATH_RA_ERROR_USUARIO_EXISTE = (
+    '//*[contains(@text, "usuario ya está registrado") or '
+    'contains(@content-desc, "usuario ya está registrado") or '
+    'contains(@text, "ya está registrado") or '
+    'contains(@content-desc, "ya está registrado")]'
+)
+XPATH_RA_ERROR_PASS_NO_COINCIDEN = '//*[contains(@text, "Las contraseñas no coinciden") or contains(@content-desc, "Las contraseñas no coinciden")]'
+XPATH_RA_ERROR_CORREO_INVALIDO = '//*[contains(@text, "Correo inválido") or contains(@content-desc, "Correo inválido")]'
+XPATH_RA_ERROR_CONTRASENA_INVALIDA = '//*[contains(@text, "Contraseña inválida") or contains(@content-desc, "Contraseña inválida")]'
+
+XPATH_RA_REGISTRO_EXITOSO = (
+    '//*[contains(@text, "suario creado correctamente") or '
+    'contains(@text, "orrectamente") or '
+    'contains(@content-desc, "suario creado correctamente") or '
+    '//android.widget.Toast]'
+)
 
 
 # === DATA T6 === #
