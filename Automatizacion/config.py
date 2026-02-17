@@ -110,17 +110,35 @@ XPATH_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
 XPATH_TXT_TOKEN_REGISTRO = '//android.widget.EditText[1]'
 XPATH_TXT_NUM_AFILIACION = '//android.widget.EditText[2]'
 XPATH_BTN_ACEPTAR_REGISTRO = '//*[contains(@content-desc, "Aceptar") or contains(@text, "Aceptar")]'
-TOKEN_REGISTRO = "1737498440884ivb"
+
+# === XPATHS OC (FORGOT PASSWORD) === #
+XPATH_OC_LNK_OLVIDASTE = '//*[contains(@text, "Olvidaste tu contraseña") or contains(@content-desc, "Olvidaste tu contraseña")]'
+XPATH_OC_TITULO_RECUPERA = '//*[contains(@text, "Recupera tu contraseña") or contains(@content-desc, "Recupera tu contraseña")]'
+XPATH_OC_BTN_ATRAS = '//android.widget.Button[1]'
+XPATH_OC_INPUT_EMAIL = '//android.widget.EditText[1]' # Assuming first edit text on recovery screen
+XPATH_OC_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
+
+XPATH_OC_MSJ_EXITO = '//*[contains(@text, "ceso de recuperaci") or contains(@content-desc, "ceso de recuperaci")]'
 NUMERO_AFILIACION = "9096021"
 
 # === IMPROVED ERROR SELECTOR === #
 XPATH_ERROR_GENERICO = (
     '//*['
-    'contains(@content-desc, "Aviso") or contains(@text, "Aviso") or '
-    'contains(@content-desc, "incorrect") or contains(@text, "incorrect") or '
-    'contains(@content-desc, "encontrado") or contains(@text, "encontrado") or '
-    'contains(@content-desc, "Error") or contains(@text, "Error") or '
-    'contains(@resource-id, "message") or '  
-    'name()="android.widget.Toast"'
-    ']'
+    'contains(@content-desc, "Ocurri") or contains(@text, "Ocurri") or '
+    'contains(@content-desc, "un error") or contains(@text, "un error") or '
+    'contains(@content-desc, "intental") or contains(@text, "intental") or '
+    'contains(@content-desc, "tarde") or contains(@text, "tarde") or '
+    'contains(@text, "Ocurrió un error, inténtalo más tarde")'
+    'contains(translate(text(), "Correo inválido", "error"), "error")'
+    '] | //android.widget.Toast'
 )
+
+XPATH_OC_ERROR_CORREO = '//*[contains(@text, "Correo inválido") or contains(@content-desc, "Correo inválido")]'
+
+# === SELECTOR ON THE WEB    EMAIL ===
+
+XPATH_EMAIL_LINK_RESET = '//a[contains(text(), "Restablecer") or contains(text(), "Recuperar") or contains(text(), "aquí")]'
+
+# VALIDATE NEW PASSWORD SCREEN
+XPATH_TITULO_NUEVA_PASS = '//*[contains(text(), "Nueva contraseña") or contains(text(), "Restablecer") or contains(text(), "Crear")]'
+XPATH_INPUT_NUEVA_PASS = '//input[@type="password"]'
