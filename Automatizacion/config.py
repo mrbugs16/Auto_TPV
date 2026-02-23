@@ -142,3 +142,16 @@ XPATH_EMAIL_LINK_RESET = '//a[contains(text(), "Restablecer") or contains(text()
 # VALIDATE NEW PASSWORD SCREEN
 XPATH_TITULO_NUEVA_PASS = '//*[contains(text(), "Nueva contraseña") or contains(text(), "Restablecer") or contains(text(), "Crear")]'
 XPATH_INPUT_NUEVA_PASS = '//input[@type="password"]'
+
+# === PWD ===
+URL_MEMPHIS_PWD = "https://fat.memphis.mx/recovery-password"
+XPATH_PWD_ACTUAL = '//input[@name="currentPassword" or @type="password"][1]'
+XPATH_PWD_NUEVA = '(//input[@type="password"])[2]'
+XPATH_PWD_CONFIRMAR = '(//input[@type="password"])[3]'
+XPATH_PWD_BTN_ESTABLECER = '//*[contains(text(), "Establecer contraseña") or contains(text(), "Guardar")]'
+
+# MESSAGESS ERRORS 
+XPATH_PWD_ERROR_VACIO = '//*[contains(text(), "requerido") or contains(text(), "obligatorio")]'
+XPATH_PWD_ERROR_INCORRECTA = '//*[contains(text(), "incorrecta")]'
+XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "debe contener") or contains(text(), "caracteres")]'
+XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
