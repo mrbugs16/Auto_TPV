@@ -155,3 +155,13 @@ XPATH_PWD_ERROR_VACIO = '//*[contains(text(), "requerido") or contains(text(), "
 XPATH_PWD_ERROR_INCORRECTA = '//*[contains(text(), "incorrecta")]'
 XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "debe contener") or contains(text(), "caracteres")]'
 XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
+
+# Busca el SEGUNDO campo de tipo contraseña
+XPATH_INPUT_REPITE_PASS = '(//input[@type="password"])[2]' 
+
+# Busca el botón con el texto exacto que vemos en la imagen
+XPATH_BTN_ACEPTAR_WEB = '//*[contains(text(), "Reestablecer Contraseña")]'
+
+XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]" 
+XPATH_ERROR_PASS_MAYUSCULA = "//*[contains(text(), 'Debe contener al menos una mayúscula')]"
+XPATH_BTN_OJO_NUEVA_PASS = "(//span[contains(@class,'ng-star-inserted') and ./i[contains(@class,'pi-eye')]])[1]"
