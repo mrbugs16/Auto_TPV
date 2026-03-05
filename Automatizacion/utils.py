@@ -21,14 +21,23 @@ import json
 import requests
 from datetime import datetime
 
+# === EMAIL & REGEX IMPORTS === #
+import imaplib
+import email
+import re
+import html
+import urllib.parse
+from email.header import decode_header
+
+import sys
+import zipfile
+import shutil
+from datetime import datetime
+
+# SCREENSHOT FUNCTION FOR T6 TERMINAL AND WEB
 def tomar_screenshot(driver, nombre, plataforma="auto"):
-    """
-    Guarda screenshot en la carpeta correspondiente.
-    plataforma: "t6", "web", o "auto" (detecta automáticamente)
-    """
     if plataforma == "auto":
         try:
-            # Si tiene capability 'automationName' es móvil (T6)
             caps = driver.capabilities
             if 'automationName' in caps or 'deviceName' in caps or 'appium' in str(caps).lower():
                 plataforma = "t6"
@@ -66,6 +75,7 @@ def escribir_texto(driver, xpath, texto):
     except Exception as e:
         print(f"✘ ERROR WRITING TO {xpath}: {e}")
 
+
 # === CLICK FUNCTION WITH ERROR HANDLING === #
 def click_boton(driver, xpath):
     try:
@@ -100,7 +110,7 @@ def iniciar_driver_web():
     wait = WebDriverWait(driver, 15)
     return driver, wait
 
-
+# === HTTP EVIDENCE FUNCTION FOR SELENIUM (CAPTURES NETWORK LOGS AND PRINTS REQUESTS TO SPECIFIC ENDPOINTS) === #
 def print_http_evidence(driver, endpoint_clave):
     print(f"\n📡 SCANNING NETWORK TRAFFIC: '{endpoint_clave}'...")
     try:
@@ -296,44 +306,343 @@ def print_test_results(nombre_test, resultados):
         print(f"   {fase} : {emoji} {descripcion}")
     print("=" * 60)
 
-# utils.py
-
-def click_eye_button(driver, xpath, descripcion="Eye Button"):
+# =================================================================================
+# FUNCTION: CLICK EYE BUTTON (WITH MULTIPLE FALLBACKS FOR ANGULAR/PRIMENG)
+# =================================================================================
+def click_eye_button(driver, xpath, descripcion="EYE BUTTON"):
     """
-    Hace click en el botón del ojo usando JavaScript como fallback.
-    Necesario cuando el elemento es un <i> con ::before pseudo-element.
+    CLICKS THE EYE BUTTON USING SELENIUM OR JAVASCRIPT AS A FALLBACK.
+    USEFUL FOR ICONS LIKE <i class="pi-eye"> THAT OVERLAP WITH INPUT FIELDS.
     """
+    print(f"👁️ ATTEMPTING TO CLICK: {descripcion}")
     try:
-        # Intento 1 — click normal con WebDriverWait
-        wait = WebDriverWait(driver, 10)
+        # ATTEMPT 1: NORMAL CLICK WITH WEBDRIVERWAIT
+        wait = WebDriverWait(driver, 5)
         elemento = wait.until(
             EC.element_to_be_clickable((By.XPATH, xpath))
         )
         elemento.click()
-        print(f"✔ CLICKED (normal): {descripcion}")
+        print(f"✔ CLICKED (NORMAL SELENIUM METHOD): {descripcion}")
         return True
 
     except Exception as e1:
-        print(f"⚠ Normal click failed: {e1.__class__.__name__} — trying JavaScript...")
+        print(f"⚠ NORMAL CLICK FAILED — TRYING JAVASCRIPT...")
         try:
-            # Intento 2 — JavaScript click (bypasa pseudo-elementos)
+            # ATTEMPT 2: JAVASCRIPT CLICK (BYPASSES UI OVERLAPS)
             elemento = driver.find_element(By.XPATH, xpath)
             driver.execute_script("arguments[0].click();", elemento)
-            print(f"✔ CLICKED (JavaScript): {descripcion}")
+            print(f"✔ CLICKED (JAVASCRIPT METHOD): {descripcion}")
             return True
 
         except Exception as e2:
-            print(f"⚠ JavaScript click failed: {e2.__class__.__name__} — trying parent span...")
+            print(f"⚠ JAVASCRIPT CLICK FAILED — TRYING PARENT SPAN...")
             try:
-                # Intento 3 — click en el <span> padre del <i>
-                elemento = driver.find_element(
-                    By.XPATH,
-                    "(//span[.//i[contains(@class,'pi-eye')]])[1]"
-                )
-                driver.execute_script("arguments[0].click();", elemento)
-                print(f"✔ CLICKED (parent span + JS): {descripcion}")
+                # ATTEMPT 3: CLICK THE PARENT ELEMENT (DYNAMICALLY)
+                # INSTEAD OF HARDCODING [1], WE FIND THE PARENT OF THE EXACT XPATH WE PASSED
+                parent_xpath = xpath + "/.."
+                parent_element = driver.find_element(By.XPATH, parent_xpath)
+                driver.execute_script("arguments[0].click();", parent_element)
+                print(f"✔ CLICKED (PARENT ELEMENT + JS): {descripcion}")
                 return True
 
             except Exception as e3:
-                print(f"❌ ALL CLICK METHODS FAILED: {e3}")
+                print(f"❌ ALL CLICK METHODS FAILED FOR {descripcion}")
                 return False
+
+
+# =================================================================================
+# FUNCTION: EXTRACT RECOVERY LINK FROM EMAIL VIA IMAP
+# =================================================================================
+def obtener_link_recuperacion_imap(usuario_email, password_app):
+    print(f"\n📧 CONNECTING TO IMAP SERVER FOR: {usuario_email}...")
+    
+    try:
+        mail = imaplib.IMAP4_SSL("imap.gmail.com")
+        mail.login(usuario_email, password_app)
+        
+        # 1. DEFINE SEARCH FOLDERS (INBOX AND ALL MAIL AS BACKUP)
+        carpetas = ["INBOX", "[Gmail]/All Mail", "[Gmail]/Spam"]
+        email_ids = []
+        remitente_buscado = 'no-reply@memphis.mx'
+        
+        # 2. SEARCH BY SENDER
+        for carpeta in carpetas:
+            try:
+                print(f"📂 SCANNING FOLDER: {carpeta}...")
+                mail.select(carpeta)
+                typ, data = mail.search(None, f'(FROM "{remitente_buscado}")')
+                
+                if data[0]:
+                    ids_encontrados = data[0].split()
+                    if ids_encontrados:
+                        email_ids = ids_encontrados[-3:] # GET LAST 3 EMAILS
+                        break 
+            except Exception:
+                continue
+        
+        if not email_ids:
+            print("❌ FAILED: NO EMAILS FOUND FROM 'no-reply@memphis.mx'.")
+            return None
+
+        # 3. ANALYZE THE LATEST EMAIL
+        email_ids.reverse() # NEWEST FIRST
+        ultimo_id = email_ids[0] 
+        
+        print(f"🔎 ANALYZING EMAIL ID: {ultimo_id.decode()}...")
+        status, msg_data = mail.fetch(ultimo_id, "(RFC822)")
+        
+        raw_email = msg_data[0][1]
+        msg = email.message_from_bytes(raw_email)
+        
+        # EXTRACT BODY
+        cuerpo = ""
+        if msg.is_multipart():
+            for part in msg.walk():
+                if part.get_content_type() == "text/html":
+                    try: cuerpo += part.get_payload(decode=True).decode(errors="ignore")
+                    except: pass
+        else:
+            try: cuerpo = msg.get_payload(decode=True).decode(errors="ignore")
+            except: pass
+
+        # 4. SEARCH AND CLEAN THE LINK (REGEX FOR 'FAT' OR 'API')
+        patron = r'https?://(?:fat|api)\.memphis\.mx/resetPwd[^\s"\'<>]+'
+        urls = re.findall(patron, cuerpo)
+        
+        if urls:
+            link_sucio = urls[0]
+            print(f"⚠️ RAW LINK DETECTED: {link_sucio[:60]}...")
+
+            # --- DEEP CLEAN ---
+            link_limpio = html.unescape(link_sucio)
+            link_limpio = urllib.parse.unquote(link_limpio)
+            link_limpio = link_limpio.replace("&amp;", "&").replace("&%23x3D;", "=")
+            
+            print(f"✅ CLEAN LINK EXTRACTED SUCCESSFULLY: {link_limpio}")
+            
+            mail.close()
+            mail.logout()
+            return link_limpio
+        else:
+            print("❌ EMAIL DOES NOT CONTAIN THE EXPECTED RESET PASSWORD LINK.")
+            mail.close()
+            mail.logout()
+            return None
+
+    except Exception as e:
+        print(f"❌ CRITICAL IMAP ERROR: {e}")
+        return None
+    
+# =================================================================================
+# REPORTING ENGINE: DUAL LOGGER AND ZIP CREATOR
+# =================================================================================
+class DualLogger:
+    """
+    INTERCEPTS TERMINAL OUTPUT TO WRITE TO BOTH THE CONSOLE AND A TEXT FILE SIMULTANEOUSLY.
+    """
+    def __init__(self, filepath):
+        self.terminal = sys.stdout
+        self.log_file = open(filepath, "w", encoding="utf-8")
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log_file.write(message)
+
+    def flush(self):
+        self.terminal.flush()
+        self.log_file.flush()
+        
+    def close(self):
+        self.log_file.close()
+        sys.stdout = self.terminal # RESTORE NORMAL PRINTING
+
+def iniciar_reporte(nombre_modulo):
+    """
+    STARTS THE RECORDING OF TERMINAL OUTPUT INTO A TEXT FILE.
+    """
+    os.makedirs("evidencias_zip", exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f"evidencias_zip/{nombre_modulo}_LOG_{timestamp}.txt"
+    
+    print(f"\n⏺️ STARTING RECORDING FOR MODULE: {nombre_modulo}...")
+    logger = DualLogger(log_filename)
+    sys.stdout = logger # REDIRECT ALL PRINTS TO OUR LOGGER
+    
+    return logger, log_filename, timestamp
+
+def generar_zip_evidencias(nombre_modulo, logger, log_filename, timestamp):
+    """
+    STOPS RECORDING AND ZIPS THE TEXT LOG ALONG WITH ALL MATCHING SCREENSHOTS.
+    """
+    # 1. STOP RECORDING AND SAVE THE TEXT FILE
+    logger.close()
+    
+    print("\n📦 PACKAGING EVIDENCE INTO A ZIP FILE...")
+    zip_filename = f"evidencias_zip/{nombre_modulo}_FULL_REPORT_{timestamp}.zip"
+    
+    try:
+        with zipfile.ZipFile(zip_filename, 'w', zipfile.ZIP_DEFLATED) as zipf:
+            # 2. ADD THE TERMINAL LOG TEXT FILE
+            if os.path.exists(log_filename):
+                zipf.write(log_filename, os.path.basename(log_filename))
+            
+            # 3. ADD ALL SCREENSHOTS RELATED TO THIS MODULE (E.G., STARTING WITH "PWD")
+            carpeta_web = os.path.join("evidencias", "Web")
+            if os.path.exists(carpeta_web):
+                for file in os.listdir(carpeta_web):
+                    if file.startswith(nombre_modulo) and file.endswith(".png"):
+                        filepath = os.path.join(carpeta_web, file)
+                        # WE PUT SCREENSHOTS INSIDE A "SCREENSHOTS" FOLDER INSIDE THE ZIP
+                        zipf.write(filepath, f"screenshots/{file}")
+                        
+        print(f"✅ SUCCESS: ZIP REPORT GENERATED AT -> {zip_filename}")
+        print("=" * 70 + "\n")
+        return zip_filename
+        
+    except Exception as e:
+        print(f"❌ ERROR GENERATING ZIP: {e}")
+        return None
+    
+import base64
+from datetime import datetime
+
+# =================================================================================
+# REPORTING ENGINE: PROFESSIONAL HTML DASHBOARD GENERATOR
+# =================================================================================
+def generar_reporte_html(nombre_modulo, log_filename, timestamp):
+    """
+    LEE EL ARCHIVO TXT DE LOGS Y GENERA UN REPORTE HTML PROFESIONAL.
+    INCLUYE MÉTRICAS AUTOMÁTICAS, ESTILOS MODERNOS Y EVIDENCIAS INCRUSTADAS EN BASE64.
+    """
+    html_filename = f"evidencias_zip/{nombre_modulo}_REPORT_{timestamp}.html"
+    print(f"\n📄 GENERANDO REPORTE HTML PROFESIONAL...")
+    
+    try:
+        with open(log_filename, 'r', encoding='utf-8') as f:
+            lineas = f.readlines()
+
+        # 1. CALCULAR MÉTRICAS BÁSICAS (Buscando palabras clave en el log)
+        total_pasadas = sum(1 for linea in lineas if "✅ SUCCESS" in linea or "✅ PWD-" in linea or "✅ AUTH" in linea)
+        total_fallidas = sum(1 for linea in lineas if "❌ FAILED" in linea or "❌ ERROR" in linea)
+        fecha_formateada = datetime.strptime(timestamp, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
+
+        # 2. PLANTILLA HTML Y CSS CORPORATIVO
+        html_content = f"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>QA Report | {nombre_modulo}</title>
+            <style>
+                :root {{
+                    --bg-main: #f4f7f9;
+                    --bg-card: #ffffff;
+                    --primary: #1e293b;
+                    --secondary: #64748b;
+                    --success: #10b981;
+                    --danger: #ef4444;
+                    --log-bg: #0f172a;
+                    --log-text: #e2e8f0;
+                }}
+                body {{ font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background-color: var(--bg-main); color: var(--primary); margin: 0; padding: 30px; line-height: 1.5; }}
+                
+                /* HEADER DASHBOARD */
+                .header-dashboard {{ background-color: var(--bg-card); padding: 25px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 6px solid var(--primary); }}
+                .header-info h1 {{ margin: 0 0 5px 0; font-size: 24px; color: var(--primary); }}
+                .header-info p {{ margin: 0; color: var(--secondary); font-size: 14px; font-weight: 500; }}
+                
+                /* METRICS BADGES */
+                .metrics {{ display: flex; gap: 15px; }}
+                .badge {{ padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; color: white; display: flex; flex-direction: column; align-items: center; min-width: 80px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }}
+                .badge span {{ font-size: 24px; margin-top: 4px; }}
+                .badge-pass {{ background-color: var(--success); }}
+                .badge-fail {{ background-color: var(--danger); }}
+                
+                /* LOG CONSOLE */
+                .main-container {{ background-color: var(--bg-card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }}
+                .section-title {{ font-size: 18px; margin-top: 0; margin-bottom: 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }}
+                .terminal {{ background-color: var(--log-bg); color: var(--log-text); padding: 20px; border-radius: 8px; font-family: 'Consolas', 'Courier New', monospace; font-size: 13px; overflow-x: auto; }}
+                
+                /* LOG LINES FORMATTING */
+                .log-line {{ margin: 3px 0; white-space: pre-wrap; word-wrap: break-word; }}
+                .log-success {{ color: #34d399; font-weight: bold; }}
+                .log-error {{ color: #f87171; font-weight: bold; }}
+                .log-info {{ color: #38bdf8; }}
+                .log-warning {{ color: #facc15; }}
+                .log-header {{ color: #cbd5e1; font-weight: bold; padding-top: 15px; border-bottom: 1px dashed #334155; padding-bottom: 5px; margin-bottom: 5px; }}
+                
+                /* EVIDENCE CARDS */
+                .evidence-card {{ background-color: #1e293b; margin: 20px 0; padding: 15px; border-left: 4px solid #38bdf8; border-radius: 6px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); }}
+                .evidence-title {{ color: #7dd3fc; font-size: 12px; font-weight: bold; margin-bottom: 10px; font-family: 'Segoe UI', sans-serif; letter-spacing: 0.5px; text-transform: uppercase; }}
+                .evidence-img {{ max-width: 100%; height: auto; border-radius: 4px; display: block; }}
+            </style>
+        </head>
+        <body>
+
+        <div class="header-dashboard">
+            <div class="header-info">
+                <h1>📊 Automated Test Execution Report</h1>
+                <p>Módulo: <strong>{nombre_modulo}</strong> | Entorno: QA | Ejecución: {fecha_formateada}</p>
+            </div>
+            <div class="metrics">
+                <div class="badge badge-pass">PASSED <span>{total_pasadas}</span></div>
+                <div class="badge badge-fail">FAILED <span>{total_fallidas}</span></div>
+            </div>
+        </div>
+
+        <div class="main-container">
+            <h2 class="section-title">Terminal Logs & Evidences</h2>
+            <div class="terminal">
+        """
+        
+        # 3. PROCESAR CADA LÍNEA DEL LOG Y APLICAR ESTILOS
+        for linea in lineas:
+            linea_limpia = linea.replace('<', '&lt;').replace('>', '&gt;').strip('\n')
+            
+            if not linea_limpia.strip():
+                html_content += "<br>\n"
+                continue
+                
+            clase = "log-line"
+            if "✅" in linea_limpia or "SUCCESS" in linea_limpia: clase += " log-success"
+            elif "❌" in linea_limpia or "ERROR" in linea_limpia or "FAILED" in linea_limpia: clase += " log-error"
+            elif "📡" in linea_limpia or "🌐" in linea_limpia or "🚀" in linea_limpia or "👉" in linea_limpia or "✍️" in linea_limpia: clase += " log-info"
+            elif "⚠️" in linea_limpia or "WARNING" in linea_limpia: clase += " log-warning"
+            elif "===" in linea_limpia: clase += " log-header"
+
+            html_content += f'<div class="{clase}">{linea_limpia}</div>\n'
+
+            # 4. INCRUSTAR IMÁGENES DENTRO DE TARJETAS
+            if "✔ SCREENSHOT TAKEN:" in linea_limpia:
+                partes = linea_limpia.split("SCREENSHOT TAKEN:")
+                if len(partes) > 1:
+                    img_path = partes[1].strip()
+                    if os.path.exists(img_path):
+                        with open(img_path, "rb") as img_file:
+                            b64_string = base64.b64encode(img_file.read()).decode()
+                            img_name = os.path.basename(img_path)
+                            html_content += f"""
+                            <div class="evidence-card">
+                                <div class="evidence-title">📸 EVIDENCIA VISUAL: {img_name}</div>
+                                <img class="evidence-img" src="data:image/png;base64,{b64_string}" alt="QA Evidence">
+                            </div>
+                            """
+
+        html_content += """
+            </div>
+        </div>
+        </body>
+        </html>
+        """
+        
+        # GUARDAR EL ARCHIVO HTML
+        with open(html_filename, 'w', encoding='utf-8') as f:
+            f.write(html_content)
+            
+        print(f"✅ SUCCESS: REPORTE HTML GENERADO EN -> {html_filename}")
+        print("=" * 70 + "\n")
+        return html_filename
+
+    except Exception as e:
+        print(f"❌ ERROR GENERANDO REPORTE HTML: {e}")
+        return None
