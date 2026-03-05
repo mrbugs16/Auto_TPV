@@ -165,3 +165,6 @@ XPATH_BTN_ACEPTAR_WEB = '//*[contains(text(), "Reestablecer Contraseña")]'
 XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]" 
 XPATH_ERROR_PASS_MAYUSCULA = "//*[contains(text(), 'Debe contener al menos una mayúscula')]"
 XPATH_BTN_OJO_NUEVA_PASS = "(//span[contains(@class,'ng-star-inserted') and ./i[contains(@class,'pi-eye')]])[1]"
+XPATH_BTN_OJO_CONFIRMAR = "(//i[contains(@class,'pi-eye')])[2]"
+XPATH_INPUT_REPITE_PASS = '(//input[@type="password" or @type="text"])[2]'
+XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "Debe contener mínimo") or contains(text(), "caracteres")]'

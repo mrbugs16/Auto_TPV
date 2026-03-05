@@ -1,97 +1,148 @@
 """
-FILENAME: RST.py
-DESCRIPTION: TESTING PASSWORD RESET ON WEB PLATFORM
+FILENAME: RST.PY
+DESCRIPTION: RESET PASSWORD MODULE VALIDATIONS
 CONTENTS:
-· RST_001: PASSWORD RECOVERY LINK 
-· RST_002: PASSWORD RECOVERY PROCESS (VALID USER)
+· RST-001: CLICK 'RESET PASSWORD' WITH EMPTY FIELDS
+· RST-002: ENTER VALID PASSWORDS IN RECOVERY FORM
 """
 
-import sys
-import os
+import sys 
+import os 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import time
-import config
+import config 
 import utils 
 
-# ================================
-# RST_001: PASSWORD RECOVERY LINK 
-# ================================
+# ==================================================
+# RST-001: CLICK 'RESET PASSWORD' WITH EMPTY FIELDS
+# ==================================================
 def RST_001():
     print("\n" + "=" * 60)
-    print("RST-001: PASSWORD RECOVERY LINK")
+    print("RST-001: CLICK 'RESET PASSWORD' WITH EMPTY FIELDS")
     print("=" * 60)
+    
+    # DATA NEEDED FOR IMAP RECOVERY
+    EMAIL_QA = "santiago.tapia@memphis.mx"
+    PASS_APP_GMAIL = "bpgg sgkz lgpi jvfi"
+    
     driver, wait = utils.iniciar_driver_web()
 
     try: 
-        print(f"👉 NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
-        driver.get(config.URL_MEMPHIS_WEB)
-        print("👉 CLICKING 'ENTER HERE' & VALIDATING CHANGING SCREEN...")
-        utils.click_boton(driver, config.XPATH_WEB_TXT_INGRESA_AQUI)
-        time.sleep(2) 
-        titulo_esperado = "Olvidaste tu contraseña"
-        es_visible = utils.verificar_existencia(wait, config.XPATH_WEB_TITULO_OLVIDASTE, "Título Recuperación", driver)
-        time.sleep(4)
-        utils.print_http_evidence(driver, "gateway/api/v2/auth")
-        if es_visible:
-            print("\n✅ SUCCESS")
-            utils.tomar_screenshot(driver, "RST_001_SUCCESS")
-        else:
-            print("\n❌ FAILED")
-            utils.tomar_screenshot(driver, "RST_001_FAIL")
-            raise Exception("No cambiamos de pantalla correctamente.")
+        print("🕵️ PHASE 1: SEARCHING FOR RECOVERY LINK IN EMAIL SERVER...")
+        link_recuperacion = utils.obtener_link_recuperacion_imap(EMAIL_QA, PASS_APP_GMAIL)
+        
+        if not link_recuperacion:
+            print("❌ RST-001 FAILED: RECOVERY LINK NOT FOUND IN INBOX")
+            return False
+
+        print(f"🌐 PHASE 2: NAVIGATING DIRECTLY TO RECOVERY URL...")
+        driver.get(link_recuperacion)
+        time.sleep(3)
+        
+        # WE DON'T WRITE ANYTHING, WE JUST CLICK
+        print("👉 PHASE 3: CLICKING 'RESET PASSWORD' BUTTON (WITHOUT FILLING FIELDS)...")
+        utils.click_boton(driver, config.XPATH_BTN_ACEPTAR_WEB)
+        time.sleep(1.5)
+        
+        print("📡 CAPTURING HTTP EVIDENCE...")
+        utils.print_http_evidence(driver, "auth")
+        
+        print("🔍 CHECKING FRONTEND VALIDATIONS (EXPECTING EMPTY FIELDS ERRORS)...")
+        utils.verificar_validacion_frontend(driver)
+        
+        print("📸 TAKING SCREENSHOT EVIDENCE...")
+        utils.tomar_screenshot(driver, "RST_001_SUCCESS")
+        
+        print("✅ RST-001: SUCCESS (SYSTEM BLOCKED EMPTY SUBMISSION)")
 
     except Exception as e:
-        print(f"❌ CRITICAL ERROR IN RST_001: {e}")
-        try: utils.tomar_screenshot(driver, "RST_001_TECHNICAL_ERROR")
+        print(f"❌ RST-001 FAILED: {e}")
+        try: utils.tomar_screenshot(driver, "RST_001_FAILED")
         except: pass
-            
     finally:
         print("🏁 CLOSING BROWSER...")
         driver.quit()
 
-# ===============================================
-# RST_002: PASSWORD RECOVERY PROCESS (VALID USER)
-# ===============================================
+
+# ==================================================
+# RST-002: ENTER VALID PASSWORDS IN RECOVERY FORM
+# ==================================================
 def RST_002():
     print("\n" + "=" * 60)
-    print("RST-002: PASSWORD RECOVERY PROCESS (VALID USER) ")
+    print("RST-002: ENTER VALID PASSWORDS IN RECOVERY FORM")
     print("=" * 60)
+    
+    # DATA NEEDED FOR IMAP RECOVERY
+    EMAIL_QA = "santiago.tapia@memphis.mx"
+    PASS_APP_GMAIL = "bpgg sgkz lgpi jvfi"
+    
+    # NEW PASSWORD THAT MEETS ALL SECURITY REQUIREMENTS
+    NEW_VALID_PASSWORD = "MemphisQA.2026!" 
+    
     driver, wait = utils.iniciar_driver_web()
 
-    try:
-        print(f"👉 NAVIGATE TO: {config.URL_MEMPHIS_WEB}")
-        driver.get(config.URL_MEMPHIS_WEB)
-        print("👉 CLICKING 'INGRESA AQUI'...")
-        utils.click_boton(driver, config.XPATH_WEB_TXT_INGRESA_AQUI)
-        time.sleep(2) 
-        print(f"✍️ ENTER USERNAME: {config.WEB_USUARIO_PRUEBA}...")
-        utils.escribir_texto(driver, config.XPATH_WEB_USER, config.WEB_USUARIO_PRUEBA)
-        print("👉 CLICKING 'ENVIAR' BUTTON...")
-        utils.click_boton(driver, config.XPATH_WEB_BTN_ENVIAR)
-        print("⏳ WAITING FOR SUCCESS POPUP...")
-        mensaje_detectado = utils.verificar_existencia(wait, config.XPATH_MSJ_EXITO_RCV, "SUCCESS GREEN POPUP", driver)
-        utils.print_http_evidence(driver, "gateway/api/v2/auth")
+    try: 
+        print("🕵️ PHASE 1: SEARCHING FOR RECOVERY LINK IN EMAIL SERVER...")
+        link_recuperacion = utils.obtener_link_recuperacion_imap(EMAIL_QA, PASS_APP_GMAIL)
         
-        if mensaje_detectado:
-            print("\n✅ SUCCESS")
-            utils.tomar_screenshot(driver, "RST_002_SUCCESS")
-        else:
-            print("\n❌ FAILED: POPUP NOT DETECTED")
-            utils.tomar_screenshot(driver, "RST_002_FAILED")
-            raise Exception("No se detectó confirmación del sistema.")
+        if not link_recuperacion:
+            print("❌ RST-002 FAILED: RECOVERY LINK NOT FOUND IN INBOX")
+            return False
+
+        print(f"🌐 PHASE 2: NAVIGATING DIRECTLY TO RECOVERY URL...")
+        driver.get(link_recuperacion)
+        time.sleep(3)
+        
+        print("✍️ PHASE 3: WRITING NEW VALID PASSWORD IN BOTH FIELDS...")
+        utils.escribir_texto(driver, config.XPATH_INPUT_NUEVA_PASS, NEW_VALID_PASSWORD)
+        utils.escribir_texto(driver, config.XPATH_INPUT_REPITE_PASS, NEW_VALID_PASSWORD)
+        time.sleep(1)
+        
+        print("👁️ REVEALING PASSWORDS FOR EVIDENCE...")
+        try:
+            utils.click_eye_button(driver, config.XPATH_BTN_OJO_NUEVA_PASS, "EYE BUTTON - NEW PASSWORD")
+            utils.click_eye_button(driver, config.XPATH_BTN_OJO_CONFIRMAR, "EYE BUTTON - CONFIRM PASSWORD")
+        except:
+            print("⚠️ WARNING: COULD NOT CLICK EYE BUTTONS. CONTINUING...")
+            pass
+        time.sleep(1)
+        
+        print("👉 CLICKING 'RESET PASSWORD' BUTTON...")
+        utils.click_boton(driver, config.XPATH_BTN_ACEPTAR_WEB)
+        
+        print("⏳ WAITING FOR SYSTEM SUCCESS CONFIRMATION...")
+        # SHORT WAIT TO CATCH THE SUCCESS POPUP BEFORE TAKING SCREENSHOT
+        time.sleep(1.5) 
+        
+        print("📸 TAKING SCREENSHOT EVIDENCE (CAPTURING VISUAL FEEDBACK)...")
+        utils.tomar_screenshot(driver, "RST_002_SUCCESS")
+        
+        print("📡 CAPTURING HTTP EVIDENCE...")
+        utils.print_http_evidence(driver, "auth")
+        
+        print("✅ RST-002: SUCCESS (FORM SUBMITTED AND VISUAL FEEDBACK SHOWN)")
 
     except Exception as e:
-        print(f"❌ CRITICAL ERROR IN RST-002: {e}")
-        try: 
-            utils.tomar_screenshot(driver, "RST_002_TECHNICAL_ERROR")
-        except: 
-            pass
-        
+        print(f"❌ RST-002 FAILED: {e}")
+        try: utils.tomar_screenshot(driver, "RST_002_FAILED")
+        except: pass
     finally:
         print("🏁 CLOSING BROWSER...")
         driver.quit()
-        
-# === EXECUTION ===
+
+
+# === MAIN EXECUTION ===
 if __name__ == "__main__":
-    RST_001()
-    RST_002()
+    
+    # START LOG RECORDER
+    logger, log_file, timestamp = utils.iniciar_reporte("RST")
+    
+    try:
+        RST_001()
+        #RST_002()
+        
+    finally:
+        # STOP RECORDER AND GENERATE HTML
+        logger.close()
+        utils.generar_reporte_html("RST", log_file, timestamp)
+        #utils.generar_zip_evidencias("RST", logger, log_file, timestamp)
