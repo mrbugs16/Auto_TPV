@@ -10,43 +10,36 @@ CONTENTS:
     - SELECTOR REPOSITORY (CENTRALIZED XPATHS).
 """
 
-# === SETTINGS === #
-URL_APPIUM = 'http://localhost:4723'
+# === DATA T6 === #
+USUARIO_VALIDO = "david.santos@ijuba.solutions"
+PASS_VALIDO = "Memphis@2021"
+USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
+PASS_INVALIDO = "ContrasenaFalsa123"
 
-CAPABILITIES = {
-    "platformName": "Android",
-    "appium:automationName": "UiAutomator2",
-    "appium:platformVersion": "13",
-    "appium:deviceName": "vnd_tb8766p1_64_bsp",
-    "appium:appPackage": "mx.memphis_beta.comercios",
-    "appium:appActivity": "mx.memphis_beta.comercios/.MainActivity",
-    "appium:autoGrantPermissions": False,
-    "appium:noReset": False
-}
+# === OPERACIONALES_LG === #
+XPATH_INPUT_USUARIO = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[1]'
+XPATH_INPUT_PASS = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[2]'
+XPATH_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
 
-# === WEB CONFIGURATION === #
-URL_MEMPHIS_WEB = "https://fat.memphis.mx/v2/login"
-XPATH_WEB_USER = '//input[@type="email" or @type="text"]'  
-XPATH_WEB_PASS = '//input[@type="password"]'
-XPATH_WEB_WRONG_USER = '//input[@type="email" or @type="text"]'  
-XPATH_WEB_WRONG_PASS = '//input[@type="password"]'
-XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "Login")]'
-XPATH_WEB_TXT_INGRESA_AQUI = "//*[contains(text(), 'Ingresa aquí')]"
-XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
-XPATH_WEB_BTN_ENVIAR = "//*[contains(text(), 'Enviar')]"
-XPATH_WEB_BTN_REGISTRA_AHORA = '//android.widget.Button[@content-desc="Regístrate ahora"]'
-XPATH_REGISTRA_AHORA_ALT1 = '//*[contains(@content-desc, "Regístrate")]'
-XPATH_REGISTRA_AHORA_ALT2 = '//*[contains(@content-desc, "gístrate")]'
+# === XPATHS RN === #
+XPATH_RN_TITULO_NEGOCIO = '//*[contains(@text, "Registro de negocio") or contains(@content-desc, "Registro de negocio")]'
+RN_TOKEN = "1737498440884ivb"
+RN_TOKEN_INVALIDO = "0000000000000err" 
+RN_TOKEN_CORTO = "123456890" 
+RN_TOKEN_LARGO = "1737498440884ivbEXTRA"
+RN_AFILIACION = "9096021"
+RN_AFILIACION_CORTA = "12345"
+RN_AFILIACION_LARGA = "12345678"
+RN_AFILIACION_INVALIDA = "9096011"
 
-# === MENSAJES DE SISTEMA (WEB) ===
-XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
-XPATH_MSJ_EXITO_RCV = "//*[contains(text(), 'Se ha enviado un mail')]"
 
-# === DATA WEB === #
-WEB_USUARIO_PRUEBA = "eamartin"
-WEB_PASS_PRUEBA = "Patito4."
-WEB_WRONGUSER = "usuariofake"
-WEB_WRONGPASS = "contrasenafake"
+# === XPATHS RN (REGISTRO DE NEGOCIO) === #
+XPATH_RN_INPUT_TOKEN = '(//android.widget.EditText)[1]'
+XPATH_RN_INPUT_AFILIACION = '(//android.widget.EditText)[2]'
+XPATH_RN_BTN_ACEPTAR_REGISTRO = '//android.widget.Button[contains(@text, "Aceptar") or contains(@content-desc, "Aceptar") or contains(@text, "Continuar") or contains(@content-desc, "Continuar")]'
+XPATH_RN_PANTALLA_EXITO = '//*[contains(@text, "permitir") or contains(@text, "ubicaci") or contains(@text, "memphis beta")]'
+XPATH_RN_MENSAJE_ERROR = '//*[contains(@text, "El token o afiliacion no son correctos o el comercio no existe") or contains(@content-desc, "El token o afiliacion no son correctos o el comercio no existe") or contains(@text, "comercio no existe")]'
+XPATH_RN_BTN_OTRA_OCASION = '//*[contains(@text, "otra") or contains(@content-desc, "otra") or contains(@text, "Ocasión")]'
 
 # === DATA RA === #
 RA_NOMBRE = "Antonio"
@@ -94,18 +87,6 @@ XPATH_RA_REGISTRO_EXITOSO = (
     '//android.widget.Toast]'
 )
 
-
-# === DATA T6 === #
-USUARIO_VALIDO = "david.santos@ijuba.solutions"
-PASS_VALIDO = "Memphis@2021"
-USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
-PASS_INVALIDO = "ContrasenaFalsa123"
-
-# === OPERACIONALES_LG === #
-XPATH_INPUT_USUARIO = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[1]'
-XPATH_INPUT_PASS = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[2]'
-XPATH_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
-
 # === REGISTRAAHORA_RA === #
 XPATH_TXT_TOKEN_REGISTRO = '//android.widget.EditText[1]'
 XPATH_TXT_NUM_AFILIACION = '//android.widget.EditText[2]'
@@ -115,7 +96,7 @@ XPATH_BTN_ACEPTAR_REGISTRO = '//*[contains(@content-desc, "Aceptar") or contains
 XPATH_OC_LNK_OLVIDASTE = '//*[contains(@text, "Olvidaste tu contraseña") or contains(@content-desc, "Olvidaste tu contraseña")]'
 XPATH_OC_TITULO_RECUPERA = '//*[contains(@text, "Recupera tu contraseña") or contains(@content-desc, "Recupera tu contraseña")]'
 XPATH_OC_BTN_ATRAS = '//android.widget.Button[1]'
-XPATH_OC_INPUT_EMAIL = '//android.widget.EditText[1]' # Assuming first edit text on recovery screen
+XPATH_OC_INPUT_EMAIL = '//android.widget.EditText[1]' 
 XPATH_OC_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
 
 XPATH_OC_MSJ_EXITO = '//*[contains(@text, "ceso de recuperaci") or contains(@content-desc, "ceso de recuperaci")]'
@@ -134,6 +115,31 @@ XPATH_ERROR_GENERICO = (
 )
 
 XPATH_OC_ERROR_CORREO = '//*[contains(@text, "Correo inválido") or contains(@content-desc, "Correo inválido")]'
+
+
+# === WEB CONFIGURATION === #
+URL_MEMPHIS_WEB = "https://fat.memphis.mx/v2/login"
+XPATH_WEB_USER = '//input[@type="email" or @type="text"]'  
+XPATH_WEB_PASS = '//input[@type="password"]'
+XPATH_WEB_WRONG_USER = '//input[@type="email" or @type="text"]'  
+XPATH_WEB_WRONG_PASS = '//input[@type="password"]'
+XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "Login")]'
+XPATH_WEB_TXT_INGRESA_AQUI = "//*[contains(text(), 'Ingresa aquí')]"
+XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
+XPATH_WEB_BTN_ENVIAR = "//*[contains(text(), 'Enviar')]"
+XPATH_WEB_BTN_REGISTRA_AHORA = '//android.widget.Button[@content-desc="Regístrate ahora"]'
+XPATH_REGISTRA_AHORA_ALT1 = '//*[contains(@content-desc, "Regístrate")]'
+XPATH_REGISTRA_AHORA_ALT2 = '//*[contains(@content-desc, "gístrate")]'
+
+# === MENSAJES DE SISTEMA (WEB) ===
+XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
+XPATH_MSJ_EXITO_RCV = "//*[contains(text(), 'Se ha enviado un mail')]"
+
+# === DATA WEB === #
+WEB_USUARIO_PRUEBA = "eamartin"
+WEB_PASS_PRUEBA = "Patito4."
+WEB_WRONGUSER = "usuariofake"
+WEB_WRONGPASS = "contrasenafake"
 
 # === SELECTOR ON THE WEB    EMAIL ===
 
@@ -156,10 +162,7 @@ XPATH_PWD_ERROR_INCORRECTA = '//*[contains(text(), "incorrecta")]'
 XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "debe contener") or contains(text(), "caracteres")]'
 XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
 
-# Busca el SEGUNDO campo de tipo contraseña
 XPATH_INPUT_REPITE_PASS = '(//input[@type="password"])[2]' 
-
-# Busca el botón con el texto exacto que vemos en la imagen
 XPATH_BTN_ACEPTAR_WEB = '//*[contains(text(), "Reestablecer Contraseña")]'
 
 XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]" 
@@ -168,3 +171,18 @@ XPATH_BTN_OJO_NUEVA_PASS = "(//span[contains(@class,'ng-star-inserted') and ./i[
 XPATH_BTN_OJO_CONFIRMAR = "(//i[contains(@class,'pi-eye')])[2]"
 XPATH_INPUT_REPITE_PASS = '(//input[@type="password" or @type="text"])[2]'
 XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "Debe contener mínimo") or contains(text(), "caracteres")]'
+
+
+# === SETTINGS (GENERAL / DRIVER) === #
+URL_APPIUM = 'http://localhost:4723'
+
+CAPABILITIES = {
+    "platformName": "Android",
+    "appium:automationName": "UiAutomator2",
+    "appium:platformVersion": "13",
+    "appium:deviceName": "vnd_tb8766p1_64_bsp",
+    "appium:appPackage": "mx.memphis_beta.comercios",
+    "appium:appActivity": "mx.memphis_beta.comercios/.MainActivity",
+    "appium:autoGrantPermissions": False,
+    "appium:noReset": False
+}

@@ -253,49 +253,87 @@ def verificar_validacion_frontend(driver):
         print(f"⚠️ Could not read frontend validation: {e}")
         return False
 
-# === T6 HTTP EVIDENCE FUNCTION WITH APPPIUM === #
+# === T6 HTTP EVIDENCE FUNCTION WITH APPIUM === #
 def print_http_evidence_appium(driver, nombre_test):
-    print(f"\n{'='*60}")
-    print(f"📡 HTTP EVIDENCE — {nombre_test} (APPIUM SERVER)")
-    print(f"{'='*60}")
-    print(f"⏰ TIMESTAMP : {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"-" * 60)
-    
+    """
+    CAPTURES APPIUM SERVER / LOGCAT LOGS AS EVIDENCE.
+    Saves to evidencias_zip/{nombre_test}_APPIUM_EVIDENCE_{timestamp}.txt
+    and prints a summary. Use with: appium --allow-insecure=*:get_server_logs
+    """
+    os.makedirs("evidencias_zip", exist_ok=True)
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    evidence_path = f"evidencias_zip/{nombre_test}_APPIUM_EVIDENCE_{ts}.txt"
+
+    lines = []
+    def add(msg=""): lines.append(msg); print(msg)
+
+    add(f"\n{'='*60}")
+    add(f"📡 HTTP EVIDENCE — {nombre_test} (APPIUM / SERVER LOGS)")
+    add(f"{'='*60}")
+    add(f"⏰ TIMESTAMP: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    add(f"-" * 60)
+
+    raw_logs = []
+    source = None
+
+    # 1) INTENTAR server logs (requiere: appium --allow-insecure=*:get_server_logs)
     try:
         server_logs = driver.get_log('server')
-        
         if server_logs:
-            status_count = {}
-            total_http = 0
-            
+            source = "server"
             for entry in server_logs:
-                msg = entry.get('message', '')
-                
-                if '<--' in msg:
-                    total_http += 1
-                    
-                    parts = msg.split()
-                    for part in parts:
-                        if part in ['200', '201', '400', '401', '403', '404', '500']:
-                            status_count[part] = status_count.get(part, 0) + 1
-                            break
-            
-            print(f"📋 {total_http} HTTP responses captured")
-            print(f"-" * 60)
-            print(f"   📊 STATUS CODES:")
-            for code, count in sorted(status_count.items()):
-                emoji = "✅" if code in ['200', '201'] else "❌"
-                print(f"      {emoji} HTTP {code}: {count} responses")
-        else:
-            print("   ⚠️ No server logs available")
-            
+                raw_logs.append(entry.get('message', ''))
     except Exception as e:
-        err_msg = str(e)[:80]
+        err_msg = str(e)[:120]
+        add(f"   ⚠️ Server logs: {err_msg}")
         if 'insecure' in err_msg.lower():
-            print(f"   ⚠️ Server logs disabled")
-            print(f"   💡 Run: appium --allow-insecure=*:get_server_logs")
-        else:
-            print(f"   ⚠️ Server logs error: {err_msg}")
+            add(f"   💡 Start Appium with: appium --allow-insecure=*:get_server_logs")
+
+    # 2) FALLBACK: logcat (siempre disponible en Android)
+    if not raw_logs:
+        try:
+            logcat = driver.get_log('logcat')
+            if logcat:
+                source = "logcat"
+                for entry in logcat:
+                    raw_logs.append(entry.get('message', ''))
+        except Exception as e:
+            add(f"   ⚠️ Logcat fallback: {str(e)[:80]}")
+
+    if raw_logs:
+        status_count = {}
+        total_http = 0
+        http_lines = []
+
+        for msg in raw_logs:
+            if '<--' in msg:
+                total_http += 1
+                http_lines.append(msg)
+                parts = msg.split()
+                for part in parts:
+                    if part in ['200', '201', '400', '401', '403', '404', '500']:
+                        status_count[part] = status_count.get(part, 0) + 1
+                        break
+
+        add(f"📋 Source: {source} | {total_http} HTTP responses")
+        add(f"-" * 60)
+        add(f"   📊 STATUS CODES:")
+        for code, count in sorted(status_count.items()):
+            emoji = "✅" if code in ['200', '201'] else "❌"
+            add(f"      {emoji} HTTP {code}: {count} responses")
+        add("")
+
+        # Guardar evidencia completa en archivo
+        with open(evidence_path, 'w', encoding='utf-8') as f:
+            f.write(f"EVIDENCE: {nombre_test} | Source: {source}\n")
+            f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+            f.write("=" * 60 + "\n\n")
+            for ln in raw_logs[-500:]:  # últimas 500 líneas
+                f.write(ln + "\n" if not ln.endswith("\n") else ln)
+        add(f"✔ EVIDENCE SAVED: {evidence_path}")
+    else:
+        add("   ⚠️ No logs available (server or logcat)")
+        add(f"   💡 Start Appium: appium --allow-insecure=*:get_server_logs")
 
 def print_test_results(nombre_test, resultados):
     print("\n" + "=" * 60)
@@ -447,13 +485,16 @@ class DualLogger:
     def write(self, message):
         self.terminal.write(message)
         self.log_file.write(message)
+        # 🛑 EL TRUCO DEL ARQUITECTO: Obligamos a Windows a guardar en el disco duro al instante
+        self.log_file.flush() 
 
     def flush(self):
         self.terminal.flush()
         self.log_file.flush()
         
     def close(self):
-        self.log_file.close()
+        if not self.log_file.closed:
+            self.log_file.close()
         sys.stdout = self.terminal # RESTORE NORMAL PRINTING
 
 def iniciar_reporte(nombre_modulo):
@@ -486,15 +527,21 @@ def generar_zip_evidencias(nombre_modulo, logger, log_filename, timestamp):
             if os.path.exists(log_filename):
                 zipf.write(log_filename, os.path.basename(log_filename))
             
-            # 3. ADD ALL SCREENSHOTS RELATED TO THIS MODULE (E.G., STARTING WITH "PWD")
-            carpeta_web = os.path.join("evidencias", "Web")
-            if os.path.exists(carpeta_web):
-                for file in os.listdir(carpeta_web):
-                    if file.startswith(nombre_modulo) and file.endswith(".png"):
-                        filepath = os.path.join(carpeta_web, file)
-                        # WE PUT SCREENSHOTS INSIDE A "SCREENSHOTS" FOLDER INSIDE THE ZIP
-                        zipf.write(filepath, f"screenshots/{file}")
-                        
+            # 3. ADD ALL SCREENSHOTS (WEB AND T6)
+            for carpeta in ("evidencias/Web", "evidencias/T6"):
+                if os.path.exists(carpeta):
+                    for file in os.listdir(carpeta):
+                        if file.endswith(".png"):
+                            filepath = os.path.join(carpeta, file)
+                            zipf.write(filepath, f"screenshots/{file}")
+
+            # 4. ADD APPIUM HTTP EVIDENCE FILES
+            if os.path.exists("evidencias_zip"):
+                for file in os.listdir("evidencias_zip"):
+                    if "APPIUM_EVIDENCE" in file and file.endswith(".txt"):
+                        filepath = os.path.join("evidencias_zip", file)
+                        zipf.write(filepath, f"appium_evidence/{file}")
+
         print(f"✅ SUCCESS: ZIP REPORT GENERATED AT -> {zip_filename}")
         print("=" * 70 + "\n")
         return zip_filename
@@ -521,9 +568,10 @@ def generar_reporte_html(nombre_modulo, log_filename, timestamp):
         with open(log_filename, 'r', encoding='utf-8') as f:
             lineas = f.readlines()
 
-        # 1. CALCULAR MÉTRICAS BÁSICAS (Buscando palabras clave en el log)
-        total_pasadas = sum(1 for linea in lineas if "✅ SUCCESS" in linea or "✅ PWD-" in linea or "✅ AUTH" in linea)
-        total_fallidas = sum(1 for linea in lineas if "❌ FAILED" in linea or "❌ ERROR" in linea)
+        # 🛑 FIX: Ahora busca que la línea tenga una palomita "✅" Y la palabra "SUCCESS" en cualquier lugar.
+        total_pasadas = sum(1 for linea in lineas if "✅" in linea and "SUCCESS" in linea.upper())
+        total_fallidas = sum(1 for linea in lineas if "❌" in linea and ("FAILED" in linea.upper() or "ERROR" in linea.upper()))
+        
         fecha_formateada = datetime.strptime(timestamp, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
 
         # 2. PLANTILLA HTML Y CSS CORPORATIVO
