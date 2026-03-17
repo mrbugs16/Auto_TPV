@@ -5,9 +5,9 @@ DESCRIPTION:
     Executes critical access validations on the POS terminal.
 
 TEST CASES COVERED:
-    · TEST 1: LOG IN WITH VALID CREDENTIALS.
-    · TEST 2: INCORRECT PASSWORD VALIDATION.
-    · TEST 4: UNREGISTERED USER VALIDATION.
+    · LG_005: LOG IN WITH VALID CREDENTIALS.
+    · LG_006: INCORRECT PASSWORD VALIDATION.
+    · LG_008: UNREGISTERED USER VALIDATION.
 
 REQUIREMENTS:
     - Requires config.py and utils.py in the same directory.
@@ -46,11 +46,11 @@ def realizar_login(driver, wait):
 
 
 # =============================================== #
-# TEST 1: LOG IN WITH VALID CREDENTIALS 
+# LG-005: LOG IN WITH VALID CREDENTIALS 
 # =============================================== #
-def test_1_login_exitoso():
+def LG_005():
     print("\n" + "=" * 60)
-    print("TEST 1: LOG IN WITH VALID CREDENTIALS")
+    print("LG-005: LOG IN WITH VALID CREDENTIALS")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -61,23 +61,21 @@ def test_1_login_exitoso():
         utils.escribir_texto(driver, config.XPATH_INPUT_PASS, config.PASS_VALIDO)
         driver.hide_keyboard()
         utils.click_boton(driver, config.XPATH_BTN_ACEPTAR)
-
-        # === WE SUCCESSFULLY VALIDATED === #
         if utils.verificar_existencia(wait, config.XPATH_INPUT_USUARIO, "NEXT SCREEN"):
-            print("✅ SUCCESSFUL LOGIN")
+            print("✅ LG-005: SUCCESSFUL")
 
     except Exception as e:
-        print(f"❌ TEST FAILURE 1: {e}")
+        print(f"❌ LG-005: FAILED: {e}")
     finally:
         utils.cerrar_driver(driver)
 
 
 # ================================================ #
-# TEST 2: INCORRECT PASSWORD VALIDATION 
+# LG-006: INCORRECT PASSWORD VALIDATION 
 # ================================================ #
-def test_2_pass_incorrecto():
+def LG_006():
     print("\n" + "=" * 60)
-    print("TEST 2: INCORRECT PASSWORD VALIDATION")
+    print("LG-006: INCORRECT PASSWORD VALIDATION")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -91,21 +89,21 @@ def test_2_pass_incorrecto():
 
         # === VALIDATE THE ERROR === #
         if utils.verificar_existencia(wait, config.XPATH_ERROR_GENERICO, "ERROR MESSAGE", driver):
-            print("✅ CREDENTIAL ERROR DETECTED ")
+            print("✅ LG-006: SUCCESS")
         else:
-            print("❌ VISUAL FAILURE")
+            print("❌ LG-006: FAILED")
 
     except Exception as e:
-        print(f"❌ TEST FAILURE 2 {e}")
+        print(f"❌ LG-006: FAILED: {e}")
     finally:
         utils.cerrar_driver(driver)
 
 # =============================================== #
-# TEST 4: UNREGISTERED USER VALIDATION 
+# LG-008: UNREGISTERED USER VALIDATION 
 # =============================================== #
-def test_4_usuario_no_registrado():
+def LG_008():
     print("\n" + "=" * 60)
-    print("TEST 4: UNREGISTERED USER VALIDATION ")
+    print("LG-008: UNREGISTERED USER VALIDATION ")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
@@ -156,20 +154,20 @@ def test_4_usuario_no_registrado():
                 continue
 
         if encontrado:
-            print("✅ ERROR DETECTED ")
+            print("✅ LG-008: SUCCESS")
         else:
-            print("❌ SPECIFIC MESSAGE NOT FOUND ")
+            print("❌ LG-008: FAILED")
             for m in mensajes_vistos:
                 print(f"   -> {m}")
 
     except Exception as e:
-        print(f"❌ RUN-TIME ERROR: {e}")
+        print(f"❌ LG-008: FAILED: {e}")
     finally:
         utils.cerrar_driver(driver)
 
 # === EXECUTION === #
 if __name__ == "__main__":
     
-    #test_1_login_exitoso()
-    #test_2_pass_incorrecto()
-    test_4_usuario_no_registrado() 
+    LG_005()
+    LG_006()
+    LG_008() 
