@@ -41,6 +41,59 @@ XPATH_RN_PANTALLA_EXITO = '//*[contains(@text, "permitir") or contains(@text, "u
 XPATH_RN_MENSAJE_ERROR = '//*[contains(@text, "El token o afiliacion no son correctos o el comercio no existe") or contains(@content-desc, "El token o afiliacion no son correctos o el comercio no existe") or contains(@text, "comercio no existe")]'
 XPATH_RN_BTN_OTRA_OCASION = '//*[contains(@text, "otra") or contains(@content-desc, "otra") or contains(@text, "Ocasión")]'
 
+# === XPATHS C (CALCULADORA) === #
+XPATH_C_BTN_MIENTRAS_USO = (
+    '//*[contains(@text, "MIENTRAS LA APP") or contains(@content-desc, "MIENTRAS LA APP") or '
+    'contains(@text, "Mientras la app") or contains(@content-desc, "Mientras la app") or '
+    'contains(@text, "mientras la app") or contains(@content-desc, "mientras la app")]'
+)
+XPATH_C_PANTALLA_COBRO  = '//*[contains(@text, "Cobrar") or contains(@content-desc, "Cobrar")]'
+XPATH_C_DISPLAY_MONTO   = '//*[contains(@text, "0.00") or contains(@content-desc, "0.00")]'
+XPATH_C_DISPLAY_UPDATED  = '//*[(contains(@text, "$") and not(contains(@text, "$0.00"))) or (contains(@content-desc, "$") and not(contains(@content-desc, "$0.00")))]'
+XPATH_C_DISPLAY_ZERO_LEADING  = '//*[contains(@text, "0001") or contains(@content-desc, "0001")]'
+XPATH_C_POPUP_PROPINA         = '//*[contains(@text, "propina") or contains(@content-desc, "propina") or contains(@text, "Propina") or contains(@content-desc, "Propina")]'
+XPATH_C_BTN_ACEPTAR_PROPINA   = '//*[contains(@text, "Aceptar") or contains(@content-desc, "Aceptar")]'
+XPATH_C_PANTALLA_TARJETA      = '//*[contains(@text, "Inserta") or contains(@content-desc, "Inserta") or contains(@text, "Desliza") or contains(@content-desc, "Desliza")]'
+XPATH_C_BTN_CANCELAR          = '//*[contains(@text, "Cancelar") or contains(@content-desc, "Cancelar")]'
+XPATH_C_POPUP_LECTOR          = '//*[contains(@text, "lector configurado") or contains(@content-desc, "lector configurado")]'
+XPATH_C_BTN_OK_POPUP          = '//*[@text="Ok" or @content-desc="Ok" or @text="OK" or @content-desc="OK"]'
+XPATH_C_TAB_AJUSTES = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+XPATH_C_TAB_INICIO = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
+XPATH_C_BTN_CONFIGURAR_LECTOR = '//*[contains(@text, "Configurar lector") or contains(@content-desc, "Configurar lector")]'
+XPATH_C_BTN_DECIMAL           = '//*[@text="+" or @content-desc="+"]'
+XPATH_C_ERROR_CANTIDAD_VALIDA = '//*[contains(@text, "ingrese una cantidad") or contains(@content-desc, "ingrese una cantidad") or contains(@text, "cantidad valida") or contains(@content-desc, "cantidad valida")]'
+# === XPATHS C (CALCULADORA) === #
+XPATH_C_BTN_BACKSPACE    = (
+    '//*[@text="\u232B" or @content-desc="\u232B" or '
+    '@text="\u2190" or @content-desc="\u2190" or '
+    'contains(@content-desc, "erase") or contains(@content-desc, "delete") or '
+    'contains(@content-desc, "backspace") or contains(@content-desc, "borrar") or '
+    'contains(@content-desc, "Borrar") or contains(@text, "borrar")]'
+)
+
+# ABSOLUTE XPATH OBTAINED FROM APPIUM INSPECTOR.
+# THE BACKSPACE KEY RENDERS AS A PLAIN android.view.View WITH NO TEXT/CONTENT-DESC
+# WHEN THE DISPLAY IS FULL (E.G. AFTER 8+ DIGITS ARE ENTERED). USE THIS AS LAST RESORT.
+XPATH_C_BTN_BACKSPACE_ABSOLUTE = (
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]'
+    '/android.widget.FrameLayout'
+    '/android.widget.FrameLayout'
+    '/android.widget.FrameLayout'
+    '/android.view.View/android.view.View/android.view.View'
+    '/android.view.View/android.view.View[13]'
+)
+XPATH_C_POPUP_AJUSTES_VERDE = '//*[contains(@text, "terminal configurada correctamente") or contains(@content-desc, "terminal configurada correctamente") or contains(@text, "Terminal configurada correctamente") or contains(@content-desc, "Terminal configurada correctamente")]'
+
+
+# === XPATHS PÑ (PESTAÑAS) === #
+XPATH_PÑ_TAB_INICIO = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
+XPATH_PÑ_TAB_TRANSACCIONES = '//*[contains(@content-desc, "Transacciones") and contains(@content-desc, "2")]'
+XPATH_PÑ_TAB_SERVICIOS = '//*[contains(@content-desc, "Servicios") and contains(@content-desc, "3")]'
+XPATH_PÑ_TAB_AJUSTES = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+
+
+
+
 # === DATA RA === #
 RA_NOMBRE = "Antonio"
 RA_APELLIDO = "Garcia"
