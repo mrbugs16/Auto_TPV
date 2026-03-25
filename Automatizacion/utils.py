@@ -253,12 +253,12 @@ def verificar_validacion_frontend(driver):
         print(f"⚠️ Could not read frontend validation: {e}")
         return False
 
-# === T6 HTTP EVIDENCE FUNCTION WITH APPIUM === #
+# === T6 HTTP EVIDENCE FUNCTION WITH APPIUM (FIXED) === #
 def print_http_evidence_appium(driver, nombre_test):
     """
     CAPTURES APPIUM SERVER / LOGCAT LOGS AS EVIDENCE.
     Saves to evidencias_zip/{nombre_test}_APPIUM_EVIDENCE_{timestamp}.txt
-    and prints a summary. Use with: appium --allow-insecure=*:get_server_logs
+    and prints a summary.
     """
     os.makedirs("evidencias_zip", exist_ok=True)
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -276,7 +276,9 @@ def print_http_evidence_appium(driver, nombre_test):
     raw_logs = []
     source = None
 
-    # 1) INTENTAR server logs (requiere: appium --allow-insecure=*:get_server_logs)
+    # ─────────────────────────────────────────────────────────
+    # 1) INTENTAR server logs (requiere --allow-insecure o --relaxed-security)
+    # ─────────────────────────────────────────────────────────
     try:
         server_logs = driver.get_log('server')
         if server_logs:
@@ -284,12 +286,15 @@ def print_http_evidence_appium(driver, nombre_test):
             for entry in server_logs:
                 raw_logs.append(entry.get('message', ''))
     except Exception as e:
-        err_msg = str(e)[:120]
+        err_msg = str(e)[:200]
         add(f"   ⚠️ Server logs: {err_msg}")
-        if 'insecure' in err_msg.lower():
-            add(f"   💡 Start Appium with: appium --allow-insecure=*:get_server_logs")
+        if 'insecure' in err_msg.lower() or 'not been enabled' in err_msg.lower():
+            add(f"   💡 Inicia Appium con: appium --relaxed-security")
+            add(f"   💡 O bien con:        appium --allow-insecure=get_server_logs")
 
+    # ─────────────────────────────────────────────────────────
     # 2) FALLBACK: logcat (siempre disponible en Android)
+    # ─────────────────────────────────────────────────────────
     if not raw_logs:
         try:
             logcat = driver.get_log('logcat')
@@ -298,51 +303,115 @@ def print_http_evidence_appium(driver, nombre_test):
                 for entry in logcat:
                     raw_logs.append(entry.get('message', ''))
         except Exception as e:
-            add(f"   ⚠️ Logcat fallback: {str(e)[:80]}")
+            add(f"   ⚠️ Logcat fallback: {str(e)[:120]}")
 
     if raw_logs:
         status_count = {}
         total_http = 0
         http_lines = []
 
+        # ═══════════════════════════════════════════════════════
+        # PATRONES DE DETECCIÓN SEGÚN FUENTE
+        # ═══════════════════════════════════════════════════════
+        
+        # Patrones para SERVER logs (formato Appium/OkHttp)
+        SERVER_PATTERNS = ['<--', 'HTTP/', 'status:']
+        
+        # Patrones para LOGCAT (formato Android nativo)
+        LOGCAT_HTTP_PATTERNS = [
+            'http',           # URLs y referencias HTTP
+            'HTTP/',          # HTTP/1.1, HTTP/2
+            'status',         # status code references
+            'response',       # response messages
+            'okhttp',         # OkHttp client logs
+            'retrofit',       # Retrofit logs
+            'NetworkDispatcher',  # Volley logs
+            'StatusCode',     # Generic status code
+            'Content-Type',   # HTTP headers
+            'Authorization',  # Auth headers
+            '<--',            # OkHttp interceptor format
+            '-->',            # OkHttp request format
+        ]
+        
+        # Códigos HTTP a detectar (ampliado)
+        HTTP_STATUS_CODES = {
+            '200', '201', '202', '204',          # Success
+            '301', '302', '304',                  # Redirects
+            '400', '401', '403', '404', '405',    # Client errors
+            '409', '422', '429',                  # Client errors
+            '500', '501', '502', '503', '504'     # Server errors
+        }
+
         for msg in raw_logs:
-            if '<--' in msg:
+            msg_lower = msg.lower()
+            is_http_log = False
+
+            if source == "server":
+                # Para server logs, usar patrones originales
+                is_http_log = any(p in msg for p in SERVER_PATTERNS)
+            else:
+                # Para logcat, usar patrones más amplios
+                is_http_log = any(p in msg_lower for p in LOGCAT_HTTP_PATTERNS)
+
+            if is_http_log:
                 total_http += 1
                 http_lines.append(msg)
+                
+                # Extraer código de status
                 parts = msg.split()
                 for part in parts:
-                    if part in ['200', '201', '400', '401', '403', '404', '500']:
-                        status_count[part] = status_count.get(part, 0) + 1
+                    # Limpiar el part de caracteres extra
+                    clean_part = ''.join(c for c in part if c.isdigit())
+                    if clean_part in HTTP_STATUS_CODES:
+                        status_count[clean_part] = status_count.get(clean_part, 0) + 1
                         break
 
-        add(f"📋 Source: {source} | {total_http} HTTP responses")
+        add(f"📋 Source: {source} | Total logs: {len(raw_logs)} | HTTP-related: {total_http}")
         add(f"-" * 60)
-        add(f"   📊 STATUS CODES:")
-        for code, count in sorted(status_count.items()):
-            emoji = "✅" if code in ['200', '201'] else "❌"
-            add(f"      {emoji} HTTP {code}: {count} responses")
+
+        if status_count:
+            add(f"   📊 STATUS CODES DETECTED:")
+            for code, count in sorted(status_count.items()):
+                if code.startswith('2'):
+                    emoji = "✅"
+                elif code.startswith('3'):
+                    emoji = "🔄"
+                elif code.startswith('4'):
+                    emoji = "⚠️"
+                else:
+                    emoji = "❌"
+                add(f"      {emoji} HTTP {code}: {count} responses")
+        else:
+            add(f"   ℹ️ No HTTP status codes detected in {source} logs")
+            add(f"   📝 Showing last 10 log entries for debugging:")
+            for i, log_entry in enumerate(raw_logs[-10:]):
+                add(f"      [{i+1}] {log_entry[:150]}")
         add("")
 
-        # Guardar evidencia completa en archivo
+        # ─── Guardar evidencia completa ───
         with open(evidence_path, 'w', encoding='utf-8') as f:
             f.write(f"EVIDENCE: {nombre_test} | Source: {source}\n")
             f.write(f"Timestamp: {datetime.now().isoformat()}\n")
+            f.write(f"Total logs: {len(raw_logs)} | HTTP-related: {total_http}\n")
             f.write("=" * 60 + "\n\n")
-            for ln in raw_logs[-500:]:  # últimas 500 líneas
+
+            if http_lines:
+                f.write("--- HTTP-RELATED LOGS ---\n")
+                for ln in http_lines[-200:]:
+                    f.write(ln + "\n" if not ln.endswith("\n") else ln)
+                f.write("\n\n")
+
+            f.write("--- ALL RAW LOGS (last 500) ---\n")
+            for ln in raw_logs[-500:]:
                 f.write(ln + "\n" if not ln.endswith("\n") else ln)
+
         add(f"✔ EVIDENCE SAVED: {evidence_path}")
     else:
-        add("   ⚠️ No logs available (server or logcat)")
-        add(f"   💡 Start Appium: appium --allow-insecure=*:get_server_logs")
+        add("   ❌ No logs available from any source (server or logcat)")
+        add(f"   💡 Option 1: appium --relaxed-security")
+        add(f"   💡 Option 2: appium --allow-insecure=get_server_logs")
 
-def print_test_results(nombre_test, resultados):
-    print("\n" + "=" * 60)
-    print(f"📊 {nombre_test} RESULTS:")
-    print("=" * 60)
-    for fase, status, descripcion in resultados:
-        emoji = "✅" if status else "❌"
-        print(f"   {fase} : {emoji} {descripcion}")
-    print("=" * 60)
+    add(f"{'='*60}\n")
 
 # =================================================================================
 # FUNCTION: CLICK EYE BUTTON (WITH MULTIPLE FALLBACKS FOR ANGULAR/PRIMENG)
