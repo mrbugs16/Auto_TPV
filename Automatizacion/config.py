@@ -1,79 +1,192 @@
 """
-FILENAME: config.py
-DESCRIPTION:
-    GLOBAL CONFIGURATION HUB FOR THE POS AUTOMATION PROJECT.
-    STORES CONSTANTS REUSABLE ACROSS MULTIPLE TEST SCRIPTS TO ENSURE MODULARITY.
-
-CONTENTS:
-    - APPIUM CAPABILITIES (T6 DEVICE CONFIGURATION).
-    - TEST CREDENTIALS (QA USERS & PASSWORDS).
-    - SELECTOR REPOSITORY (CENTRALIZED XPATHS).
+# ==================================================================================
+# FILENAME    : config.py
+# PROJECT     : MEMPHIS QA AUTOMATION FRAMEWORK
+# DESCRIPTION : GLOBAL CONFIGURATION HUB — SINGLE SOURCE OF TRUTH FOR ALL TEST
+#               SCRIPTS. CENTRALIZES CREDENTIALS, URLS, DEVICE CAPABILITIES,
+#               AND XPATH SELECTORS FOR BOTH MOBILE (T6) AND WEB PLATFORMS.
+#
+# STRUCTURE:
+#   [1] T6 MOBILE — APPIUM & DEVICE SETTINGS
+#   [2] T6 MOBILE — CREDENTIALS
+#   [3] T6 MOBILE — XPATHS: LOGIN
+#   [4] T6 MOBILE — XPATHS: REGISTRO DE NEGOCIO (RN)
+#   [5] T6 MOBILE — XPATHS: CALCULADORA (C)
+#   [6] T6 MOBILE — XPATHS: PESTAÑAS (PÑ)
+#   [7] T6 MOBILE — XPATHS: REGISTRO DE AHORA (RA)
+#   [8] T6 MOBILE — XPATHS: OLVIDASTE CONTRASEÑA (OC)
+#   [9] T6 MOBILE — XPATHS: GENERIC ERRORS
+#   [10] WEB PLATFORM — URLS & DRIVER SETTINGS
+#   [11] WEB PLATFORM — CREDENTIALS
+#   [12] WEB PLATFORM — XPATHS: LOGIN
+#   [13] WEB PLATFORM — XPATHS: PASSWORD RECOVERY
+#   [14] WEB PLATFORM — XPATHS: SYSTEM MESSAGES
+#
+# USAGE CONVENTION:
+#   - ALL T6 CONSTANTS ARE PREFIXED WITH THEIR MODULE ABBREVIATION (RN_, C_, RA_, OC_).
+#   - ALL WEB CONSTANTS ARE PREFIXED WITH XPATH_WEB_ OR WEB_.
+#   - XPATHS ARE NEVER HARDCODED INSIDE TEST FILES — ALWAYS REFERENCE THIS FILE.
+# ==================================================================================
 """
 
-# === DATA T6 === #
-USUARIO_VALIDO = "david.santos@ijuba.solutions"
-PASS_VALIDO = "Memphis@2021"
-USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
-PASS_INVALIDO = "ContrasenaFalsa123"
 
-# === OPERACIONALES_LG === #
-XPATH_INPUT_USUARIO = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[1]'
-XPATH_INPUT_PASS = '//android.widget.FrameLayout[@resource-id="android:id/content"]//android.widget.EditText[2]'
+# ==================================================================================
+# [1] T6 MOBILE — APPIUM & DEVICE SETTINGS
+# ==================================================================================
+
+URL_APPIUM = "http://localhost:4723"
+
+CAPABILITIES = {
+    "platformName"              : "Android",
+    "appium:automationName"     : "UiAutomator2",
+    "appium:platformVersion"    : "13",
+    "appium:deviceName"         : "vnd_tb8766p1_64_bsp",
+    "appium:appPackage"         : "mx.memphis_beta.comercios",
+    "appium:appActivity"        : "mx.memphis_beta.comercios/.MainActivity",
+    "appium:autoGrantPermissions": False,
+    "appium:noReset"            : False,
+}
+
+
+# ==================================================================================
+# [2] T6 MOBILE — CREDENTIALS
+# ==================================================================================
+
+USUARIO_VALIDO   = "david.santos@ijuba.solutions"
+PASS_VALIDO      = "Memphis@2021"
+USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
+PASS_INVALIDO    = "ContrasenaFalsa123"
+
+
+# ==================================================================================
+# [3] T6 MOBILE — XPATHS: LOGIN SCREEN
+# ==================================================================================
+
+XPATH_INPUT_USUARIO = (
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]'
+    '//android.widget.EditText[1]'
+)
+XPATH_INPUT_PASS = (
+    '//android.widget.FrameLayout[@resource-id="android:id/content"]'
+    '//android.widget.EditText[2]'
+)
 XPATH_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
 
-# === XPATHS RN === #
-XPATH_RN_TITULO_NEGOCIO = '//*[contains(@text, "Registro de negocio") or contains(@content-desc, "Registro de negocio")]'
-RN_TOKEN = "1737498440884ivb"
-RN_TOKEN_INVALIDO = "0000000000000err" 
-RN_TOKEN_CORTO = "123456890" 
-RN_TOKEN_LARGO = "1737498440884ivbEXTRA"
-RN_AFILIACION = "9096021"
-RN_AFILIACION_CORTA = "12345"
-RN_AFILIACION_LARGA = "12345678"
-RN_AFILIACION_INVALIDA = "9096011"
 
+# ==================================================================================
+# [4] T6 MOBILE — XPATHS & DATA: REGISTRO DE NEGOCIO (RN)
+# ==================================================================================
 
-# === XPATHS RN (REGISTRO DE NEGOCIO) === #
-XPATH_RN_INPUT_TOKEN = '(//android.widget.EditText)[1]'
+# --- SCREEN IDENTIFIERS ---
+XPATH_RN_TITULO_NEGOCIO = (
+    '//*[contains(@text, "Registro de negocio") or '
+    'contains(@content-desc, "Registro de negocio")]'
+)
+XPATH_RN_PANTALLA_EXITO = (
+    '//*[contains(@text, "permitir") or '
+    'contains(@text, "ubicaci") or '
+    'contains(@text, "memphis beta")]'
+)
+XPATH_RN_MENSAJE_ERROR = (
+    '//*[contains(@text, "El token o afiliacion no son correctos o el comercio no existe") or '
+    'contains(@content-desc, "El token o afiliacion no son correctos o el comercio no existe") or '
+    'contains(@text, "comercio no existe")]'
+)
+
+# --- FORM INPUTS ---
+XPATH_RN_INPUT_TOKEN     = '(//android.widget.EditText)[1]'
 XPATH_RN_INPUT_AFILIACION = '(//android.widget.EditText)[2]'
-XPATH_RN_BTN_ACEPTAR_REGISTRO = '//android.widget.Button[contains(@text, "Aceptar") or contains(@content-desc, "Aceptar") or contains(@text, "Continuar") or contains(@content-desc, "Continuar")]'
-XPATH_RN_PANTALLA_EXITO = '//*[contains(@text, "permitir") or contains(@text, "ubicaci") or contains(@text, "memphis beta")]'
-XPATH_RN_MENSAJE_ERROR = '//*[contains(@text, "El token o afiliacion no son correctos o el comercio no existe") or contains(@content-desc, "El token o afiliacion no son correctos o el comercio no existe") or contains(@text, "comercio no existe")]'
-XPATH_RN_BTN_OTRA_OCASION = '//*[contains(@text, "otra") or contains(@content-desc, "otra") or contains(@text, "Ocasión")]'
 
-# === XPATHS C (CALCULADORA) === #
+# --- BUTTONS ---
+XPATH_RN_BTN_ACEPTAR_REGISTRO = (
+    '//android.widget.Button[contains(@text, "Aceptar") or '
+    'contains(@content-desc, "Aceptar") or '
+    'contains(@text, "Continuar") or '
+    'contains(@content-desc, "Continuar")]'
+)
+XPATH_RN_BTN_OTRA_OCASION = (
+    '//*[contains(@text, "otra") or '
+    'contains(@content-desc, "otra") or '
+    'contains(@text, "Ocasión")]'
+)
+
+# --- TEST DATA: TOKEN ---
+RN_TOKEN         = "1737498440884ivb"    # VALID 16-CHAR TOKEN
+RN_TOKEN_INVALIDO = "0000000000000err"   # INVALID TOKEN (WRONG CREDENTIALS)
+RN_TOKEN_CORTO   = "123456890"           # SHORT TOKEN  (< 16 CHARS)
+RN_TOKEN_LARGO   = "1737498440884ivbEXTRA"  # LONG TOKEN (> 16 CHARS)
+
+# --- TEST DATA: AFFILIATION ---
+RN_AFILIACION         = "9096021"   # VALID 7-DIGIT AFFILIATION
+RN_AFILIACION_CORTA   = "12345"     # SHORT AFFILIATION (< 7 CHARS)
+RN_AFILIACION_LARGA   = "12345678"  # LONG AFFILIATION  (> 7 CHARS)
+RN_AFILIACION_INVALIDA = "9096011"  # INVALID (WRONG COMMERCE)
+
+# --- REGISTRATION FORM (GENERIC) ---
+XPATH_TXT_TOKEN_REGISTRO  = '//android.widget.EditText[1]'
+XPATH_TXT_NUM_AFILIACION  = '//android.widget.EditText[2]'
+XPATH_BTN_ACEPTAR_REGISTRO = (
+    '//*[contains(@content-desc, "Aceptar") or '
+    'contains(@text, "Aceptar")]'
+)
+
+
+# ==================================================================================
+# [5] T6 MOBILE — XPATHS: CALCULADORA (C)
+# ==================================================================================
+
+# --- SCREEN IDENTIFIERS ---
+XPATH_C_PANTALLA_COBRO       = '//*[contains(@text, "Cobrar") or contains(@content-desc, "Cobrar")]'
+XPATH_C_DISPLAY_MONTO        = '//*[contains(@text, "0.00") or contains(@content-desc, "0.00")]'
+XPATH_C_DISPLAY_UPDATED      = (
+    '//*[(contains(@text, "$") and not(contains(@text, "$0.00"))) or '
+    '(contains(@content-desc, "$") and not(contains(@content-desc, "$0.00")))]'
+)
+XPATH_C_DISPLAY_ZERO_LEADING = '//*[contains(@text, "0001") or contains(@content-desc, "0001")]'
+XPATH_C_PANTALLA_TARJETA     = (
+    '//*[contains(@text, "Inserta") or contains(@content-desc, "Inserta") or '
+    'contains(@text, "Desliza") or contains(@content-desc, "Desliza")]'
+)
+
+# --- POPUPS ---
 XPATH_C_BTN_MIENTRAS_USO = (
     '//*[contains(@text, "MIENTRAS LA APP") or contains(@content-desc, "MIENTRAS LA APP") or '
     'contains(@text, "Mientras la app") or contains(@content-desc, "Mientras la app") or '
     'contains(@text, "mientras la app") or contains(@content-desc, "mientras la app")]'
 )
-XPATH_C_PANTALLA_COBRO  = '//*[contains(@text, "Cobrar") or contains(@content-desc, "Cobrar")]'
-XPATH_C_DISPLAY_MONTO   = '//*[contains(@text, "0.00") or contains(@content-desc, "0.00")]'
-XPATH_C_DISPLAY_UPDATED  = '//*[(contains(@text, "$") and not(contains(@text, "$0.00"))) or (contains(@content-desc, "$") and not(contains(@content-desc, "$0.00")))]'
-XPATH_C_DISPLAY_ZERO_LEADING  = '//*[contains(@text, "0001") or contains(@content-desc, "0001")]'
-XPATH_C_POPUP_PROPINA         = '//*[contains(@text, "propina") or contains(@content-desc, "propina") or contains(@text, "Propina") or contains(@content-desc, "Propina")]'
+XPATH_C_POPUP_PROPINA       = (
+    '//*[contains(@text, "propina") or contains(@content-desc, "propina") or '
+    'contains(@text, "Propina") or contains(@content-desc, "Propina")]'
+)
+XPATH_C_POPUP_LECTOR        = '//*[contains(@text, "lector configurado") or contains(@content-desc, "lector configurado")]'
+XPATH_C_POPUP_AJUSTES_VERDE = (
+    '//*[contains(@text, "terminal configurada correctamente") or '
+    'contains(@content-desc, "terminal configurada correctamente") or '
+    'contains(@text, "Terminal configurada correctamente") or '
+    'contains(@content-desc, "Terminal configurada correctamente")]'
+)
+
+# --- BUTTONS ---
 XPATH_C_BTN_ACEPTAR_PROPINA   = '//*[contains(@text, "Aceptar") or contains(@content-desc, "Aceptar")]'
-XPATH_C_PANTALLA_TARJETA      = '//*[contains(@text, "Inserta") or contains(@content-desc, "Inserta") or contains(@text, "Desliza") or contains(@content-desc, "Desliza")]'
 XPATH_C_BTN_CANCELAR          = '//*[contains(@text, "Cancelar") or contains(@content-desc, "Cancelar")]'
-XPATH_C_POPUP_LECTOR          = '//*[contains(@text, "lector configurado") or contains(@content-desc, "lector configurado")]'
 XPATH_C_BTN_OK_POPUP          = '//*[@text="Ok" or @content-desc="Ok" or @text="OK" or @content-desc="OK"]'
-XPATH_C_TAB_AJUSTES = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
-XPATH_C_TAB_INICIO = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
-XPATH_C_BTN_CONFIGURAR_LECTOR = '//*[contains(@text, "Configurar lector") or contains(@content-desc, "Configurar lector")]'
 XPATH_C_BTN_DECIMAL           = '//*[@text="+" or @content-desc="+"]'
-XPATH_C_ERROR_CANTIDAD_VALIDA = '//*[contains(@text, "ingrese una cantidad") or contains(@content-desc, "ingrese una cantidad") or contains(@text, "cantidad valida") or contains(@content-desc, "cantidad valida")]'
-# === XPATHS C (CALCULADORA) === #
-XPATH_C_BTN_BACKSPACE    = (
+XPATH_C_BTN_CONFIGURAR_LECTOR = (
+    '//*[contains(@text, "Configurar lector") or '
+    'contains(@content-desc, "Configurar lector")]'
+)
+
+# --- BACKSPACE BUTTON ---
+# STANDARD ATTRIBUTE-BASED SELECTOR (WORKS WHEN DISPLAY IS NOT FULL)
+XPATH_C_BTN_BACKSPACE = (
     '//*[@text="\u232B" or @content-desc="\u232B" or '
     '@text="\u2190" or @content-desc="\u2190" or '
     'contains(@content-desc, "erase") or contains(@content-desc, "delete") or '
     'contains(@content-desc, "backspace") or contains(@content-desc, "borrar") or '
     'contains(@content-desc, "Borrar") or contains(@text, "borrar")]'
 )
-
-# ABSOLUTE XPATH OBTAINED FROM APPIUM INSPECTOR.
-# THE BACKSPACE KEY RENDERS AS A PLAIN android.view.View WITH NO TEXT/CONTENT-DESC
-# WHEN THE DISPLAY IS FULL (E.G. AFTER 8+ DIGITS ARE ENTERED). USE THIS AS LAST RESORT.
+# ABSOLUTE XPATH FROM APPIUM INSPECTOR — USED AS LAST RESORT WHEN DISPLAY IS FULL
+# (8+ DIGITS ENTERED). THE KEY LOSES ALL text/content-desc ATTRIBUTES IN THAT STATE.
 XPATH_C_BTN_BACKSPACE_ABSOLUTE = (
     '//android.widget.FrameLayout[@resource-id="android:id/content"]'
     '/android.widget.FrameLayout'
@@ -82,57 +195,83 @@ XPATH_C_BTN_BACKSPACE_ABSOLUTE = (
     '/android.view.View/android.view.View/android.view.View'
     '/android.view.View/android.view.View[13]'
 )
-XPATH_C_POPUP_AJUSTES_VERDE = '//*[contains(@text, "terminal configurada correctamente") or contains(@content-desc, "terminal configurada correctamente") or contains(@text, "Terminal configurada correctamente") or contains(@content-desc, "Terminal configurada correctamente")]'
+
+# --- ERROR MESSAGES ---
+XPATH_C_ERROR_CANTIDAD_VALIDA = (
+    '//*[contains(@text, "ingrese una cantidad") or '
+    'contains(@content-desc, "ingrese una cantidad") or '
+    'contains(@text, "cantidad valida") or '
+    'contains(@content-desc, "cantidad valida")]'
+)
 
 
-# === XPATHS PÑ (PESTAÑAS) === #
-XPATH_PÑ_TAB_INICIO = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
+# ==================================================================================
+# [6] T6 MOBILE — XPATHS: PESTAÑAS (PÑ) — BOTTOM NAV TABS
+# ==================================================================================
+
+XPATH_C_TAB_INICIO       = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
+XPATH_C_TAB_AJUSTES      = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+
+XPATH_PÑ_TAB_INICIO        = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
 XPATH_PÑ_TAB_TRANSACCIONES = '//*[contains(@content-desc, "Transacciones") and contains(@content-desc, "2")]'
-XPATH_PÑ_TAB_SERVICIOS = '//*[contains(@content-desc, "Servicios") and contains(@content-desc, "3")]'
-XPATH_PÑ_TAB_AJUSTES = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+XPATH_PÑ_TAB_SERVICIOS     = '//*[contains(@content-desc, "Servicios") and contains(@content-desc, "3")]'
+XPATH_PÑ_TAB_AJUSTES       = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
 
 
+# ==================================================================================
+# [7] T6 MOBILE — XPATHS & DATA: REGISTRO DE AHORA (RA)
+# ==================================================================================
 
+# --- TEST DATA ---
+RA_NOMBRE           = "Antonio"
+RA_APELLIDO         = "Garcia"
+RA_SEGUNDOAPELLIDO  = "Garcia"
+RA_EMAIL            = "usuariofake@prueba.com"
+RA_PASS             = "contrasenafake"
 
-# === DATA RA === #
-RA_NOMBRE = "Antonio"
-RA_APELLIDO = "Garcia"
-RA_SEGUNDOAPELLIDO = "Garcia"
-RA_EMAIL = "usuariofake@prueba.com"
-RA_PASS = "contrasenafake"
-
-# === DATA RA_010 === #
-RA_010_NOMBRE = "Santiago"
-RA_010_APELLIDO = "martinez"
+RA_010_NOMBRE           = "Santiago"
+RA_010_APELLIDO         = "martinez"
 RA_010_SEGUNDO_APELLIDO = "martinez"
-RA_010_EMAIL = "sss@gmail.com"
-RA_010_PASS = "Memphis@2030"
+RA_010_EMAIL            = "sss@gmail.com"
+RA_010_PASS             = "Memphis@2030"
 
-# === DATA RA_013 === #
 RA_013_EMAIL = "david.santos@ijuba.solutions"
 
-# === XPATHS RA === #
-XPATH_RA_NOMBRE = '//android.widget.EditText[1]'
-XPATH_RA_APELLIDO = '//android.widget.EditText[2]'
+# --- FORM INPUTS ---
+XPATH_RA_NOMBRE          = '//android.widget.EditText[1]'
+XPATH_RA_APELLIDO        = '//android.widget.EditText[2]'
 XPATH_RA_SEGUNDOAPELLIDO = '//android.widget.EditText[3]'
-XPATH_RA_EMAIL = '//android.widget.EditText[4]'
-XPATH_RA_PASS = '//android.widget.EditText[5]'
-XPATH_RA_CONFIRMAR_PASS = '//android.widget.EditText[6]'
-XPATH_RA_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
-XPATH_RA_BTN_ATRAS = '//android.widget.Button[1]'  # Usually the first button/imagebutton in the header
+XPATH_RA_EMAIL           = '//android.widget.EditText[4]'
+XPATH_RA_PASS            = '//android.widget.EditText[5]'
+XPATH_RA_CONFIRMAR_PASS  = '//android.widget.EditText[6]'
 
-# === VALIDATION ERROR MESSAGES RA === #
-XPATH_RA_ERROR_NOMBRE = '//*[contains(@text, "Ingresa un nombre") or contains(@content-desc, "Ingresa un nombre")]'
+# --- BUTTONS ---
+XPATH_RA_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
+XPATH_RA_BTN_ATRAS   = '//android.widget.Button[1]'
+
+# --- VALIDATION ERROR MESSAGES ---
+XPATH_RA_ERROR_NOMBRE = (
+    '//*[contains(@text, "Ingresa un nombre") or '
+    'contains(@content-desc, "Ingresa un nombre")]'
+)
 XPATH_RA_ERROR_USUARIO_EXISTE = (
     '//*[contains(@text, "usuario ya está registrado") or '
     'contains(@content-desc, "usuario ya está registrado") or '
     'contains(@text, "ya está registrado") or '
     'contains(@content-desc, "ya está registrado")]'
 )
-XPATH_RA_ERROR_PASS_NO_COINCIDEN = '//*[contains(@text, "Las contraseñas no coinciden") or contains(@content-desc, "Las contraseñas no coinciden")]'
-XPATH_RA_ERROR_CORREO_INVALIDO = '//*[contains(@text, "Correo inválido") or contains(@content-desc, "Correo inválido")]'
-XPATH_RA_ERROR_CONTRASENA_INVALIDA = '//*[contains(@text, "Contraseña inválida") or contains(@content-desc, "Contraseña inválida")]'
-
+XPATH_RA_ERROR_PASS_NO_COINCIDEN = (
+    '//*[contains(@text, "Las contraseñas no coinciden") or '
+    'contains(@content-desc, "Las contraseñas no coinciden")]'
+)
+XPATH_RA_ERROR_CORREO_INVALIDO = (
+    '//*[contains(@text, "Correo inválido") or '
+    'contains(@content-desc, "Correo inválido")]'
+)
+XPATH_RA_ERROR_CONTRASENA_INVALIDA = (
+    '//*[contains(@text, "Contraseña inválida") or '
+    'contains(@content-desc, "Contraseña inválida")]'
+)
 XPATH_RA_REGISTRO_EXITOSO = (
     '//*[contains(@text, "suario creado correctamente") or '
     'contains(@text, "orrectamente") or '
@@ -140,22 +279,37 @@ XPATH_RA_REGISTRO_EXITOSO = (
     '//android.widget.Toast]'
 )
 
-# === REGISTRAAHORA_RA === #
-XPATH_TXT_TOKEN_REGISTRO = '//android.widget.EditText[1]'
-XPATH_TXT_NUM_AFILIACION = '//android.widget.EditText[2]'
-XPATH_BTN_ACEPTAR_REGISTRO = '//*[contains(@content-desc, "Aceptar") or contains(@text, "Aceptar")]'
 
-# === XPATHS OC (FORGOT PASSWORD) === #
-XPATH_OC_LNK_OLVIDASTE = '//*[contains(@text, "Olvidaste tu contraseña") or contains(@content-desc, "Olvidaste tu contraseña")]'
-XPATH_OC_TITULO_RECUPERA = '//*[contains(@text, "Recupera tu contraseña") or contains(@content-desc, "Recupera tu contraseña")]'
-XPATH_OC_BTN_ATRAS = '//android.widget.Button[1]'
-XPATH_OC_INPUT_EMAIL = '//android.widget.EditText[1]' 
+# ==================================================================================
+# [8] T6 MOBILE — XPATHS: OLVIDASTE CONTRASEÑA (OC)
+# ==================================================================================
+
+XPATH_OC_LNK_OLVIDASTE  = (
+    '//*[contains(@text, "Olvidaste tu contraseña") or '
+    'contains(@content-desc, "Olvidaste tu contraseña")]'
+)
+XPATH_OC_TITULO_RECUPERA = (
+    '//*[contains(@text, "Recupera tu contraseña") or '
+    'contains(@content-desc, "Recupera tu contraseña")]'
+)
+XPATH_OC_BTN_ATRAS   = '//android.widget.Button[1]'
+XPATH_OC_INPUT_EMAIL = '//android.widget.EditText[1]'
 XPATH_OC_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
-
-XPATH_OC_MSJ_EXITO = '//*[contains(@text, "ceso de recuperaci") or contains(@content-desc, "ceso de recuperaci")]'
+XPATH_OC_MSJ_EXITO   = (
+    '//*[contains(@text, "ceso de recuperaci") or '
+    'contains(@content-desc, "ceso de recuperaci")]'
+)
+XPATH_OC_ERROR_CORREO = (
+    '//*[contains(@text, "Correo inválido") or '
+    'contains(@content-desc, "Correo inválido")]'
+)
 NUMERO_AFILIACION = "9096021"
 
-# === IMPROVED ERROR SELECTOR === #
+
+# ==================================================================================
+# [9] T6 MOBILE — XPATHS: GENERIC ERROR SELECTORS
+# ==================================================================================
+
 XPATH_ERROR_GENERICO = (
     '//*['
     'contains(@content-desc, "Ocurri") or contains(@text, "Ocurri") or '
@@ -163,79 +317,112 @@ XPATH_ERROR_GENERICO = (
     'contains(@content-desc, "intental") or contains(@text, "intental") or '
     'contains(@content-desc, "tarde") or contains(@text, "tarde") or '
     'contains(@text, "Ocurrió un error, inténtalo más tarde")'
-    'contains(translate(text(), "Correo inválido", "error"), "error")'
     '] | //android.widget.Toast'
 )
 
-XPATH_OC_ERROR_CORREO = '//*[contains(@text, "Correo inválido") or contains(@content-desc, "Correo inválido")]'
 
+# ==================================================================================
+# [10] WEB PLATFORM — URLS & DRIVER SETTINGS
+# ==================================================================================
 
-# === WEB CONFIGURATION === #
 URL_MEMPHIS_WEB = "https://fat.memphis.mx/v2/login"
-XPATH_WEB_USER = '//input[@type="email" or @type="text"]'  
-XPATH_WEB_PASS = '//input[@type="password"]'
-XPATH_WEB_WRONG_USER = '//input[@type="email" or @type="text"]'  
-XPATH_WEB_WRONG_PASS = '//input[@type="password"]'
-XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "Login")]'
-XPATH_WEB_TXT_INGRESA_AQUI = "//*[contains(text(), 'Ingresa aquí')]"
-XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
-XPATH_WEB_BTN_ENVIAR = "//*[contains(text(), 'Enviar')]"
-XPATH_WEB_BTN_REGISTRA_AHORA = '//android.widget.Button[@content-desc="Regístrate ahora"]'
-XPATH_REGISTRA_AHORA_ALT1 = '//*[contains(@content-desc, "Regístrate")]'
-XPATH_REGISTRA_AHORA_ALT2 = '//*[contains(@content-desc, "gístrate")]'
+URL_MEMPHIS_PWD = "https://fat.memphis.mx/recovery-password"
 
-# === MENSAJES DE SISTEMA (WEB) ===
-XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
-XPATH_MSJ_EXITO_RCV = "//*[contains(text(), 'Se ha enviado un mail')]"
+# DEFAULT IMPLICIT WAIT FOR WEB DRIVER (SECONDS)
+WEB_IMPLICIT_WAIT   = 10
+WEB_EXPLICIT_WAIT   = 15
 
-# === DATA WEB === #
+
+# ==================================================================================
+# [11] WEB PLATFORM — CREDENTIALS
+# ==================================================================================
+
+# --- FULL-ACCESS USER (CRUD PERMISSIONS) ---
 WEB_USUARIO_PRUEBA = "eamartin"
-WEB_PASS_PRUEBA = "Patito4."
+WEB_PASS_PRUEBA    = "Patito4."
+
+# --- NEGATIVE TEST CREDENTIALS ---
 WEB_WRONGUSER = "usuariofake"
 WEB_WRONGPASS = "contrasenafake"
 
-# === SELECTOR ON THE WEB    EMAIL ===
+# --- PERMISSION-RESTRICTED USERS ---
+# NOTE: REPLACE WITH REAL RESTRICTED ACCOUNTS FROM YOUR QA ENVIRONMENT.
+WEB_USUARIO_SIN_EDICION = "usuario.readonly@memphis.mx"   # NO EDIT PERMISSIONS
+WEB_USUARIO_SIN_BORRADO = "usuario.nodelete@memphis.mx"   # NO DELETE PERMISSIONS
 
-XPATH_EMAIL_LINK_RESET = '//a[contains(text(), "Restablecer") or contains(text(), "Recuperar") or contains(text(), "aquí")]'
 
-# VALIDATE NEW PASSWORD SCREEN
-XPATH_TITULO_NUEVA_PASS = '//*[contains(text(), "Nueva contraseña") or contains(text(), "Restablecer") or contains(text(), "Crear")]'
+# ==================================================================================
+# [12] WEB PLATFORM — XPATHS: LOGIN SCREEN
+# ==================================================================================
+
+XPATH_WEB_USER      = '//input[@type="email" or @type="text"]'
+XPATH_WEB_PASS      = '//input[@type="password"]'
+XPATH_WEB_BTN_LOGIN = '//button[contains(text(), "Inicia") or contains(text(), "Login")]'
+
+# NEGATIVE TEST SELECTORS (SAME DOM LOCATION — KEPT SEPARATE FOR READABILITY)
+XPATH_WEB_WRONG_USER = '//input[@type="email" or @type="text"]'
+XPATH_WEB_WRONG_PASS = '//input[@type="password"]'
+
+# NAVIGATION LINKS ON THE LOGIN SCREEN
+XPATH_WEB_TXT_INGRESA_AQUI    = "//*[contains(text(), 'Ingresa aquí')]"
+XPATH_WEB_BTN_REGISTRA_AHORA  = '//android.widget.Button[@content-desc="Regístrate ahora"]'
+XPATH_REGISTRA_AHORA_ALT1     = '//*[contains(@content-desc, "Regístrate")]'
+XPATH_REGISTRA_AHORA_ALT2     = '//*[contains(@content-desc, "gístrate")]'
+
+
+# ==================================================================================
+# [13] WEB PLATFORM — XPATHS: PASSWORD RECOVERY FLOW
+# ==================================================================================
+
+# --- FORGOT PASSWORD SCREEN ---
+XPATH_WEB_TITULO_OLVIDASTE = "//*[contains(text(), 'Olvidaste tu contraseña')]"
+XPATH_WEB_BTN_ENVIAR       = "//*[contains(text(), 'Enviar')]"
+XPATH_MSJ_EXITO_RCV        = "//*[contains(text(), 'Se ha enviado un mail')]"
+
+# --- EMAIL RECOVERY LINK ---
+XPATH_EMAIL_LINK_RESET = (
+    '//a[contains(text(), "Restablecer") or '
+    'contains(text(), "Recuperar") or '
+    'contains(text(), "aquí")]'
+)
+
+# --- NEW PASSWORD SCREEN ---
+XPATH_TITULO_NUEVA_PASS = (
+    '//*[contains(text(), "Nueva contraseña") or '
+    'contains(text(), "Restablecer") or '
+    'contains(text(), "Crear")]'
+)
 XPATH_INPUT_NUEVA_PASS = '//input[@type="password"]'
 
-# === PWD ===
-URL_MEMPHIS_PWD = "https://fat.memphis.mx/recovery-password"
-XPATH_PWD_ACTUAL = '//input[@name="currentPassword" or @type="password"][1]'
-XPATH_PWD_NUEVA = '(//input[@type="password"])[2]'
-XPATH_PWD_CONFIRMAR = '(//input[@type="password"])[3]'
-XPATH_PWD_BTN_ESTABLECER = '//*[contains(text(), "Establecer contraseña") or contains(text(), "Guardar")]'
-
-# MESSAGESS ERRORS 
-XPATH_PWD_ERROR_VACIO = '//*[contains(text(), "requerido") or contains(text(), "obligatorio")]'
-XPATH_PWD_ERROR_INCORRECTA = '//*[contains(text(), "incorrecta")]'
-XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "debe contener") or contains(text(), "caracteres")]'
-XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
-
-XPATH_INPUT_REPITE_PASS = '(//input[@type="password"])[2]' 
+# --- CHANGE PASSWORD FORM ---
+XPATH_PWD_ACTUAL      = '//input[@name="currentPassword" or @type="password"][1]'
+XPATH_PWD_NUEVA       = '(//input[@type="password"])[2]'
+XPATH_PWD_CONFIRMAR   = '(//input[@type="password"])[3]'
+XPATH_PWD_BTN_ESTABLECER = (
+    '//*[contains(text(), "Establecer contraseña") or '
+    'contains(text(), "Guardar")]'
+)
 XPATH_BTN_ACEPTAR_WEB = '//*[contains(text(), "Reestablecer Contraseña")]'
 
-XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]" 
-XPATH_ERROR_PASS_MAYUSCULA = "//*[contains(text(), 'Debe contener al menos una mayúscula')]"
-XPATH_BTN_OJO_NUEVA_PASS = "(//span[contains(@class,'ng-star-inserted') and ./i[contains(@class,'pi-eye')]])[1]"
-XPATH_BTN_OJO_CONFIRMAR = "(//i[contains(@class,'pi-eye')])[2]"
+# --- EYE TOGGLE BUTTONS ---
+XPATH_BTN_OJO_NUEVA_PASS = (
+    "(//span[contains(@class,'ng-star-inserted') and "
+    "./i[contains(@class,'pi-eye')]])[1]"
+)
+XPATH_BTN_OJO_CONFIRMAR  = "(//i[contains(@class,'pi-eye')])[2]"
+
+# COMBINED SELECTOR FOR SECOND PASSWORD FIELD (VISIBLE OR MASKED)
 XPATH_INPUT_REPITE_PASS = '(//input[@type="password" or @type="text"])[2]'
-XPATH_PWD_ERROR_REGLAS = '//*[contains(text(), "Debe contener mínimo") or contains(text(), "caracteres")]'
 
 
-# === SETTINGS (GENERAL / DRIVER) === #
-URL_APPIUM = 'http://localhost:4723'
+# ==================================================================================
+# [14] WEB PLATFORM — XPATHS: ERROR / VALIDATION MESSAGES
+# ==================================================================================
 
-CAPABILITIES = {
-    "platformName": "Android",
-    "appium:automationName": "UiAutomator2",
-    "appium:platformVersion": "13",
-    "appium:deviceName": "vnd_tb8766p1_64_bsp",
-    "appium:appPackage": "mx.memphis_beta.comercios",
-    "appium:appActivity": "mx.memphis_beta.comercios/.MainActivity",
-    "appium:autoGrantPermissions": False,
-    "appium:noReset": False
-}
+XPATH_PWD_ERROR_VACIO       = '//*[contains(text(), "requerido") or contains(text(), "obligatorio")]'
+XPATH_PWD_ERROR_INCORRECTA  = '//*[contains(text(), "incorrecta")]'
+XPATH_PWD_ERROR_REGLAS      = '//*[contains(text(), "Debe contener mínimo") or contains(text(), "caracteres")]'
+XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
+XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]"
+XPATH_ERROR_PASS_MAYUSCULA   = "//*[contains(text(), 'Debe contener al menos una mayúscula')]"
+XPATH_BTN_APPLY_FILTER       = "//button[contains(text(), 'CREADO') or contains(text(), 'Creado')]"
