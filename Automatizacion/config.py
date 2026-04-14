@@ -426,3 +426,9 @@ XPATH_PWD_ERROR_NO_COINCIDEN = '//*[contains(text(), "no coinciden")]'
 XPATH_ERROR_PASS_NO_COINCIDE = "//*[contains(text(), 'Las contraseñas no coinciden')]"
 XPATH_ERROR_PASS_MAYUSCULA   = "//*[contains(text(), 'Debe contener al menos una mayúscula')]"
 XPATH_BTN_APPLY_FILTER       = "//button[contains(text(), 'CREADO') or contains(text(), 'Creado')]"
+
+# ==================================================================================
+# MODULE CONFIGURATION
+# ==================================================================================
+USUARIOS_URL      = "https://fat.memphis.mx/cat/users"
+NUEVO_USUARIO_URL = "https://fat.memphis.mx/cat/users/create"
