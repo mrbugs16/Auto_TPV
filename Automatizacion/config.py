@@ -320,6 +320,239 @@ XPATH_ERROR_GENERICO = (
     '] | //android.widget.Toast'
 )
 
+# ==================================================================================
+# [10] T6 MOBILE — XPATHS: TRANSACCIONES [TS-70]
+# ==================================================================================
+# --- SCREEN VERIFICATION INDICATORS ---
+# INDICATOR 1: TRANSACTIONS SCREEN HEADER / TITLE
+XPATH_TS_HEADER_TITULO = (
+    '//*[contains(@text, "Transacciones") or '
+    'contains(@content-desc, "Transacciones")]'
+)
+
+# INDICATOR 2: TRANSACTION LIST ITEMS OR EMPTY STATE MESSAGE
+XPATH_TS_LISTA_O_ESTADO_VACIO = (
+    '//*[contains(@text, "No hay transacciones") or '
+    'contains(@content-desc, "No hay transacciones") or '
+    'contains(@text, "sin transacciones") or '
+    'contains(@text, "historial") or '
+    'contains(@content-desc, "historial")]'
+)
+
+# INDICATOR 3: TAB IN SELECTED/ACTIVE STATE
+XPATH_TS_TAB_SELECTED_STATE = (
+    '//*[contains(@content-desc, "Transacciones") and '
+    '(@selected="true" or contains(@content-desc, "selected"))]'
+)
+
+
+# ==================================================================================
+# [11] T6 MOBILE — XPATHS: TRANSACCIONES [TS-71]
+# ==================================================================================
+# THE DEFAULT ACTIVE TAB LABEL ON THE TRANSACTIONS SCREEN
+XPATH_TS_TAB_30_DIAS = (
+    '//*[contains(@text, "ltimos 30") or '
+    'contains(@content-desc, "ltimos 30") or '
+    'contains(@text, "30 d") or '
+    'contains(@content-desc, "30 d")]'
+)
+
+# A TRANSACTION ROW ITEM — IDENTIFIED BY THE DATE FORMAT (DD-MM-YYYY, HH:MM:SS)
+XPATH_TS_TRANSACTION_ITEM = (
+    '//*[contains(@text, "2026") or contains(@content-desc, "2026") or '
+    'contains(@text, "2025") or contains(@content-desc, "2025")]'
+)
+
+# DATE FIELD WITHIN A TRANSACTION ROW (SAME PATTERN — USED FOR STRUCTURE CHECK)
+XPATH_TS_TRANSACTION_DATE = (
+    '//*[contains(@text, "-202") or contains(@content-desc, "-202")]'
+)
+
+# AMOUNT FIELD — TRANSACTIONS SHOW DOLLAR AMOUNTS WITH "$" SIGN
+XPATH_TS_TRANSACTION_AMOUNT = (
+    '//*[contains(@text, "$") and not(contains(@text, "$0.00")) or '
+    'contains(@content-desc, "$") and not(contains(@content-desc, "$0.00"))]'
+)
+
+# STATUS BADGE — "APROBACIÓN" OR "CANCELACIÓN"
+XPATH_TS_TRANSACTION_STATUS = (
+    '//*[contains(@text, "APROBACI") or contains(@content-desc, "APROBACI") or '
+    'contains(@text, "CANCELACI") or contains(@content-desc, "CANCELACI")]'
+)
+
+# ==================================================================================
+# [12] T6 MOBILE — XPATHS: TRANSACCIONES [TS-73]
+# ==================================================================================
+XPATH_TS_TAB_CORTE_DIA = (
+    '//*[contains(@content-desc, "Corte por d") or '
+    'contains(@content-desc, "corte por d")]'
+)
+
+XPATH_TS_TAB_CORTE_DIA_TEXT = (
+    '//*[@text="Corte por día" or @text="Corte por dia"]'
+)
+
+XPATH_TS_TAB_CORTE_DIA_PARTIAL = (
+    '//*[contains(@text, "Corte") or contains(@content-desc, "Corte")]'
+)
+
+XPATH_TS_TAB_CORTE_DIA_SIBLING = (
+    '(//android.view.View[contains(@content-desc, "ltimos") or '
+    'contains(@text, "ltimos")]/following-sibling::android.view.View)[1]'
+)
+
+# SUMMARY SECTION LABELS
+XPATH_TS_CORTE_MONTO_TOTAL = (
+    '//*[contains(@text, "Monto total") or '
+    'contains(@content-desc, "Monto total")]'
+)
+XPATH_TS_CORTE_SUBTOTAL_PAGOS = (
+    '//*[contains(@text, "Subtotal de pagos") or '
+    'contains(@content-desc, "Subtotal de pagos")]'
+)
+
+# ACTION BUTTON
+XPATH_TS_BTN_IMPRIMIR_CORTE = (
+    '//*[contains(@text, "Imprimir corte") or '
+    'contains(@content-desc, "Imprimir corte")]'
+)
+
+# MOVIMIENTOS SECTION LABEL (BOTTOM OF SCREEN, WITH CHEVRON)
+XPATH_TS_CORTE_MOVIMIENTOS = (
+    '//*[contains(@text, "Movimientos") or '
+    'contains(@content-desc, "Movimientos")]'
+)
+
+# ==================================================================================
+# [13] T6 MOBILE — XPATHS: TRANSACCIONES [TS-74]
+# ==================================================================================
+XPATH_TS_BTN_FECHA_ANTERIOR = (
+    '//*[@content-desc="◄" or @text="◄" or '
+    'contains(@content-desc, "anterior") or '
+    'contains(@content-desc, "atr")]'
+)
+# STRATEGY 2: FIRST ARROW-LIKE ELEMENT NEAR THE DATE DISPLAY
+XPATH_TS_BTN_FECHA_ANTERIOR_ALT = (
+    '(//android.view.View[@clickable="true"])[1]'
+)
+
+# EMPTY STATE MESSAGE
+XPATH_TS_FECHA_SIN_REGISTROS = (
+    '//*[contains(@text, "sin registros") or '
+    'contains(@content-desc, "sin registros") or '
+    'contains(@text, "Sin registros") or '
+    'contains(@content-desc, "Sin registros")]'
+)
+
+XPATH_TS_CORTE_MONTO_CERO = (
+    '//*[@text="$0.00" or @content-desc="$0.00"]'
+)
+
+TS_DIAS_ATRAS_SIN_REGISTRO = 60
+TS_FECHA_SIN_REGISTROS = "~60 DAYS AGO (EXPECTED EMPTY)"
+
+# ==============================================================================================
+# [14] T6 MOBILE — XPATHS: TRANSACCIONES [TS-75] ◄ BACK ARROW — STRATEGY 2: ATTRIBUTE-BASED
+# ==============================================================================================
+XPATH_TS_BTN_FECHA_ANTERIOR = (
+    '//*[contains(@content-desc, "anterior") or '
+    'contains(@content-desc, "atr") or '
+    'contains(@content-desc, "prev") or '
+    '@content-desc="◄" or @text="◄"]'
+)
+# ◄ BACK ARROW — FROM APPIUM INSPECTOR (ABSOLUTE — MOST RELIABLE)
+XPATH_TS_BTN_FECHA_ANTERIOR = (
+    '//android.widget.ScrollView/android.widget.Button[1]'
+)
+
+# ► FORWARD ARROW — SIBLING OF ◄ (BUTTON[2] IN SAME SCROLLVIEW)
+XPATH_TS_BTN_FECHA_SIGUIENTE = (
+    '//android.widget.ScrollView/android.widget.Button[2]'
+)
+# DATE TEXT IN NAVIGATOR BAR — MATCHES "Miércoles, 15 abril" FORMAT
+XPATH_TS_NAVIGATOR_DATE_TEXT = (
+    '//*[contains(@text, ",") or contains(@content-desc, ",")]'
+)
+
+TS_ARROW_BACK_X = 60    
+TS_ARROW_FWD_X  = 390   
+TS_ARROW_Y      = 315   
+
+
+# ==============================================================================================
+# [15] T6 MOBILE — XPATHS: TRANSACCIONES [TS-76]
+# ==============================================================================================
+# LIST — STATUS BADGE SELECTOR
+XPATH_TS_ITEM_APROBACION_STATUS = (
+    '//*[contains(@text, "APROBACI") or '
+    'contains(@content-desc, "APROBACI")]'
+)
+
+# LIST — FIRST ROW FALLBACK 
+XPATH_TS_FIRST_LIST_ROW = (
+    '//android.widget.ScrollView//android.view.View[1]'
+)
+
+# DETAIL SCREEN — TITLE
+XPATH_TS_DETALLE_TITULO = (
+    '//*[@text="Detalle" or @content-desc="Detalle" or '
+    'contains(@text, "Detalle") or contains(@content-desc, "Detalle")]'
+)
+
+# DETAIL SCREEN — LARGE AMOUNT AT TOP
+XPATH_TS_DETALLE_MONTO_GRANDE = (
+    '//*[contains(@text, "$") and contains(@text, ".") and '
+    'not(contains(@text, "0.00"))]'
+)
+
+# DETAIL SCREEN — ESTATUS VALUE
+XPATH_TS_DETALLE_ESTATUS_APROBADA = (
+    '//*[@text="APROBADA" or @content-desc="APROBADA" or '
+    'contains(@text, "APROBADA") or contains(@content-desc, "APROBADA")]'
+)
+
+# EACH KEY IS THE LABEL NAME, VALUE IS ITS XPATH
+TS_DETALLE_CAMPOS_REQUERIDOS = {
+    "ESTATUS"           : '//*[contains(@text, "Estatus") or contains(@content-desc, "Estatus")]',
+    "VENTA"             : '//*[contains(@text, "Venta") or contains(@content-desc, "Venta")]',
+    "PROPINA"           : '//*[contains(@text, "Propina") or contains(@content-desc, "Propina")]',
+    "NOMBRE COMERCIO"   : '//*[contains(@text, "Nombre del comercio") or contains(@content-desc, "Nombre del comercio")]',
+    "ID"                : '//*[@text="ID" or @content-desc="ID"]',
+    "FECHA"             : '//*[contains(@text, "Fecha") or contains(@content-desc, "Fecha")]',
+    "TARJETA"           : '//*[contains(@text, "Tarjeta") or contains(@content-desc, "Tarjeta")]',
+    "BTN_REIMPRIMIR"    : '//*[contains(@text, "Reimprimir") or contains(@content-desc, "Reimprimir")]',
+}
+
+# ==============================================================================================
+# [15] T6 MOBILE — XPATHS: TRANSACCIONES [TS-77]
+# ==============================================================================================
+# --- TS-77: CANCELACIÓN DETAIL ---
+
+# LIST — CANCELACIÓN STATUS BADGE
+XPATH_TS_ITEM_CANCELACION_STATUS = (
+    '//*[contains(@text, "CANCELACI") or '
+    'contains(@content-desc, "CANCELACI")]'
+)
+
+# DETAIL SCREEN — VENTA / CANCELACIÓN TABS
+XPATH_TS_DETALLE_TAB_VENTA = (
+    '//*[@text="Venta" or @content-desc="Venta" or '
+    'contains(@text, "Venta") or contains(@content-desc, "Venta")]'
+)
+XPATH_TS_DETALLE_TAB_CANCELACION = (
+    '//*[@text="Cancelación" or @content-desc="Cancelación" or '
+    'contains(@text, "Cancelaci") or contains(@content-desc, "Cancelaci")]'
+)
+
+# ==============================================================================================
+# [16] T6 MOBILE — XPATHS: TRANSACCIONES [TS-79 - TS-80]
+# ==============================================================================================
+TS_MAX_DIAS_BUSQUEDA = 120
+XPATH_TS_LOADING_CARGANDO = (
+    '//*[contains(@text, "Cargando") or contains(@content-desc, "Cargando") or '
+    'contains(@text, "cargando") or contains(@content-desc, "cargando") or '
+    'contains(@text, "Loading") or contains(@content-desc, "Loading")]'
+)
 
 # ==================================================================================
 # [10] WEB PLATFORM — URLS & DRIVER SETTINGS
