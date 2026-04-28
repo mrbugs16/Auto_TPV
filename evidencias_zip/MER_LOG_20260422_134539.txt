@@ -1,0 +1,106 @@
+
+============================================================
+🧪 MER-04: COMERCIOS TABLE → DELETE FIRST ROW → VERIFY REMOVAL
+============================================================
+🚀 STARTING WEB AUTOMATION SESSION...
+   ✅ CHROME SESSION STARTED.
+🔐 PRECONDITION: LOGGING IN AND NAVIGATING TO COMERCIOS MODULE...
+   🌐 NAVIGATING TO LOGIN: https://fat.memphis.mx/v2/login
+   ✏️  ENTERING CREDENTIALS — USER: eamartin
+   🖱️  CLICKING LOGIN BUTTON...
+   ⏳ WAITING FOR HOME DASHBOARD TO LOAD...
+   🌐 POST-LOGIN URL: https://fat.memphis.mx/home
+   🖱️  CLICKING ORANGE 'COMERCIOS' CARD (4-STRATEGY CASCADE)...
+   ✅ CARD CLICKED — STRATEGY 3 (JS TEXT WALK: text-walk:fallback-up2).
+   🌐 CURRENT URL AFTER CARD CLICK: https://fat.memphis.mx/merchant
+   ⏳ WAITING FOR COMERCIOS TABLE TO RENDER...
+
+📸 TAKING SCREENSHOT #1 — COMERCIOS TABLE BEFORE DELETION...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_04_1_TABLE_BEFORE_DELETE.png
+
+👉 STEP 1: VERIFYING COMERCIOS TABLE IS LOADED...
+   ✅ TABLE LOADED.
+
+👉 STEP 2: COUNTING DATA ROWS BEFORE DELETION...
+   ✅ 10 ROW(S) FOUND.
+
+👉 STEP 3: CLICKING DELETE ICON 🗑️ ON FIRST ROW (4-STRATEGY CASCADE)...
+   ✅ DELETE CLICKED — STRATEGY 1 (SECOND BUTTON IN FIRST TR).
+   🖱️  DELETE ACTION TRIGGERED. WAITING FOR CONFIRMATION DIALOG...
+
+📸 TAKING SCREENSHOT #2 — AFTER CLICKING DELETE (CONFIRMATION DIALOG)...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_04_2_DELETE_CONFIRMATION.png
+
+👉 STEP 4: LOOKING FOR CONFIRMATION DIALOG AND ACCEPTING...
+   ✅ CONFIRMATION DIALOG DETECTED.
+   ✅ CONFIRMATION CLICKED USING: //*[contains(@class,'btn')][contains(.,'Eliminar') or contai...
+   ⏳ WAITING FOR DELETION TO COMPLETE...
+
+📸 TAKING SCREENSHOT #3 — AFTER CONFIRMATION / DELETION (SHOULD SHOW SUCCESS POPUP)...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_04_3_AFTER_DELETE.png
+
+👉 STEP 5: VERIFYING ITEM WAS REMOVED...
+   🔍 LOOKING FOR SUCCESS POPUP...
+   ℹ️  SUCCESS POPUP NOT DETECTED: Message: 
+Stacktrace:
+	chromedriver!GetHandleVerifier [0xbfb373+10553]
+	chromedriver!GetHandleVerifier [0xbfb4a4+10684]
+	chromedriver!(No symbol) [0xa01e10]
+	chromedriver!(No symbol) [0xa4a9da]
+	chromedriver!(No symbol) [0xa4ac7b]
+	chromedriver!(No symbol) [0xa8d162]
+	chromedriver!(No symbol) [0xa6d8b4]
+	chromedriver!(No symbol) [0xa8aa36]
+	chromedriver!(No symbol) [0xa6d606]
+	chromedriver!(No symbol) [0xa40039]
+	chromedriver!(No symbol) [0xa40df4]
+	chromedriver!GetHandleVerifier [0xe7ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xe7937d+28e55d]
+	chromedriver!GetHandleVerifier [0xe98215+2ad3f5]
+	chromedriver!GetHandleVerifier [0xc14c18+29df8]
+	chromedriver!GetHandleVerifier [0xc1c6fd+318dd]
+	chromedriver!GetHandleVerifier [0xc03c78+18e58]
+	chromedriver!GetHandleVerifier [0xc03e42+19022]
+	chromedriver!GetHandleVerifier [0xbed45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+   🔄 FALLBACK: CHECKING ROW COUNT...
+   📊 ROW COUNT BEFORE: 10 | AFTER: 10
+
+📸 TAKING SCREENSHOT #4 — FINAL TABLE STATE...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_04_4_FINAL_TABLE.png
+
+   🔬 MER-04 ASSERTION SUMMARY:
+      • DELETE ICON CLICKED        : True
+      • CONFIRMATION HANDLED       : True
+      • DELETION VERIFIED          : False
+      • ROW COUNT CHANGE           : 10 → 10
+      • FINAL URL                  : https://fat.memphis.mx/merchant
+
+📡 CAPTURING HTTP EVIDENCE FOR [MER_04]...
+   ⚠️  KEYWORD 'comercios' NOT FOUND IN CAPTURED URLS.
+   🔍 DIAGNOSTIC MODE — ALL 8 NON-STATIC RESPONSE(S):
+------------------------------------------------------------
+   GET    | 200 | https://fat.memphis.mx/v2/login
+   GET    | 200 | https://fat.memphis.mx/gateway/api/v2/about/get-info
+   POST   | 200 | https://fat.memphis.mx/gateway/api/v2/auth
+          📤 PAYLOAD: {"username":"eamartin","password":"MjM1ZGQyNDZhYTk0NzgxNmU2OGEyMmNmYzYzZTg2NTNlMTJkM2UwNWE2YzM5NWI3M
+   GET    | 200 | https://fat.memphis.mx/gateway/api/v2/profiles/1/menu
+   GET    | 200 | https://fat.memphis.mx/gateway/api/v2/about/get-info
+   GET    | 200 | https://fat.memphis.mx/gateway/api/v2/merchants?page=1&pageSize=10
+   DELETE | 200 | https://fat.memphis.mx/gateway/api/v2/merchants/152
+   GET    | 200 | https://fat.memphis.mx/gateway/api/v2/merchants?page=1&pageSize=10
+------------------------------------------------------------
+   💡 UPDATE 'EVIDENCE_ENDPOINT' WITH A KEYWORD FROM THE URLS ABOVE.
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_04_FAILED.png
+
+❌ MER-04: FAILED — DELETION COULD NOT BE VERIFIED.
+
+🏁 CLOSING BROWSER...
+
+📄 GENERATING HTML REPORT...
+✅ HTML REPORT GENERATED: evidencias_zip/MER_REPORT_20260422_134539.html
+======================================================================
+

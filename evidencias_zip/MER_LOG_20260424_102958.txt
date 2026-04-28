@@ -1,0 +1,1036 @@
+
+============================================================
+🧪 MER-06: NUEVO COMERCIO → FILL ALL SECTIONS → GUARDAR → VERIFY DATA
+============================================================
+🚀 STARTING WEB AUTOMATION SESSION...
+   ✅ CHROME SESSION STARTED.
+🔐 PRECONDITION: LOGGING IN AND NAVIGATING TO COMERCIOS MODULE...
+   🌐 NAVIGATING TO LOGIN: https://fat.memphis.mx/v2/login
+   ✏️  ENTERING CREDENTIALS — USER: eamartin
+   🖱️  CLICKING LOGIN BUTTON...
+   ⏳ WAITING FOR HOME DASHBOARD TO LOAD...
+   🌐 POST-LOGIN URL: https://fat.memphis.mx/home
+   🖱️  CLICKING ORANGE 'COMERCIOS' CARD (4-STRATEGY CASCADE)...
+   ✅ CARD CLICKED — STRATEGY 3 (JS TEXT WALK: text-walk:fallback-up2).
+   🌐 CURRENT URL AFTER CARD CLICK: https://fat.memphis.mx/merchant
+   ⏳ WAITING FOR COMERCIOS TABLE TO RENDER...
+
+📸 TAKING SCREENSHOT #1 — COMERCIOS TABLE BEFORE CLICKING NUEVO...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_1_COMERCIOS_TABLE.png
+
+👉 STEP 1: CLICKING 'NUEVO +' BUTTON...
+   ✅ 'NUEVO +' CLICKED — STRATEGY 1 (XPATH).
+   🌐 CURRENT URL: https://fat.memphis.mx/merchant/create
+
+📸 TAKING SCREENSHOT #2 — CREATION FORM OPENED...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_2_CREATION_FORM_OPEN.png
+
+👉 STEP 2: FILLING SECTION 1 — DATOS DE COMERCIO...
+      ✅ CLIENTE → 'ALIADAS XIMPLE' (FIRST AVAILABLE OPTION).
+      ✅ TIPO DE PERSONA → 'Persona Física' (FIRST AVAILABLE OPTION).
+      ❌ RAZON SOCIAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Razón Social') or contains(@id,'razon') or         contains(@formcontrolname,'razon')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ NOMBRE COMERCIAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Nombre Comercial') or         contains(@formcontrolname,'nombreComercial') or         contains(@formcontrolname,'nombre_comercial')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ RFC → 'CACX7605101P8'
+      ❌ REPRESENTANTE FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Representante') or         contains(@formcontrolname,'representante')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ REGIMEN FISCAL → '601 - General de Ley Personas Morales' (FIRST AVAILABLE OPTION).
+      ❌ URL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[@placeholder='URL' or contains(@formcontrolname,'url')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CALLE FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Calle') or contains(@formcontrolname,'calle')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ NO. EXTERIOR FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Exterior') or contains(@formcontrolname,'exterior') or         contains(@formcontrolname,'noExt')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ NO. INTERIOR FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Interior') or contains(@formcontrolname,'interior') or         contains(@formcontrolname,'noInt')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ COLONIA FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Colonia') or contains(@formcontrolname,'colonia')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CODIGO POSTAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Código Postal') or contains(@placeholder,'Postal') or         contains(@formcontrolname,'codigoPostal') or contains(@formcontrolname,'cp')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ MUNICIPIO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Municipio') or contains(@placeholder,'Alcald') or         contains(@formcontrolname,'municipio') or contains(@formcontrolname,'alcaldia')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CIUDAD FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Ciudad') or contains(@formcontrolname,'ciudad')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ ESTADO → 'Aguascalientes' (FIRST AVAILABLE OPTION).
+      ✅ PAIS → 'Afghanistan' (FIRST AVAILABLE OPTION).
+      ❌ DESCRIPCION FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//textarea[contains(@placeholder,'Descripción') or contains(@formcontrolname,'descripcion')] | //input[contains(@placeholder,'Descripción') or contains(@formcontrolname,'descripcion')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ AGENTE COMERCIAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Agente') or contains(@formcontrolname,'agente')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+
+📸 TAKING SCREENSHOT #3 — SECTION 1 FILLED...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_3_SECTION1_FILLED.png
+
+👉 STEP 3: FILLING SECTION 2 — DATOS DE CONTACTO...
+      ❌ NOMBRE CONTACTO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Nombre') or contains(@formcontrolname,'nombre')][ancestor::*[.//*[contains(text(),'DATOS DE CONTACTO') or              contains(text(),'Datos de Contacto')]]]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ ROL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Rol') or contains(@formcontrolname,'rol')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CORREO ELECTRONICO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Correo') or contains(@placeholder,'Email') or         contains(@formcontrolname,'correo') or contains(@formcontrolname,'email')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ TELEFONO PRINCIPAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Teléfono Principal') or         contains(@formcontrolname,'telefonoPrincipal')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ TELEFONO ALTERNO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Teléfono Alterno') or         contains(@formcontrolname,'telefonoAlterno')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CELULAR FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Celular') or contains(@formcontrolname,'celular')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+
+📸 TAKING SCREENSHOT #4 — SECTION 2 FILLED...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_4_SECTION2_FILLED.png
+
+👉 STEP 4: FILLING SECTION 3 — DATOS DE OPERACION...
+      ✅ ESQUEMA TRANSACCIONAL → 'Esquema 0 - No Agregador' (FIRST AVAILABLE OPTION).
+      ❌ AFILIACION NO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Afiliación No') or         contains(@formcontrolname,'afiliacion')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ SUBAFILIACION NO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Subafiliación') or         contains(@formcontrolname,'subafiliacion')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ GIRO MCC → '12 3 3 33 - Giro Test' (FIRST AVAILABLE OPTION).
+      ✅ BANCO ADQUIRENTE → 'B058 - BANREGIO' (FIRST AVAILABLE OPTION).
+      ✅ RED LOGICA → 'AGRS - Agregador' (FIRST AVAILABLE OPTION).
+      ✅ NOMBRE AGREGADOR → 'MPHS - MEMPHIS' (FIRST AVAILABLE OPTION).
+      ✅ PROCESADOR → 'AMEX - AMERICAN EXPRESS' (FIRST AVAILABLE OPTION).
+      ❌ TOKEN DE REGISTRO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Token') or contains(@formcontrolname,'token')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ NOMBRE COMERCIO BROXEL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Nombre del Comercio') or         contains(@formcontrolname,'nombreBroxel')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ VISA FACILITADOR → '4000000000001'
+      ❌ MASTERCARD FACILITADOR FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"(//input[contains(@id,'mastercard') or contains(@formcontrolname,'mastercard')])[1]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ INTERNACIONAL FACILITADOR FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"(//input[contains(@id,'internacional') or contains(@formcontrolname,'internacional')])[1]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ VISA ISO → '4000000000002'
+      ❌ MASTERCARD ISO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"(//input[contains(@id,'mastercard') or contains(@formcontrolname,'mastercard')])[2]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ ID MEDIO FAILED: Message: element not interactable
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#elementnotinteractableexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1c4e]
+	chromedriver!(No symbol) [0x626adf]
+	chromedriver!(No symbol) [0x625830]
+	chromedriver!(No symbol) [0x64d86c]
+	chromedriver!(No symbol) [0x6214f4]
+	chromedriver!(No symbol) [0x64da34]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ MODO TRANSACCION → JS FALLBACK: 'set:RND - Modo de prueba respuesta aleatoria'.
+      ✅ URL DESTINO → JS FALLBACK: 'set:https://colecto.banregio.com/adq'.
+      ✅ PERFIL TRANSACCIONAL → 'CARGO_RECURRENTE' (FIRST AVAILABLE OPTION).
+      ❌ SERIE TERMINAL FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Serie Terminal') or contains(@formcontrolname,'serie')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ AFILIACION LINK DE PAGO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Afiliación Link') or         contains(@formcontrolname,'afiliacionLink')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ ID MEDIO LINK DE PAGO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'ID Medio Link') or         contains(@formcontrolname,'idMedioLink')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ✅ VALOR DE IMPUESTO → '16%' (FIRST AVAILABLE OPTION).
+
+📸 TAKING SCREENSHOT #5 — SECTION 3 FILLED...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_5_SECTION3_FILLED.png
+
+👉 STEP 5: FILLING SECTION 4 — VALIDACIONES...
+      ❌ MONTO MINIMO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Monto') and contains(@placeholder,'Mínima')] | //input[contains(@formcontrolname,'montoMin') or contains(@formcontrolname,'minimo')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ MONTO MAXIMO FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Monto') and contains(@placeholder,'Máximo')] | //input[contains(@formcontrolname,'montoMax') or contains(@formcontrolname,'maximo')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+
+👉 STEP 6: FILLING SECTION 5 — DATOS BANCARIOS...
+      ✅ BANCO → 'Banco AutoTest'
+      ❌ TARJETA FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Tarjeta') or contains(@formcontrolname,'tarjeta')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ NO. CUENTA FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'No. Cuenta') or contains(@formcontrolname,'cuenta')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+      ❌ CLABE FAILED: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'CLABE') or contains(@formcontrolname,'clabe')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+
+📸 TAKING SCREENSHOT #6 — SECTIONS 4 AND 5 FILLED...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_6_SECTIONS4_5_FILLED.png
+
+👉 STEP 7: SECTIONS 6 & 7 — COMISIONES: USING DEFAULT 0% VALUES...
+   ℹ️  COMMISSION FIELDS ARE PRE-FILLED WITH 0% / $0 — NO INPUT NEEDED.
+
+👉 STEP 8: SCROLLING TO BOTTOM AND CLICKING 'GUARDAR' BUTTON...
+   ✅ 'GUARDAR' CLICKED — STRATEGY 1 (XPATH).
+
+👉 STEP 9: WAITING FOR REDIRECT TO TABLE AND CLICKING PENCIL ✏️...
+   ⚠️  STILL ON FORM URL: https://fat.memphis.mx/merchant/create — NAVIGATING TO TABLE DIRECTLY...
+   🌐 CURRENT URL BEFORE PENCIL CLICK: https://fat.memphis.mx/merchant
+   ✅ PENCIL CLICKED — STRATEGY 1 (FIRST BUTTON IN FIRST TR).
+   🌐 CURRENT URL: https://fat.memphis.mx/merchant/edit/154
+
+👉 STEP 10: VERIFYING 'NOMBRE COMERCIAL' MATCHES ORIGINAL INPUT...
+   ⚠️  FIELD NOT FOUND VIA XPATH — TRYING JS: Message: no such element: Unable to locate element: {"method":"xpath","selector":"//input[contains(@placeholder,'Nombre Comercial') or         contains(@formcontrolname,'nombreComercial') or         contains(@formcontrolname,'nombre_comercial')]"}
+  (Session info: chrome=147.0.7727.102); For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors#nosuchelementexception
+Stacktrace:
+	chromedriver!GetHandleVerifier [0x7db373+10553]
+	chromedriver!GetHandleVerifier [0x7db4a4+10684]
+	chromedriver!(No symbol) [0x5e1e10]
+	chromedriver!(No symbol) [0x62a9da]
+	chromedriver!(No symbol) [0x62ac7b]
+	chromedriver!(No symbol) [0x66d162]
+	chromedriver!(No symbol) [0x64d8b4]
+	chromedriver!(No symbol) [0x66aa36]
+	chromedriver!(No symbol) [0x64d606]
+	chromedriver!(No symbol) [0x620039]
+	chromedriver!(No symbol) [0x620df4]
+	chromedriver!GetHandleVerifier [0xa5ddb4+292f94]
+	chromedriver!GetHandleVerifier [0xa5937d+28e55d]
+	chromedriver!GetHandleVerifier [0xa78215+2ad3f5]
+	chromedriver!GetHandleVerifier [0x7f4c18+29df8]
+	chromedriver!GetHandleVerifier [0x7fc6fd+318dd]
+	chromedriver!GetHandleVerifier [0x7e3c78+18e58]
+	chromedriver!GetHandleVerifier [0x7e3e42+19022]
+	chromedriver!GetHandleVerifier [0x7cd45f+263f]
+	KERNEL32!BaseThreadInitThunk [0x75f55d49+19]
+	ntdll!RtlInitializeExceptionChain [0x7716d83b+6b]
+	ntdll!RtlGetAppContainerNamedObjectPath [0x7716d7c1+231]
+
+   ❌ 'AutoTest Comercio' NOT FOUND IN ANY INPUT.
+
+📸 TAKING SCREENSHOT #8 — EDIT FORM REOPENED (VERIFICATION STATE)...
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_8_EDIT_FORM_VERIFIED.png
+
+   🔬 MER-06 ASSERTION SUMMARY:
+      • 'NUEVO +' CLICKED          : True
+      • 'GUARDAR' CLICKED          : True
+
+💥 MER-06 CRITICAL ERROR: name 'toast_detected' is not defined
+✔ SCREENSHOT TAKEN: evidencias\Web\MER_06_TECHNICAL_ERROR.png
+
+🏁 CLOSING BROWSER...
+
+📄 GENERATING HTML REPORT...
+✅ HTML REPORT GENERATED: evidencias_zip/MER_REPORT_20260424_102958.html
+======================================================================
+
