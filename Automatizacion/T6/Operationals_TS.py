@@ -129,7 +129,7 @@ def helper_login_to_calculator(driver, wait):
 def _navigate_to_transactions_tab(driver, wait):
     print("   🔍 [NAV] ATTEMPTING STRATEGY 1: CONTENT-DESC WITH INDEX...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_TRANSACCIONES).click()
+        driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_TRANSACTIONSS).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 1 SUCCEEDED.")
         return True
@@ -174,7 +174,7 @@ def _verify_transactions_screen_loaded(driver, wait):
     print("   🔍 [VERIFY] CHECKING INDICATOR 1: HEADER TITLE 'TRANSACCIONES'...")
     try:
         wait.until(EC.presence_of_element_located(
-            (By.XPATH, config.XPATH_TS_HEADER_TITULO)
+            (By.XPATH, config.XPATH_TS_HEADER_TITLE)
         ))
         print("   ✅ [VERIFY] INDICATOR 1 FOUND: TRANSACTIONS HEADER TITLE VISIBLE.")
         return True
@@ -184,7 +184,7 @@ def _verify_transactions_screen_loaded(driver, wait):
     print("   🔍 [VERIFY] CHECKING INDICATOR 2: TRANSACTION LIST OR EMPTY STATE...")
     try:
         wait.until(EC.presence_of_element_located(
-            (By.XPATH, config.XPATH_TS_LISTA_O_ESTADO_VACIO)
+            (By.XPATH, config.XPATH_TS_EMPTY_STATE)
         ))
         print("   ✅ [VERIFY] INDICATOR 2 FOUND: LIST OR EMPTY-STATE MESSAGE VISIBLE.")
         return True
@@ -210,7 +210,7 @@ def _verify_transactions_screen_loaded(driver, wait):
 def _click_corte_por_dia_tab(driver, wait):
     print("   🔍 [NAV] ATTEMPTING STRATEGY 1: CONTENT-DESC 'CORTE POR DÍA'...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_TS_TAB_CORTE_DIA).click()
+        driver.find_element(By.XPATH, config.XPATH_TS_TAB_DAILY_CUT).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 1 SUCCEEDED.")
         return True
@@ -219,7 +219,7 @@ def _click_corte_por_dia_tab(driver, wait):
 
     print("   🔍 [NAV] ATTEMPTING STRATEGY 2: TEXT ATTRIBUTE MATCH...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_TS_TAB_CORTE_DIA_TEXT).click()
+        driver.find_element(By.XPATH, config.XPATH_TS_TAB_DAILY_CUT_TEXT).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 2 SUCCEEDED.")
         return True
@@ -228,7 +228,7 @@ def _click_corte_por_dia_tab(driver, wait):
 
     print("   🔍 [NAV] ATTEMPTING STRATEGY 3: PARTIAL TEXT 'CORTE'...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_TS_TAB_CORTE_DIA_PARTIAL).click()
+        driver.find_element(By.XPATH, config.XPATH_TS_TAB_DAILY_CUT_PARTIAL).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 3 SUCCEEDED.")
         return True
@@ -237,7 +237,7 @@ def _click_corte_por_dia_tab(driver, wait):
 
     print("   🔍 [NAV] ATTEMPTING STRATEGY 4: SECOND TAB BY SIBLING POSITION...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_TS_TAB_CORTE_DIA_SIBLING).click()
+        driver.find_element(By.XPATH, config.XPATH_TS_TAB_DAILY_CUT_SIBLING).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 4 SUCCEEDED.")
         return True
@@ -299,7 +299,7 @@ def _get_current_navigator_date(driver):
 # =================================================================================
 def _click_date_arrow(driver, wait, direction="back"):
     dir_label  = "◄ BACK" if direction == "back" else "► FORWARD"
-    xpath_abs  = config.XPATH_TS_BTN_FECHA_ANTERIOR if direction == "back" else config.XPATH_TS_BTN_FECHA_SIGUIENTE
+    xpath_abs  = config.XPATH_TS_BTN_PREVIOUS_DATE if direction == "back" else config.XPATH_TS_BTN_NEXT_DATE
     x_coord    = config.TS_ARROW_BACK_X if direction == "back" else config.TS_ARROW_FWD_X
 
     date_before = _get_current_navigator_date(driver)
@@ -372,7 +372,7 @@ def _get_first_aprobacion_item(driver):
     print("   🔍 [LIST READER] SCANNING FOR FIRST 'APROBACIÓN' ITEM...")
 
     aprobacion_elements = driver.find_elements(
-        By.XPATH, config.XPATH_TS_ITEM_APROBACION_STATUS
+        By.XPATH, config.XPATH_TS_ITEM_APPROVAL_STATUS
     )
     print(f"   📊 [LIST READER] 'APROBACIÓN' ELEMENTS FOUND: {len(aprobacion_elements)}")
 
@@ -613,7 +613,7 @@ def _get_first_cancelacion_item(driver):
     print("   🔍 [LIST READER] SCANNING FOR FIRST 'CANCELACIÓN' ITEM...")
 
     cancelacion_elements = driver.find_elements(
-        By.XPATH, config.XPATH_TS_ITEM_CANCELACION_STATUS
+        By.XPATH, config.XPATH_TS_ITEM_STATUS_CANCELATION
     )
     print(f"   📊 [LIST READER] 'CANCELACIÓN' ELEMENTS FOUND: {len(cancelacion_elements)}")
 
@@ -816,7 +816,7 @@ def TS_71():
         print("\n👉 STEP 2: VERIFYING 'ÚLTIMOS 30 DÍAS' TAB IS ACTIVE BY DEFAULT...")
         tab_30_dias_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_TAB_30_DIAS,
+            config.XPATH_TS_TAB_30_DAYS,
             "ÚLTIMOS 30 DÍAS TAB",
             driver
         )
@@ -1142,13 +1142,13 @@ def TS_73():
 
         monto_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_CORTE_MONTO_TOTAL,
+            config.XPATH_TS_TOTAL_AMOUNT,
             "MONTO TOTAL LABEL",
             driver
         )
         subtotal_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_CORTE_SUBTOTAL_PAGOS,
+            config.XPATH_TS_SUBTOTAL_CUT_PAYMENTS,
             "SUBTOTAL DE PAGOS LABEL",
             driver
         )
@@ -1164,7 +1164,7 @@ def TS_73():
         print("\n👉 STEP 5: VERIFYING 'IMPRIMIR CORTE' BUTTON IS PRESENT...")
         btn_imprimir = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_BTN_IMPRIMIR_CORTE,
+            config.XPATH_TS_BTN_PRINT_CUT,
             "IMPRIMIR CORTE BUTTON",
             driver
         )
@@ -1178,7 +1178,7 @@ def TS_73():
         print("\n👉 STEP 6: VERIFYING 'MOVIMIENTOS' SECTION IS PRESENT...")
         movimientos_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_CORTE_MOVIMIENTOS,
+            config.XPATH_TS_CUT_MOVEMENTS,
             "MOVIMIENTOS SECTION",
             driver
         )
@@ -1644,7 +1644,7 @@ def TS_76():
         # ── STEP 4: VERIFY DETAIL SCREEN LOADED ──────────────────────────────
         print("\n👉 STEP 4: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_loaded = utils.verificar_existencia(
-            wait, config.XPATH_TS_DETALLE_TITULO,
+            wait, config.XPATH_TS_TITLE_DETAILS,
             "DETAIL SCREEN TITLE 'Detalle'", driver
         )
 
@@ -1652,7 +1652,7 @@ def TS_76():
             print("   ⚠️  STEP 4 WARNING — 'DETALLE' TITLE NOT FOUND. CHECKING FOR AMOUNT...")
             
             detail_loaded = utils.verificar_existencia(
-                wait, config.XPATH_TS_DETALLE_MONTO_GRANDE,
+                wait, config.XPATH_TS_LARGE_SCALE_DETAIL,
                 "DETAIL SCREEN LARGE AMOUNT", driver
             )
 
@@ -1734,7 +1734,7 @@ def TS_76():
         # ── STEP 8: VERIFY DETAIL FIELDS ARE PRESENT (STRUCTURE CHECK) ────────
         print("\n👉 STEP 8: VERIFYING DETAIL SCREEN FIELD LABELS ARE PRESENT...")
         fields_found = {}
-        for label, xpath in config.TS_DETALLE_CAMPOS_REQUERIDOS.items():
+        for label, xpath in config.TS_DETAILS_REQUIRED_FIELDS.items():
             found = utils.verificar_existencia(wait, xpath, label, driver)
             fields_found[label] = found
 
@@ -1750,7 +1750,7 @@ def TS_76():
         # ── STEP 9: VERIFY ESTATUS IS "APROBADA" ─────────────────────────────
         print("\n👉 STEP 9: VERIFYING ESTATUS IS 'APROBADA'...")
         estatus_ok = utils.verificar_existencia(
-            wait, config.XPATH_TS_DETALLE_ESTATUS_APROBADA,
+            wait, config.XPATH_TS_DETAIL_APPROVED_STATUS,
             "ESTATUS — APROBADA", driver
         )
         if estatus_ok:
@@ -1852,11 +1852,11 @@ def TS_77():
         # ── STEP 4: VERIFY DETAIL SCREEN LOADED ──────────────────────────────
         print("\n👉 STEP 4: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_loaded = utils.verificar_existencia(
-            wait, config.XPATH_TS_DETALLE_TITULO, "DETAIL SCREEN TITLE", driver
+            wait, config.XPATH_TS_TITLE_DETAILS, "DETAIL SCREEN TITLE", driver
         )
         if not detail_loaded:
             detail_loaded = utils.verificar_existencia(
-                wait, config.XPATH_TS_DETALLE_MONTO_GRANDE, "DETAIL LARGE AMOUNT", driver
+                wait, config.XPATH_TS_LARGE_SCALE_DETAIL, "DETAIL LARGE AMOUNT", driver
             )
         if not detail_loaded:
             print("\n❌ TS-77: FAILED — DETAIL SCREEN DID NOT OPEN.")
@@ -1870,11 +1870,11 @@ def TS_77():
         # ── STEP 5: VERIFY BOTH TABS (VENTA / CANCELACIÓN) ARE PRESENT ────────
         print("\n👉 STEP 5: VERIFYING 'VENTA' AND 'CANCELACIÓN' TABS ARE PRESENT...")
         tab_venta_ok = utils.verificar_existencia(
-            wait, config.XPATH_TS_DETALLE_TAB_VENTA,
+            wait, config.XPATH_TS_DETAIL_SELL_TAB,
             "TAB 'VENTA'", driver
         )
         tab_cancelacion_ok = utils.verificar_existencia(
-            wait, config.XPATH_TS_DETALLE_TAB_CANCELACION,
+            wait, config.XPATH_TS_DETAIL_CANCELATION_TAB,
             "TAB 'CANCELACIÓN'", driver
         )
 
@@ -2313,14 +2313,14 @@ def TS_79():
 
         # ── STEP 3: NAVIGATE BACK DAY BY DAY UNTIL DATA IS FOUND ─────────────
         print(f"\n👉 STEP 3: SEARCHING FOR A DATE WITH TRANSACTIONS "
-              f"(MAX {config.TS_MAX_DIAS_BUSQUEDA} DAYS BACK)...")
+              f"(MAX {config.TS_MAX_SEARCH_DAYS} DAYS BACK)...")
         print("   ⏩ NAVIGATION LOGS SUPPRESSED — ONLY RESULT WILL BE SHOWN.")
 
         days_navigated   = 0
         date_found       = None
         monto_found      = None
         subtotal_found   = None
-        max_days         = config.TS_MAX_DIAS_BUSQUEDA
+        max_days         = config.TS_MAX_SEARCH_DAYS
 
         for i in range(max_days):
             
@@ -2338,12 +2338,12 @@ def TS_79():
             
             try:
                 driver.find_element(
-                    By.XPATH, config.XPATH_TS_BTN_FECHA_ANTERIOR
+                    By.XPATH, config.XPATH_TS_BTN_PREVIOUS_DATE
                 ).click()
             except:
                 try:
                     driver.find_element(
-                        By.XPATH, config.XPATH_TS_BTN_FECHA_ANTERIOR_POS
+                        By.XPATH, config.XPATH_TS_BTN_PREVIOUS_DATE
                     ).click()
                 except:
                     pass
@@ -2357,7 +2357,7 @@ def TS_79():
             print(f"   🔢 SUBTOTAL: '{subtotal_found}'")
         else:
             print(f"   ⚠️  NO DATE WITH TRANSACTIONS FOUND IN {max_days} DAYS.")
-            print(f"   💡 INCREASE config.TS_MAX_DIAS_BUSQUEDA IF MORE HISTORY EXISTS.")
+            print(f"   💡 INCREASE config.TS_MAX_SEARCH_DAYS IF MORE HISTORY EXISTS.")
 
         utils.tomar_screenshot(driver, "TS_79_STEP3_DATE_WITH_DATA")
 
@@ -2407,10 +2407,10 @@ def TS_79():
         # ── STEP 7: VERIFY LABELS ARE PRESENT ON SCREEN ───────────────────────
         print("\n👉 STEP 7: VERIFYING 'MONTO TOTAL' AND 'SUBTOTAL DE PAGOS' LABELS...")
         monto_label_ok    = utils.verificar_existencia(
-            wait, config.XPATH_TS_CORTE_MONTO_TOTAL, "MONTO TOTAL LABEL", driver
+            wait, config.XPATH_TS_TOTAL_CUT_AMOUNT, "MONTO TOTAL LABEL", driver
         )
         subtotal_label_ok = utils.verificar_existencia(
-            wait, config.XPATH_TS_CORTE_SUBTOTAL_PAGOS, "SUBTOTAL DE PAGOS LABEL", driver
+            wait, config.XPATH_TS_SUBTOTAL_CUT_PAYMENTS, "SUBTOTAL DE PAGOS LABEL", driver
         )
 
         if monto_label_ok and subtotal_label_ok:
@@ -2484,7 +2484,7 @@ def TS_80():
         
         print("\n👉 STEP 1: TAPPING 'INICIO' TAB TO ENSURE FRESH STATE ON RETURN...")
         try:
-            driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_INICIO).click()
+            driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_HOME).click()
             time.sleep(2)
             print("   ✅ STEP 1 COMPLETE — NOW ON 'INICIO' TAB.")
         except Exception as e:
@@ -2497,7 +2497,7 @@ def TS_80():
 
         
         try:
-            driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_TRANSACCIONES).click()
+            driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_TRANSACTIONS).click()
         except Exception as e:
             print(f"   ⚠️  TAP FAILED WITH PRIMARY XPATH: {e} — TRYING FALLBACK...")
             try:
@@ -2547,7 +2547,7 @@ def TS_80():
             print("\n👉 STEP 4: FALLBACK — TRYING WebDriverWait FOR 'CARGANDO'...")
             try:
                 wait_short.until(EC.presence_of_element_located(
-                    (By.XPATH, config.XPATH_TS_LOADING_CARGANDO)
+                    (By.XPATH, config.XPATH_TS_LOADING)
                 ))
                 loading_detected = True
                 print("   ✅ STEP 4 FALLBACK SUCCESS — 'CARGANDO' FOUND VIA WebDriverWait.")
