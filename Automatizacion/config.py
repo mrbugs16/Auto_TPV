@@ -320,6 +320,16 @@ XPATH_ERROR_GENERICO = (
     '] | //android.widget.Toast'
 )
 
+# ==================================================================================
+# WEB PLATFORM — XPATHS: COMERCIOS (MER)
+# ==================================================================================
+
+# 1. BOTÓN PARA CREAR UN NUEVO COMERCIO
+XPATH_BTN_NUEVO = "//button[contains(translate(normalize-space(.), 'abcdefghijklmnopqrstuvwxyzáéíóúñ', 'ABCDEFGHIJKLMNOPQRSTUVWXYZÁÉÍÓÚÑ'), 'NUEVO') or contains(., '+')]"
+
+# 2. BOTÓN DE LÁPIZ (EDITAR) EN LA PRIMERA FILA DE LA TABLA
+XPATH_BTN_PENCIL_FIRST_ROW = "(//tbody//tr[1]//button[contains(@class, 'edit') or contains(@class, 'pencil') or .//i[contains(@class, 'pi-pencil')]])[1]"
+
 
 # ==================================================================================
 # [10] WEB PLATFORM — URLS & DRIVER SETTINGS
