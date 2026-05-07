@@ -243,7 +243,7 @@ def SVS_92():
 
         # STEP 2: VERIFY THAT "LINKS DE PAGO" CARD IS VISIBLE
         print("\n👉 STEP 2: VERIFYING 'LINKS DE PAGO' CARD IS DISPLAYED...")
-        card_visible = _verify_links_de_pago_visible(driver)
+        card_visible = _verify_payment_links_visible(driver)
 
         if not card_visible:
             print("\n💥 SVS-92: FAILED — 'LINKS DE PAGO' CARD NOT FOUND ON SERVICES TAB.")
@@ -305,7 +305,7 @@ def SVS_93():
 
         # STEP 2: VERIFY THAT "LINKS DE PAGO" CARD IS VISIBLE
         print("\n👉 STEP 2: VERIFYING 'LINKS DE PAGO' CARD IS DISPLAYED...")
-        card_visible = _verify_links_de_pago_visible(driver)
+        card_visible = _verify_payment_links_visible(driver)
 
         if not card_visible:
             print("\n💥 SVS-93: FAILED — LINK DE PAGO IS NOT VISIBLE")
