@@ -22,9 +22,9 @@ import os
 import re
 import time
 
-ruta_proyecto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if ruta_proyecto not in sys.path:
-    sys.path.append(ruta_proyecto)
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_path not in sys.path:
+    sys.path.append(project_path)
 
 import config
 import utils
@@ -173,7 +173,7 @@ def _navigate_to_transactions_tab(driver, wait):
 # =================================================================================
 # INTERNAL HELPER: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE
 # =================================================================================
-def _ensure_ultimos_30_dias_tab(driver, wait):
+def _ensure_last_30_days_tab(driver, wait):
     print("   🔍 [SUB-TAB] ATTEMPTING STRATEGY 1: EXACT MATCH 'Últimos 30 días'...")
     try:
         driver.find_element(
@@ -317,7 +317,7 @@ def DT_82():
 
         # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
-        _ensure_ultimos_30_dias_tab(driver, wait)
+        _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
@@ -704,7 +704,7 @@ def DT_83():
 
         # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
-        _ensure_ultimos_30_dias_tab(driver, wait)
+        _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
@@ -946,7 +946,7 @@ def DT_84():
 
         # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
-        _ensure_ultimos_30_dias_tab(driver, wait)
+        _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
@@ -1221,7 +1221,7 @@ def DT_85():
 
         # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
-        _ensure_ultimos_30_dias_tab(driver, wait)
+        _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
@@ -1454,7 +1454,7 @@ def DT_89():
  
         # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
-        _ensure_ultimos_30_dias_tab(driver, wait)
+        _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
  

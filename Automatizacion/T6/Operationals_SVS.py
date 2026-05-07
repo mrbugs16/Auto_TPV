@@ -21,9 +21,9 @@ import os
 import re
 import time
 
-ruta_proyecto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if ruta_proyecto not in sys.path:
-    sys.path.append(ruta_proyecto)
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_path not in sys.path:
+    sys.path.append(project_path)
 
 import config
 import utils
@@ -170,8 +170,8 @@ def _navigate_to_services_tab(driver, wait):
 
 # =================================================================================
 # INTERNAL HELPER: VERIFY THAT "LINKS DE PAGO" CARD IS VISIBLE ON SCREEN
-# =================================================================================
-def _verify_links_de_pago_visible(driver):
+# ================================================================================= 
+def _verify_payment_links_visible(driver):
     """
     CHECKS THAT THE "LINKS DE PAGO" CARD IS RENDERED ON THE SERVICES TAB.
     THIS IS THE ONLY CONTENT ELEMENT VISIBLE ON THE SCREEN (SEE SCREENSHOT).
@@ -343,7 +343,7 @@ def SVS_93():
 # =================================================================================
 # INTERNAL HELPER: CLICK THE "LINKS DE PAGO" CARD ON THE SERVICES TAB
 # =================================================================================
-def _click_links_de_pago_card(driver):
+def _click_payment_links_card(driver):
     """
     TAPS THE "LINKS DE PAGO" CARD ON THE SERVICES SCREEN.
     THE CARD IS A TOUCHABLE ELEMENT — ITS CLICKABLE ANCESTOR MAY NOT CARRY
@@ -407,7 +407,7 @@ def _click_links_de_pago_card(driver):
 # =================================================================================
 # INTERNAL HELPER: VERIFY THE "LINK DE PAGO" DETAIL SCREEN LOADED CORRECTLY
 # =================================================================================
-def _verify_link_de_pago_screen(driver):
+def _verify_payment_link_screen(driver):
     heading_found = False
     button_found  = False
  
@@ -492,7 +492,7 @@ def SVS_94():
  
         # STEP 2: CLICK THE "LINKS DE PAGO" CARD
         print("\n👉 STEP 2: CLICKING 'LINKS DE PAGO' CARD...")
-        card_clicked = _click_links_de_pago_card(driver)
+        card_clicked = _click_payment_links_card(driver)
  
         if not card_clicked:
             print("\n💥 SVS-94: FAILED — COULD NOT CLICK 'LINKS DE PAGO' CARD.")
@@ -502,7 +502,7 @@ def SVS_94():
  
         # STEP 3: VERIFY THE "LINK DE PAGO" DETAIL SCREEN LOADED
         print("\n👉 STEP 3: VERIFYING 'LINK DE PAGO' SCREEN LOADED CORRECTLY...")
-        screen_loaded = _verify_link_de_pago_screen(driver)
+        screen_loaded = _verify_payment_link_screen(driver)
  
         if not screen_loaded:
             print("\n💥 SVS-94: FAILED — 'LINK DE PAGO' SCREEN DID NOT LOAD AS EXPECTED.")
@@ -540,7 +540,7 @@ def SVS_94():
 # =================================================================================
 # INTERNAL HELPER: CLICK THE "+ CREAR NUEVO" BUTTON ON THE LINK DE PAGO SCREEN
 # =================================================================================
-def _click_crear_nuevo(driver):
+def _click_create_new(driver):
     """
     TAPS THE FLOATING "+ CREAR NUEVO" BUTTON.
     THE BUTTON IS POSITIONED AT THE BOTTOM OF THE SCREEN AND MAY BE A FAB
@@ -603,7 +603,7 @@ def _click_crear_nuevo(driver):
 # =================================================================================
 # INTERNAL HELPER: FILL THE "MONTO" FIELD
 # =================================================================================
-def _fill_monto(driver, monto):
+def _fill_amount(driver, amount):
     print(f"   🔍 [MONTO] ATTEMPTING STRATEGY 1: PLACEHOLDER @text='Monto'...")
     try:
         el = driver.find_element(
@@ -667,7 +667,7 @@ def _fill_monto(driver, monto):
 # =================================================================================
 # INTERNAL HELPER: FILL THE "PRODUCTO O SERVICIO" FIELD
 # =================================================================================
-def _fill_concepto(driver, concepto):
+def _fill_description(driver, description):
     print(f"   🔍 [CONCEPTO] ATTEMPTING STRATEGY 1: PLACEHOLDER TEXT MATCH...")
     try:
         el = driver.find_element(
@@ -732,7 +732,7 @@ def _fill_concepto(driver, concepto):
 # =================================================================================
 # INTERNAL HELPER: OPEN THE DATE PICKER AND SELECT TODAY'S DATE
 # =================================================================================
-def _select_fecha_vencimiento(driver):
+def _select_due_date(driver):
     
     from datetime import date as _date
  
@@ -884,7 +884,7 @@ def _select_fecha_vencimiento(driver):
 # =================================================================================
 # INTERNAL HELPER: CLICK THE "GENERAR" BUTTON
 # =================================================================================
-def _click_generar(driver):
+def _click_generate(driver):
     
     print("   🔍 [GENERAR] ATTEMPTING STRATEGY 1: EXACT @text='Generar'...")
     try:
@@ -941,7 +941,7 @@ def _click_generar(driver):
 # =================================================================================
 # INTERNAL HELPER: VERIFY THE SUCCESS SCREEN "LINK DE PAGO GENERADO"
 # =================================================================================
-def _verify_link_generado_screen(driver, monto, concepto):
+def _verify_generated_link_screen(driver, amount, description):
     heading_ok  = False
     data_ok     = False
  
@@ -1038,7 +1038,7 @@ def SVS_95():
  
         # STEP 2: CLICK "LINKS DE PAGO" CARD
         print("\n👉 STEP 2: CLICKING 'LINKS DE PAGO' CARD...")
-        if not _click_links_de_pago_card(driver):
+        if not _click_payment_links_card(driver):
             print("\n💥 SVS-95: FAILED — COULD NOT CLICK 'LINKS DE PAGO' CARD.")
             utils.tomar_screenshot(driver, "SVS_95_CARD_CLICK_FAILED")
             _capture_evidence(driver, "SVS_95")
@@ -1046,7 +1046,7 @@ def SVS_95():
  
         # STEP 3: CLICK "+ CREAR NUEVO" BUTTON
         print("\n👉 STEP 3: CLICKING '+ CREAR NUEVO' BUTTON...")
-        if not _click_crear_nuevo(driver):
+        if not _click_create_new(driver):
             print("\n💥 SVS-95: FAILED — COULD NOT CLICK '+ CREAR NUEVO'.")
             utils.tomar_screenshot(driver, "SVS_95_CREAR_FAILED")
             _capture_evidence(driver, "SVS_95")
@@ -1073,7 +1073,7 @@ def SVS_95():
  
         # STEP 6: SELECT FECHA DE VENCIMIENTO (TODAY'S DATE — ALWAYS ENABLED IN PICKER)
         print("\n👉 STEP 6: SELECTING FECHA DE VENCIMIENTO (TODAY'S DATE)...")
-        if not _select_fecha_vencimiento(driver):
+        if not _select_due_date(driver):
             print("\n💥 SVS-95: FAILED — COULD NOT SELECT EXPIRY DATE.")
             utils.tomar_screenshot(driver, "SVS_95_FECHA_FAILED")
             _capture_evidence(driver, "SVS_95")
@@ -1084,7 +1084,7 @@ def SVS_95():
  
         # STEP 7: CLICK "GENERAR"
         print("\n👉 STEP 7: CLICKING 'GENERAR' BUTTON...")
-        if not _click_generar(driver):
+        if not _click_generate(driver):
             print("\n💥 SVS-95: FAILED — COULD NOT CLICK 'GENERAR'.")
             utils.tomar_screenshot(driver, "SVS_95_GENERAR_FAILED")
             _capture_evidence(driver, "SVS_95")
@@ -1154,7 +1154,7 @@ def SVS_96():
  
         # STEP 2: CLICK "LINKS DE PAGO" CARD
         print("\n👉 STEP 2: CLICKING 'LINKS DE PAGO' CARD...")
-        if not _click_links_de_pago_card(driver):
+        if not _click_payment_links_card(driver):
             print("\n💥 SVS-96: FAILED — COULD NOT CLICK 'LINKS DE PAGO' CARD.")
             utils.tomar_screenshot(driver, "SVS_96_CARD_CLICK_FAILED")
             _capture_evidence(driver, "SVS_96")
@@ -1162,7 +1162,7 @@ def SVS_96():
  
         # STEP 3: CLICK "+ CREAR NUEVO" BUTTON
         print("\n👉 STEP 3: CLICKING '+ CREAR NUEVO' BUTTON...")
-        if not _click_crear_nuevo(driver):
+        if not _click_create_new(driver):
             print("\n💥 SVS-96: FAILED — COULD NOT CLICK '+ CREAR NUEVO'.")
             utils.tomar_screenshot(driver, "SVS_96_CREAR_FAILED")
             _capture_evidence(driver, "SVS_96")
@@ -1181,7 +1181,7 @@ def SVS_96():
             
         # STEP 6: SELECT FECHA DE VENCIMIENTO (TODAY'S DATE — SAME AS SVS-95)
         print("\n👉 STEP 6: SELECTING FECHA DE VENCIMIENTO (TODAY'S DATE)...")
-        if not _select_fecha_vencimiento(driver):
+        if not _select_due_date(driver):
             print("\n💥 SVS-96: FAILED — COULD NOT SELECT EXPIRY DATE.")
             utils.tomar_screenshot(driver, "SVS_96_FECHA_FAILED")
             _capture_evidence(driver, "SVS_96")
@@ -1191,7 +1191,7 @@ def SVS_96():
         utils.tomar_screenshot(driver, "SVS_96_FORM_BLANK_MONTO")
  
         print("\n👉 STEP 7: CLICKING 'GENERAR' (EXPECTING VALIDATION TO BLOCK SUBMISSION)...")
-        _click_generar(driver)
+        _click_generate(driver)
         time.sleep(2)
  
         # STEP 8: VERIFY VALIDATION ERROR "INGRESA UN CONCEPTO" IS VISIBLE
@@ -1311,7 +1311,7 @@ def SVS_97():
  
         # STEP 2: CLICK "LINKS DE PAGO" CARD
         print("\n👉 STEP 2: CLICKING 'LINKS DE PAGO' CARD...")
-        if not _click_links_de_pago_card(driver):
+        if not _click_payment_links_card(driver):
             print("\n💥 SVS-97: FAILED — COULD NOT CLICK 'LINKS DE PAGO' CARD.")
             utils.tomar_screenshot(driver, "SVS_97_CARD_CLICK_FAILED")
             _capture_evidence(driver, "SVS_97")
@@ -1319,7 +1319,7 @@ def SVS_97():
  
         # STEP 3: CLICK "+ CREAR NUEVO" BUTTON
         print("\n👉 STEP 3: CLICKING '+ CREAR NUEVO' BUTTON...")
-        if not _click_crear_nuevo(driver):
+        if not _click_create_new(driver):
             print("\n💥 SVS-97: FAILED — COULD NOT CLICK '+ CREAR NUEVO'.")
             utils.tomar_screenshot(driver, "SVS_97_CREAR_FAILED")
             _capture_evidence(driver, "SVS_97")
@@ -1338,7 +1338,7 @@ def SVS_97():
  
         # STEP 6: SELECT FECHA DE VENCIMIENTO (TODAY'S DATE — SAME AS SVS-95)
         print("\n👉 STEP 6: SELECTING FECHA DE VENCIMIENTO (TODAY'S DATE)...")
-        if not _select_fecha_vencimiento(driver):
+        if not _select_due_date(driver):
             print("\n💥 SVS-97: FAILED — COULD NOT SELECT EXPIRY DATE.")
             utils.tomar_screenshot(driver, "SVS_97_FECHA_FAILED")
             _capture_evidence(driver, "SVS_97")
@@ -1348,7 +1348,7 @@ def SVS_97():
         utils.tomar_screenshot(driver, "SVS_97_FORM_BLANK_CONCEPTO")
  
         print("\n👉 STEP 7: CLICKING 'GENERAR' (EXPECTING VALIDATION TO BLOCK SUBMISSION)...")
-        _click_generar(driver)
+        _click_generate(driver)
         time.sleep(2)
  
         # STEP 8: VERIFY VALIDATION ERROR "INGRESA UN CONCEPTO" IS VISIBLE
