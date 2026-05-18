@@ -28,6 +28,7 @@ if project_path not in sys.path:
 
 import config
 import utils
+from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -157,7 +158,7 @@ def _navigate_to_transactions_tab(driver, wait):
     print("   🔍 [NAV] ATTEMPTING STRATEGY 4: UIAUTOMATOR TEXT SEARCH (FINAL FALLBACK)...")
     try:
         driver.find_element(
-            By.ANDROID_UIAUTOMATOR,
+            AppiumBy.ANDROID_UIAUTOMATOR,
             'new UiSelector().textContains("Transacciones")'
         ).click()
         time.sleep(2)
@@ -201,7 +202,7 @@ def _ensure_last_30_days_tab(driver, wait):
     print("   🔍 [SUB-TAB] ATTEMPTING STRATEGY 3: UIAUTOMATOR TEXT CONTAINS '30'...")
     try:
         driver.find_element(
-            By.ANDROID_UIAUTOMATOR,
+            AppiumBy.ANDROID_UIAUTOMATOR,
             'new UiSelector().textContains("30")'
         ).click()
         time.sleep(2)
@@ -210,7 +211,6 @@ def _ensure_last_30_days_tab(driver, wait):
     except Exception as e:
         print(f"   💥 [SUB-TAB] STRATEGY 3 FAILED: {e}")
 
-    # NOT A HARD BLOCKER — DEFAULT VIEW MAY ALREADY BE "ÚLTIMOS 30 DÍAS"
     print("   ⚠️  [SUB-TAB] ALL STRATEGIES FAILED — ASSUMING DEFAULT VIEW IS ALREADY ACTIVE.")
     return False
 
@@ -242,7 +242,6 @@ def _find_approved_transaction(driver):
     except Exception as e:
         print(f"   ⚠️  [FIND APPROVED] STRATEGY 1 FAILED: {e}")
 
-    # ── STRATEGY 2: FULL ELEMENT ITERATION ───────────────────────────────────
     print("   🔍 [FIND APPROVED] STRATEGY 2: FULL ELEMENT SCAN (text + content-desc)...")
     try:
         approved_count = 0
@@ -256,7 +255,7 @@ def _find_approved_transaction(driver):
                     approved_count += 1
                     if first_match is None:
                         first_match = val
-                    break  
+                    break
 
         if approved_count > 0:
             print(f"   ✅ [FIND APPROVED] STRATEGY 2 SUCCEEDED — "
@@ -267,11 +266,10 @@ def _find_approved_transaction(driver):
     except Exception as e:
         print(f"   ⚠️  [FIND APPROVED] STRATEGY 2 FAILED: {e}")
 
-    # ── STRATEGY 3: UIAUTOMATOR SCROLL INTO VIEW ──────────────────────────────
     print("   🔍 [FIND APPROVED] STRATEGY 3: UIAUTOMATOR SCROLL INTO VIEW...")
     try:
         el = driver.find_element(
-            By.ANDROID_UIAUTOMATOR,
+            AppiumBy.ANDROID_UIAUTOMATOR,
             'new UiScrollable(new UiSelector().scrollable(true))'
             '.scrollIntoView(new UiSelector().textContains("probac"))'
         )
@@ -287,46 +285,39 @@ def _find_approved_transaction(driver):
 
 
 # =================================================================================
-# DT-82: VIEW DETAILS OF APPROVED TRANSACTION. 
+# DT-82: VIEW DETAILS OF APPROVED TRANSACTION.
 # =================================================================================
 def DT_82():
     print("\n" + "=" * 60)
-    print("🧪 DT-82: VIEW DETAILS OF APPROVED TRANSACTION. ")
+    print("🧪 DT-82: VIEW DETAILS OF APPROVED TRANSACTION.")
     print("=" * 60)
 
     driver, wait = utils.iniciar_driver()
 
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
 
-        # ── STEP 1: NAVIGATE TO "TRANSACCIONES" BOTTOM NAV TAB ───────────────
         print("\n👉 STEP 1: NAVIGATING TO 'TRANSACCIONES' BOTTOM NAV TAB...")
         tab_clicked = _navigate_to_transactions_tab(driver, wait)
-
         if not tab_clicked:
             print("\n❌ DT-82: FAILED — COULD NOT NAVIGATE TO 'TRANSACCIONES' TAB.")
             utils.tomar_screenshot(driver, "DT_82_TAB_CLICK_FAILED")
             _capture_evidence(driver, "DT_82")
             return False
-
         print("   ✅ STEP 1 COMPLETE — 'TRANSACCIONES' TAB REACHED.")
         time.sleep(3)
 
-        # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
         _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
-        # ── STEP 3: WAIT FOR HISTORY LIST TO FULLY RENDER ────────────────────
         print("\n👉 STEP 3: WAITING FOR TRANSACTION HISTORY LIST TO FULLY RENDER...")
         time.sleep(3)
         print("   ✅ STEP 3 COMPLETE — RENDER WAIT ELAPSED.")
 
-        # ── STEP 4: SCAN FOR AT LEAST ONE APPROVED TRANSACTION ───────────────
         print("\n👉 STEP 4: SCANNING HISTORY LIST FOR AT LEAST ONE APPROVED TRANSACTION...")
         approved_found, approved_count = _find_approved_transaction(driver)
 
@@ -335,7 +326,6 @@ def DT_82():
         else:
             print("   ❌ STEP 4 — NO APPROVED TRANSACTIONS FOUND IN VISIBLE LIST.")
 
-        # ── DEBUG: LOG ALL VISIBLE TEXT FOR TRACEABILITY ─────────────────────
         print("\n🔍 SCANNING ALL VISIBLE TEXT FOR DEBUGGING...")
         try:
             seen_debug = set()
@@ -348,11 +338,11 @@ def DT_82():
                         break
         except:
             pass
+
         print("\n📸 TAKING SCREENSHOT — TRANSACTION HISTORY LIST (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_82_APPROVED_TRANSACTION_HISTORY")
         _capture_evidence(driver, "DT_82")
 
-        # ── RESULT ────────────────────────────────────────────────────────────
         print("\n" + "-" * 60)
         print("📊 DT-82 VALIDATION SUMMARY:")
         print(f"   TRANSACTIONS TAB REACHED     : ✅")
@@ -387,7 +377,6 @@ def _click_first_transaction_in_list(driver):
     DATE_PATTERN   = re.compile(r"\d{2}-\d{2}-\d{4},\s*\d{2}:\d{2}:\d{2}")
     AMOUNT_PATTERN = re.compile(r"\$[\d,]+\.\d{2}")
 
-    # ── STRATEGY 1: FIND DATE TEXT ELEMENT → WALK UP TO CLICKABLE PARENT ─────
     print("   🔍 [CLICK FIRST] STRATEGY 1: DATE TEXT → WALK UP TO CLICKABLE PARENT ROW...")
     try:
         all_els = driver.find_elements(By.XPATH, "//*")
@@ -402,7 +391,6 @@ def _click_first_transaction_in_list(driver):
         if date_element:
             clicked = driver.execute_script("""
                 var el = arguments[0];
-                // TRAVERSE UP MAX 6 LEVELS LOOKING FOR CLICKABLE CONTAINER
                 for (var i = 0; i < 6; i++) {
                     if (!el.parentElement) break;
                     el = el.parentElement;
@@ -411,7 +399,6 @@ def _click_first_transaction_in_list(driver):
                         return true;
                     }
                 }
-                // FALLBACK: CLICK THE DIRECT PARENT OF THE DATE TEXT
                 if (arguments[0].parentElement) {
                     arguments[0].parentElement.click();
                     return true;
@@ -423,7 +410,6 @@ def _click_first_transaction_in_list(driver):
                 print("   ✅ [CLICK FIRST] STRATEGY 1 SUCCEEDED — CLICKED PARENT CARD.")
                 return True
             else:
-                print("   💡 [CLICK FIRST] JS WALK DID NOT FIND CLICKABLE — TRYING NATIVE PARENT...")
                 try:
                     parent = driver.find_element(
                         By.XPATH,
@@ -437,11 +423,10 @@ def _click_first_transaction_in_list(driver):
     except Exception as e:
         print(f"   ⚠️  [CLICK FIRST] STRATEGY 1 FAILED: {e}")
 
-    # ── STRATEGY 2: UIAUTOMATOR — CLICK FIRST CLICKABLE VIEW CONTAINING A DATE ─
     print("   🔍 [CLICK FIRST] STRATEGY 2: UIAUTOMATOR CLICKABLE ROW WITH DATE TEXT...")
     try:
         driver.find_element(
-            By.ANDROID_UIAUTOMATOR,
+            AppiumBy.ANDROID_UIAUTOMATOR,
             'new UiSelector().clickable(true).descriptionMatches(".*\\d{2}-\\d{2}-\\d{4}.*")'
         ).click()
         print("   ✅ [CLICK FIRST] STRATEGY 2 SUCCEEDED — UIAUTOMATOR DESC MATCH.")
@@ -449,28 +434,23 @@ def _click_first_transaction_in_list(driver):
     except Exception as e:
         print(f"   ⚠️  [CLICK FIRST] STRATEGY 2 FAILED: {e}")
 
-    # ── STRATEGY 3: UIAUTOMATOR — FIRST CLICKABLE android.view.View IN LIST ───
     print("   🔍 [CLICK FIRST] STRATEGY 3: FIRST CLICKABLE android.view.View IN LIST...")
     try:
-        rows = driver.find_elements(
-            By.XPATH,
-            '//android.view.View[@clickable="true"]'
-        )
+        rows = driver.find_elements(By.XPATH, '//android.view.View[@clickable="true"]')
         if rows:
             rows[0].click()
-            print(f"   ✅ [CLICK FIRST] STRATEGY 3 SUCCEEDED — CLICKED FIRST CLICKABLE VIEW.")
+            print("   ✅ [CLICK FIRST] STRATEGY 3 SUCCEEDED — CLICKED FIRST CLICKABLE VIEW.")
             return True
         else:
             print("   ⚠️  [CLICK FIRST] STRATEGY 3 — NO CLICKABLE VIEWS FOUND.")
     except Exception as e:
         print(f"   ⚠️  [CLICK FIRST] STRATEGY 3 FAILED: {e}")
 
-    # ── STRATEGY 4: COORDINATE TAP ON FIRST ROW (ABSOLUTE FALLBACK) ──────────
     print("   🔍 [CLICK FIRST] STRATEGY 4: COORDINATE TAP ON FIRST ROW (y≈200)...")
     try:
         size   = driver.get_window_size()
         tap_x  = size["width"] // 2
-        tap_y  = int(size["height"] * 0.22)   # ~22% FROM TOP = FIRST ROW AREA
+        tap_y  = int(size["height"] * 0.22)
         driver.execute_script("mobile: clickGesture", {"x": tap_x, "y": tap_y})
         time.sleep(1)
         print(f"   ✅ [CLICK FIRST] STRATEGY 4 SUCCEEDED — TAPPED AT ({tap_x}, {tap_y}).")
@@ -513,21 +493,16 @@ def _validate_detail_fields(driver):
     print("   🔍 [FIELD VALIDATOR] CHECKING: TOTAL AMOUNT...")
     total_candidates = [v for v in all_values if AMOUNT_PATTERN.match(v)]
     if total_candidates:
-        
         total_value = max(
             total_candidates,
             key=lambda x: float(x.replace("$", "").replace(",", ""))
         )
-        results["TOTAL_AMOUNT"] = {
-            "value"     : total_value,
-            "format_ok" : True
-        }
+        results["TOTAL_AMOUNT"] = {"value": total_value, "format_ok": True}
         print(f"   ✅ TOTAL AMOUNT: '{total_value}' — FORMAT OK")
     else:
         results["TOTAL_AMOUNT"] = {"value": None, "format_ok": False}
         print("   ❌ TOTAL AMOUNT: NOT FOUND OR WRONG FORMAT")
 
-    # ── STATUS (APROBADA / CANCELADA) ─────────────────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: STATUS (APROBADA / CANCELADA)...")
     status_value = None
     for v in all_values:
@@ -541,7 +516,6 @@ def _validate_detail_fields(driver):
         results["STATUS"] = {"value": None, "format_ok": False}
         print("   ❌ STATUS: NOT FOUND — EXPECTED 'APROBADA' OR 'CANCELADA'")
 
-    # ── SALE AMOUNT (VENTA) ───────────────────────────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: SALE AMOUNT (VENTA)...")
     total_numeric = (
         float(results["TOTAL_AMOUNT"]["value"].replace("$", "").replace(",", ""))
@@ -554,7 +528,6 @@ def _validate_detail_fields(driver):
             float(v.replace("$", "").replace(",", "")) < total_numeric
         )
     ]
-    
     if sale_candidates:
         sale_value = max(
             sale_candidates,
@@ -566,17 +539,14 @@ def _validate_detail_fields(driver):
         results["SALE_AMOUNT"] = {"value": None, "format_ok": False}
         print("   ❌ SALE AMOUNT (VENTA): NOT FOUND")
 
-    # ── TIP AMOUNT (PROPINA) ──────────────────────────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: TIP AMOUNT (PROPINA)...")
     tip_value = None
-    # LOOK FOR ELEMENT DIRECTLY AFTER LABEL "Propina"
     for i, v in enumerate(all_values):
         if "propina" in v.lower() and i + 1 < len(all_values):
             candidate = all_values[i + 1]
             if re.match(r"^\$[\d,]+\.\d{2}$", candidate):
                 tip_value = candidate
                 break
-    # FALLBACK: ANY REMAINING AMOUNT SMALLER THAN SALE
     if not tip_value:
         sale_numeric = (
             float(results["SALE_AMOUNT"]["value"].replace("$", "").replace(",", ""))
@@ -619,7 +589,6 @@ def _validate_detail_fields(driver):
     else:
         print("   ❌ COMMERCE NAME: NOT FOUND OR EMPTY")
 
-    # ── TRANSACTION ID ────────────────────────────────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: TRANSACTION ID...")
     id_value = None
     for i, v in enumerate(all_values):
@@ -638,7 +607,6 @@ def _validate_detail_fields(driver):
     else:
         print(f"   ❌ TRANSACTION ID: VALUE='{id_value}' — WRONG FORMAT OR NOT FOUND")
 
-    # ── DATE (FECHA) ──────────────────────────────────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: DATE (FECHA) FORMAT DD-MM-YYYY, HH:MM:SS...")
     date_value = None
     for i, v in enumerate(all_values):
@@ -646,7 +614,6 @@ def _validate_detail_fields(driver):
             date_value = all_values[i + 1]
             break
     if not date_value:
-        # FALLBACK: ANY VALUE MATCHING THE DATE PATTERN
         for v in all_values:
             if DATE_PATTERN.match(v.strip()):
                 date_value = v
@@ -658,7 +625,6 @@ def _validate_detail_fields(driver):
     else:
         print(f"   ❌ DATE (FECHA): VALUE='{date_value}' — WRONG FORMAT OR NOT FOUND")
 
-    # ── AUTHORIZATION NUMBER (N.º DE AUTORIZACIÓN) ────────────────────────────
     print("   🔍 [FIELD VALIDATOR] CHECKING: AUTHORIZATION NUMBER...")
     auth_value = None
     AUTH_LABEL_FRAGMENTS = ["autorización", "autorizacion", "autoriza"]
@@ -687,12 +653,10 @@ def DT_83():
     driver, wait = utils.iniciar_driver()
 
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
 
-        # ── STEP 1: NAVIGATE TO "TRANSACCIONES" BOTTOM NAV TAB ───────────────
         print("\n👉 STEP 1: NAVIGATING TO 'TRANSACCIONES' BOTTOM NAV TAB...")
         if not _navigate_to_transactions_tab(driver, wait):
             print("\n❌ DT-83: FAILED — COULD NOT NAVIGATE TO 'TRANSACCIONES' TAB.")
@@ -702,23 +666,19 @@ def DT_83():
         print("   ✅ STEP 1 COMPLETE — 'TRANSACCIONES' TAB REACHED.")
         time.sleep(3)
 
-        # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
         _ensure_last_30_days_tab(driver, wait)
         print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
         time.sleep(2)
 
-        # ── STEP 3: WAIT FOR HISTORY LIST TO FULLY RENDER ────────────────────
         print("\n👉 STEP 3: WAITING FOR TRANSACTION HISTORY LIST TO RENDER...")
         time.sleep(3)
         print("   ✅ STEP 3 COMPLETE — RENDER WAIT ELAPSED.")
 
-        # ── STEP 4: TAKE SCREENSHOT OF THE LIST BEFORE CLICKING ──────────────
         print("\n👉 STEP 4: CAPTURING LIST BEFORE TAPPING FIRST TRANSACTION...")
         utils.tomar_screenshot(driver, "DT_83_LIST_BEFORE_TAP")
         print("   ✅ STEP 4 COMPLETE — LIST SCREENSHOT SAVED.")
 
-        # ── STEP 5: CLICK THE FIRST AVAILABLE TRANSACTION IN THE LIST ─────────
         print("\n👉 STEP 5: CLICKING FIRST AVAILABLE TRANSACTION IN THE LIST...")
         if not _click_first_transaction_in_list(driver):
             print("\n❌ DT-83: FAILED — COULD NOT CLICK ANY TRANSACTION ROW.")
@@ -728,10 +688,8 @@ def DT_83():
         time.sleep(3)
         print("   ✅ STEP 5 COMPLETE — TRANSACTION ROW TAPPED.")
 
-        # ── STEP 6: VERIFY DETAIL SCREEN LOADED ──────────────────────────────
         print("\n👉 STEP 6: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_title_found = False
-        # CHECK FOR TITLE "Detalle" OR FOR A LARGE DOLLAR AMOUNT IN HEADER
         for xpath in (
             '//*[@text="Detalle" or @content-desc="Detalle"]',
             '//*[contains(@text, "$") and string-length(@text) > 4]',
@@ -752,16 +710,13 @@ def DT_83():
             return False
         print("   ✅ STEP 6 COMPLETE — DETAIL SCREEN IS OPEN.")
 
-        # ── STEP 7: VALIDATE ALL REQUIRED FIELDS ─────────────────────────────
         print("\n👉 STEP 7: VALIDATING FIELD ACCURACY AND FORMAT...")
         field_results = _validate_detail_fields(driver)
 
-        # ── EVIDENCE: SCREENSHOT OF DETAIL SCREEN ─────────────────────────────
         print("\n📸 TAKING SCREENSHOT — TRANSACTION DETAIL SCREEN (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_83_DETAIL_FIELDS_VALIDATED")
         _capture_evidence(driver, "DT_83")
 
-        # ── RESULT SUMMARY ────────────────────────────────────────────────────
         print("\n" + "-" * 60)
         print("📊 DT-83 VALIDATION SUMMARY:")
         print(f"   TRANSACTIONS TAB REACHED     : ✅")
@@ -855,7 +810,6 @@ def _is_within_24_hours(transaction_date):
 def _find_cancel_button(driver):
     CANCEL_KEYWORDS = ["cancelar", "cancel", "anular"]
 
-    # ── STRATEGY 1: EXACT TEXT / CONTENT-DESC MATCH ───────────────────────────
     print("   🔍 [CANCEL BTN] STRATEGY 1: EXACT MATCH 'Cancelar'...")
     try:
         elements = driver.find_elements(
@@ -870,7 +824,6 @@ def _find_cancel_button(driver):
     except Exception as e:
         print(f"   ⚠️  [CANCEL BTN] STRATEGY 1 FAILED: {e}")
 
-    # ── STRATEGY 2: PARTIAL CONTAINS "ancelar" (AVOIDS ACCENT ISSUES) ─────────
     print("   🔍 [CANCEL BTN] STRATEGY 2: PARTIAL CONTAINS 'ancelar'...")
     try:
         elements = driver.find_elements(
@@ -885,11 +838,10 @@ def _find_cancel_button(driver):
     except Exception as e:
         print(f"   ⚠️  [CANCEL BTN] STRATEGY 2 FAILED: {e}")
 
-    # ── STRATEGY 3: UIAUTOMATOR TEXT CONTAINS ─────────────────────────────────
     print("   🔍 [CANCEL BTN] STRATEGY 3: UIAUTOMATOR textContains 'ancelar'...")
     try:
         el = driver.find_element(
-            By.ANDROID_UIAUTOMATOR,
+            AppiumBy.ANDROID_UIAUTOMATOR,
             'new UiSelector().textContains("ancelar")'
         )
         txt = el.get_attribute("text") or "(no text)"
@@ -898,7 +850,6 @@ def _find_cancel_button(driver):
     except Exception as e:
         print(f"   ⚠️  [CANCEL BTN] STRATEGY 3 FAILED: {e}")
 
-    # ── STRATEGY 4: FULL ELEMENT SCAN (FINAL FALLBACK) ────────────────────────
     print("   🔍 [CANCEL BTN] STRATEGY 4: FULL ELEMENT SCAN (text + content-desc)...")
     try:
         for el in driver.find_elements(By.XPATH, "//*"):
@@ -921,7 +872,7 @@ def _find_cancel_button(driver):
 def DT_84():
     from datetime import datetime
     print("\n" + "=" * 60)
-    print('🧪 DT-84: VERIFICATION OF THE CANCEL BUTTON (CRITICAL DEFECT)')
+    print("🧪 DT-84: VERIFICATION OF THE CANCEL BUTTON (CRITICAL DEFECT)")
     print("=" * 60)
     print("   ℹ️  NOTE: THE 'CANCELAR' BUTTON IS ONLY VISIBLE IF THE MOST RECENT")
     print("   TRANSACTION WAS MADE WITHIN THE LAST 24 HOURS.")
@@ -929,12 +880,10 @@ def DT_84():
     driver, wait = utils.iniciar_driver()
 
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
 
-        # ── STEP 1: NAVIGATE TO "TRANSACCIONES" BOTTOM NAV TAB ───────────────
         print("\n👉 STEP 1: NAVIGATING TO 'TRANSACCIONES' BOTTOM NAV TAB...")
         if not _navigate_to_transactions_tab(driver, wait):
             print("\n❌ DT-84: FAILED — COULD NOT NAVIGATE TO 'TRANSACCIONES' TAB.")
@@ -944,50 +893,38 @@ def DT_84():
         print("   ✅ STEP 1 COMPLETE — 'TRANSACCIONES' TAB REACHED.")
         time.sleep(3)
 
-        # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
         _ensure_last_30_days_tab(driver, wait)
-        print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
+        print("   ✅ STEP 2 COMPLETE.")
         time.sleep(2)
 
-        # ── STEP 3: WAIT FOR HISTORY LIST TO FULLY RENDER ────────────────────
         print("\n👉 STEP 3: WAITING FOR TRANSACTION HISTORY LIST TO RENDER...")
         time.sleep(3)
         print("   ✅ STEP 3 COMPLETE — RENDER WAIT ELAPSED.")
 
-        # ── STEP 4: READ DATE OF MOST RECENT TRANSACTION ─────────────────────
         print("\n👉 STEP 4: READING DATE OF MOST RECENT TRANSACTION IN LIST...")
         most_recent_date = _get_most_recent_transaction_date(driver)
-
         if most_recent_date is None:
             print("\n⚠️  DT-84: SKIPPED — COULD NOT READ ANY TRANSACTION DATE FROM LIST.")
-            print("   💡 VERIFY THAT THE LIST IS LOADED AND HAS AT LEAST ONE TRANSACTION.")
             utils.tomar_screenshot(driver, "DT_84_NO_DATE_FOUND")
             _capture_evidence(driver, "DT_84")
             return False
-
         print("   ✅ STEP 4 COMPLETE — MOST RECENT TRANSACTION DATE READ.")
 
-        # ── STEP 5: CHECK IF MOST RECENT TRANSACTION IS WITHIN 24 HOURS ──────
         print("\n👉 STEP 5: CHECKING IF MOST RECENT TRANSACTION IS WITHIN THE 24H WINDOW...")
         within_24h, hours_elapsed = _is_within_24_hours(most_recent_date)
-
         if not within_24h:
             print(f"\n⚠️  DT-84: SKIPPED — MOST RECENT TRANSACTION IS {hours_elapsed:.1f}H OLD.")
             print("   💡 THE 'CANCELAR' BUTTON ONLY APPEARS WITHIN 24 HOURS OF THE TRANSACTION.")
-            print("   💡 PERFORM A NEW TRANSACTION AND RE-RUN THIS TEST WITHIN 24 HOURS.")
             utils.tomar_screenshot(driver, "DT_84_OUTSIDE_24H_WINDOW")
             _capture_evidence(driver, "DT_84")
             return False
-
         print(f"   ✅ STEP 5 COMPLETE — TRANSACTION IS {hours_elapsed:.1f}H OLD. WITHIN 24H WINDOW.")
 
-        # ── STEP 6: TAKE SCREENSHOT OF THE LIST BEFORE CLICKING ──────────────
         print("\n👉 STEP 6: CAPTURING LIST BEFORE TAPPING MOST RECENT TRANSACTION...")
         utils.tomar_screenshot(driver, "DT_84_LIST_BEFORE_TAP")
-        print("   ✅ STEP 6 COMPLETE — LIST SCREENSHOT SAVED.")
+        print("   ✅ STEP 6 COMPLETE.")
 
-        # ── STEP 7: CLICK THE FIRST (MOST RECENT) TRANSACTION IN THE LIST ─────
         print("\n👉 STEP 7: CLICKING MOST RECENT TRANSACTION TO OPEN DETAIL SCREEN...")
         if not _click_first_transaction_in_list(driver):
             print("\n❌ DT-84: FAILED — COULD NOT CLICK MOST RECENT TRANSACTION ROW.")
@@ -997,7 +934,6 @@ def DT_84():
         time.sleep(3)
         print("   ✅ STEP 7 COMPLETE — TRANSACTION ROW TAPPED.")
 
-        # ── STEP 8: VERIFY DETAIL SCREEN LOADED ──────────────────────────────
         print("\n👉 STEP 8: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_loaded = False
         for xpath in (
@@ -1007,11 +943,9 @@ def DT_84():
             try:
                 if driver.find_elements(By.XPATH, xpath):
                     detail_loaded = True
-                    print(f"   ✅ DETAIL SCREEN INDICATOR FOUND.")
                     break
             except:
                 pass
-
         if not detail_loaded:
             print("\n❌ DT-84: FAILED — DETAIL SCREEN DID NOT OPEN AFTER TAP.")
             utils.tomar_screenshot(driver, "DT_84_DETAIL_NOT_OPENED")
@@ -1019,11 +953,9 @@ def DT_84():
             return False
         print("   ✅ STEP 8 COMPLETE — DETAIL SCREEN IS OPEN.")
 
-        # ── STEP 9: SCAN FOR "CANCELAR" BUTTON ───────────────────────────────
         print("\n👉 STEP 9: SCANNING DETAIL SCREEN FOR 'CANCELAR' BUTTON...")
         cancel_found, cancel_text = _find_cancel_button(driver)
 
-        # ── DEBUG: LOG ALL VISIBLE TEXT FOR TRACEABILITY ─────────────────────
         print("\n🔍 SCANNING ALL VISIBLE TEXT FOR DEBUGGING...")
         try:
             seen_debug = set()
@@ -1037,14 +969,12 @@ def DT_84():
         except:
             pass
 
-        # ── EVIDENCE: SCREENSHOT OF DETAIL SCREEN ─────────────────────────────
         print("\n📸 TAKING SCREENSHOT — DETAIL SCREEN WITH 'CANCELAR' BUTTON (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_84_CANCEL_BUTTON_DETAIL")
         _capture_evidence(driver, "DT_84")
 
-        # ── RESULT ────────────────────────────────────────────────────────────
         print("\n" + "-" * 60)
-        print('📊 DT-84 VALIDATION SUMMARY:')
+        print("📊 DT-84 VALIDATION SUMMARY:")
         print(f"   TRANSACTIONS TAB REACHED     : ✅")
         print(f"   MOST RECENT DATE READ        : ✅  ({most_recent_date})")
         print(f"   WITHIN 24H WINDOW            : ✅  ({hours_elapsed:.1f}H ELAPSED)")
@@ -1079,7 +1009,6 @@ def DT_84():
 def _click_back_arrow_from_detail(driver):
     BACK_LABELS = ["Volver", "volver", "Back", "back", "Atrás", "atrás", "atras", "←", "<"]
 
-    # ── STRATEGY 1: KNOWN BACK LABELS IN content-desc / text ─────────────────
     print("   🔍 [BACK ARROW] STRATEGY 1: KNOWN BACK LABELS (content-desc / text)...")
     try:
         for label in BACK_LABELS:
@@ -1095,8 +1024,6 @@ def _click_back_arrow_from_detail(driver):
     except Exception as e:
         print(f"   ⚠️  [BACK ARROW] STRATEGY 1 FAILED: {e}")
 
-    # ── STRATEGY 2: FIRST android.widget.Button WITH EMPTY / ICON-ONLY TEXT ───
-    
     print("   🔍 [BACK ARROW] STRATEGY 2: FIRST ICON-ONLY BUTTON (NO TEXT)...")
     try:
         buttons = driver.find_elements(By.XPATH, "//android.widget.Button")
@@ -1107,7 +1034,6 @@ def _click_back_arrow_from_detail(driver):
                 btn.click()
                 print("   ✅ [BACK ARROW] STRATEGY 2 SUCCEEDED — ICON-ONLY BUTTON CLICKED.")
                 return True
-            # ALSO ACCEPT IF content-desc CONTAINS DIRECTIONAL HINT
             if any(kw in desc.lower() for kw in ("back", "volver", "atr", "regresar")):
                 btn.click()
                 print(f"   ✅ [BACK ARROW] STRATEGY 2 SUCCEEDED — DESC: '{desc}'")
@@ -1116,7 +1042,6 @@ def _click_back_arrow_from_detail(driver):
     except Exception as e:
         print(f"   ⚠️  [BACK ARROW] STRATEGY 2 FAILED: {e}")
 
-    # ── STRATEGY 3: SIBLING ELEMENT TO THE LEFT OF "Detalle" TITLE ───────────
     print("   🔍 [BACK ARROW] STRATEGY 3: PRECEDING SIBLING OF 'Detalle' TITLE...")
     try:
         back_btn = driver.find_element(
@@ -1129,10 +1054,9 @@ def _click_back_arrow_from_detail(driver):
     except Exception as e:
         print(f"   ⚠️  [BACK ARROW] STRATEGY 3 FAILED: {e}")
 
-    # ── STRATEGY 4: ANDROID HARDWARE BACK KEY (SYSTEM-LEVEL FALLBACK) ─────────
     print("   🔍 [BACK ARROW] STRATEGY 4: ANDROID HARDWARE BACK KEY...")
     try:
-        driver.press_keycode(4)   # KEYCODE 4 = ANDROID BACK BUTTON
+        driver.press_keycode(4)
         time.sleep(2)
         print("   ✅ [BACK ARROW] STRATEGY 4 SUCCEEDED — HARDWARE BACK KEY PRESSED.")
         return True
@@ -1149,7 +1073,6 @@ def _click_back_arrow_from_detail(driver):
 def _verify_back_on_history_list(driver, wait):
     DATE_PATTERN = re.compile(r"\d{2}-\d{2}-\d{4},\s*\d{2}:\d{2}:\d{2}")
 
-    # ── INDICATOR 1: "Transacciones" HEADER TITLE ─────────────────────────────
     print("   🔍 [VERIFY BACK] INDICATOR 1: 'Transacciones' HEADER TITLE...")
     try:
         elements = driver.find_elements(
@@ -1163,7 +1086,6 @@ def _verify_back_on_history_list(driver, wait):
     except Exception as e:
         print(f"   ⚠️  [VERIFY BACK] INDICATOR 1 FAILED: {e}")
 
-    # ── INDICATOR 2: "Últimos 30 días" SUB-TAB ────────────────────────────────
     print("   🔍 [VERIFY BACK] INDICATOR 2: 'Últimos 30 días' SUB-TAB...")
     try:
         elements = driver.find_elements(
@@ -1177,7 +1099,6 @@ def _verify_back_on_history_list(driver, wait):
     except Exception as e:
         print(f"   ⚠️  [VERIFY BACK] INDICATOR 2 FAILED: {e}")
 
-    # ── INDICATOR 3: TRANSACTION DATE FORMAT IN DOM ────────────────────────────
     print("   🔍 [VERIFY BACK] INDICATOR 3: TRANSACTION DATE IN LIST...")
     try:
         for el in driver.find_elements(By.XPATH, "//*"):
@@ -1204,38 +1125,32 @@ def DT_85():
     driver, wait = utils.iniciar_driver()
 
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
 
-        # ── STEP 1: NAVIGATE TO "TRANSACCIONES" BOTTOM NAV TAB ───────────────
         print("\n👉 STEP 1: NAVIGATING TO 'TRANSACCIONES' BOTTOM NAV TAB...")
         if not _navigate_to_transactions_tab(driver, wait):
             print("\n❌ DT-85: FAILED — COULD NOT NAVIGATE TO 'TRANSACCIONES' TAB.")
             utils.tomar_screenshot(driver, "DT_85_TAB_CLICK_FAILED")
             _capture_evidence(driver, "DT_85")
             return False
-        print("   ✅ STEP 1 COMPLETE — 'TRANSACCIONES' TAB REACHED.")
+        print("   ✅ STEP 1 COMPLETE.")
         time.sleep(3)
 
-        # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
         _ensure_last_30_days_tab(driver, wait)
-        print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
+        print("   ✅ STEP 2 COMPLETE.")
         time.sleep(2)
 
-        # ── STEP 3: WAIT FOR HISTORY LIST TO FULLY RENDER ────────────────────
         print("\n👉 STEP 3: WAITING FOR TRANSACTION HISTORY LIST TO RENDER...")
         time.sleep(3)
-        print("   ✅ STEP 3 COMPLETE — RENDER WAIT ELAPSED.")
+        print("   ✅ STEP 3 COMPLETE.")
 
-        # ── STEP 4: TAKE SCREENSHOT OF THE HISTORY LIST (BASELINE) ───────────
         print("\n👉 STEP 4: CAPTURING HISTORY LIST AS BASELINE BEFORE NAVIGATION...")
         utils.tomar_screenshot(driver, "DT_85_LIST_BASELINE")
-        print("   ✅ STEP 4 COMPLETE — BASELINE SCREENSHOT SAVED.")
+        print("   ✅ STEP 4 COMPLETE.")
 
-        # ── STEP 5: CLICK THE FIRST (MOST RECENT) TRANSACTION ────────────────
         print("\n👉 STEP 5: CLICKING MOST RECENT TRANSACTION TO OPEN DETAIL SCREEN...")
         if not _click_first_transaction_in_list(driver):
             print("\n❌ DT-85: FAILED — COULD NOT CLICK MOST RECENT TRANSACTION ROW.")
@@ -1245,7 +1160,6 @@ def DT_85():
         time.sleep(3)
         print("   ✅ STEP 5 COMPLETE — TRANSACTION ROW TAPPED.")
 
-        # ── STEP 6: VERIFY DETAIL SCREEN IS OPEN ─────────────────────────────
         print("\n👉 STEP 6: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_loaded = False
         for xpath in (
@@ -1255,11 +1169,9 @@ def DT_85():
             try:
                 if driver.find_elements(By.XPATH, xpath):
                     detail_loaded = True
-                    print("   ✅ DETAIL SCREEN INDICATOR FOUND.")
                     break
             except:
                 pass
-
         if not detail_loaded:
             print("\n❌ DT-85: FAILED — DETAIL SCREEN DID NOT OPEN AFTER TAP.")
             utils.tomar_screenshot(driver, "DT_85_DETAIL_NOT_OPENED")
@@ -1267,29 +1179,23 @@ def DT_85():
             return False
         print("   ✅ STEP 6 COMPLETE — DETAIL SCREEN IS OPEN.")
 
-        # ── STEP 7: TAKE SCREENSHOT OF DETAIL SCREEN (SHOWS BACK ARROW) ──────
         print("\n👉 STEP 7: CAPTURING DETAIL SCREEN SHOWING BACK ARROW...")
         utils.tomar_screenshot(driver, "DT_85_DETAIL_BEFORE_BACK")
-        print("   ✅ STEP 7 COMPLETE — DETAIL SCREENSHOT SAVED.")
+        print("   ✅ STEP 7 COMPLETE.")
 
-        # ── STEP 8: CLICK THE BACK ARROW (←) ─────────────────────────────────
         print("\n👉 STEP 8: CLICKING BACK ARROW TO RETURN TO HISTORY LIST...")
         back_clicked = _click_back_arrow_from_detail(driver)
-
         if not back_clicked:
             print("\n❌ DT-85: FAILED — COULD NOT CLICK BACK ARROW ON DETAIL SCREEN.")
             utils.tomar_screenshot(driver, "DT_85_BACK_CLICK_FAILED")
             _capture_evidence(driver, "DT_85")
             return False
-
         time.sleep(3)
         print("   ✅ STEP 8 COMPLETE — BACK ARROW CLICKED.")
 
-        # ── STEP 9: VERIFY WE ARE BACK ON THE HISTORY LIST ───────────────────
         print("\n👉 STEP 9: VERIFYING NAVIGATION RETURNED TO TRANSACTION HISTORY LIST...")
         back_on_list = _verify_back_on_history_list(driver, wait)
 
-        # ── DEBUG: LOG ALL VISIBLE TEXT FOR TRACEABILITY ─────────────────────
         print("\n🔍 SCANNING ALL VISIBLE TEXT FOR DEBUGGING...")
         try:
             seen_debug = set()
@@ -1303,12 +1209,10 @@ def DT_85():
         except:
             pass
 
-        # ── EVIDENCE: SCREENSHOT OF THE LIST AFTER BACK NAVIGATION ────────────
         print("\n📸 TAKING SCREENSHOT — HISTORY LIST AFTER BACK NAVIGATION (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_85_BACK_TO_HISTORY_LIST")
         _capture_evidence(driver, "DT_85")
 
-        # ── RESULT ────────────────────────────────────────────────────────────
         print("\n" + "-" * 60)
         print("📊 DT-85 VALIDATION SUMMARY:")
         print(f"   TRANSACTIONS TAB REACHED     : ✅")
@@ -1342,14 +1246,13 @@ def DT_85():
 def _click_second_transaction_in_list(driver):
     DATE_PATTERN   = re.compile(r"\d{2}-\d{2}-\d{4},\s*\d{2}:\d{2}:\d{2}")
     NAV_BAR_LABELS = {"inicio", "transacciones", "servicios", "ajustes"}
- 
+
     def _is_nav_bar(el):
         for attr in ("text", "content-desc"):
             if (el.get_attribute(attr) or "").lower().strip() in NAV_BAR_LABELS:
                 return True
         return False
- 
-    # ── STRATEGY 1: SECOND CLICKABLE VIEW (EXCLUDING NAV BAR) ────────────────
+
     print("   🔍 [CLICK 2ND] STRATEGY 1: SECOND CLICKABLE android.view.View...")
     try:
         rows = driver.find_elements(By.XPATH, '//android.view.View[@clickable="true"]')
@@ -1357,7 +1260,6 @@ def _click_second_transaction_in_list(driver):
         print(f"   📋 [CLICK 2ND] {len(tx_rows)} TRANSACTION ROW(S) FOUND AFTER NAV FILTER.")
         if len(tx_rows) >= 2:
             second_row = tx_rows[1]
-            # LOG DATE TEXT FROM CHILDREN FOR TRACEABILITY
             date_hint = "(second row)"
             try:
                 for child in second_row.find_elements(By.XPATH, ".//*"):
@@ -1377,8 +1279,7 @@ def _click_second_transaction_in_list(driver):
             print("   ⚠️  [CLICK 2ND] STRATEGY 1 — NO TRANSACTION ROWS FOUND.")
     except Exception as e:
         print(f"   ⚠️  [CLICK 2ND] STRATEGY 1 FAILED: {e}")
- 
-    # ── STRATEGY 2: SECOND DATE TEXT ELEMENT → PARENT CLICK ──────────────────
+
     print("   🔍 [CLICK 2ND] STRATEGY 2: SECOND DATE TEXT ELEMENT → PARENT CLICK...")
     try:
         date_elements = []
@@ -1399,14 +1300,9 @@ def _click_second_transaction_in_list(driver):
                 second_el.click()
             print("   ✅ [CLICK 2ND] STRATEGY 2 SUCCEEDED.")
             return True, second_val
-        elif len(date_elements) == 1:
-            print("   ⚠️  [CLICK 2ND] STRATEGY 2 — ONLY 1 DATE ELEMENT VISIBLE.")
-        else:
-            print("   ⚠️  [CLICK 2ND] STRATEGY 2 — NO DATE ELEMENTS FOUND.")
     except Exception as e:
         print(f"   ⚠️  [CLICK 2ND] STRATEGY 2 FAILED: {e}")
- 
-    # ── STRATEGY 3: COORDINATE TAP ON SECOND ROW (~27% FROM TOP) ─────────────
+
     print("   🔍 [CLICK 2ND] STRATEGY 3: COORDINATE TAP ON SECOND ROW (~27% FROM TOP)...")
     try:
         size  = driver.get_window_size()
@@ -1418,70 +1314,61 @@ def _click_second_transaction_in_list(driver):
         return True, "(coordinate tap ~27%)"
     except Exception as e:
         print(f"   💥 [CLICK 2ND] STRATEGY 3 FAILED: {e}")
- 
+
     print("   ❌ [CLICK 2ND] ALL STRATEGIES EXHAUSTED.")
     return False, None
- 
- 
+
+
 # =================================================================================
 # DT-89: BEHAVIOR IN TRANSACTIONS NOT ELIGIBLE FOR CANCELLATION
 # =================================================================================
 def DT_89():
     from datetime import datetime
     print("\n" + "=" * 60)
-    print('🧪 DT-89: BEHAVIOR IN TRANSACTIONS NOT ELIGIBLE FOR CANCELLATION')
+    print("🧪 DT-89: BEHAVIOR IN TRANSACTIONS NOT ELIGIBLE FOR CANCELLATION")
     print("=" * 60)
     print("   ℹ️  CLICKS THE SECOND TRANSACTION IN THE LIST (ALWAYS > 24H OLD)")
     print("   AND VERIFIES THE 'CANCELAR' BUTTON IS NOT PRESENT IN THE DETAIL.")
- 
+
     driver, wait = utils.iniciar_driver()
- 
+
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
- 
-        # ── STEP 1: NAVIGATE TO "TRANSACCIONES" BOTTOM NAV TAB ───────────────
+
         print("\n👉 STEP 1: NAVIGATING TO 'TRANSACCIONES' BOTTOM NAV TAB...")
         if not _navigate_to_transactions_tab(driver, wait):
             print("\n❌ DT-89: FAILED — COULD NOT NAVIGATE TO 'TRANSACCIONES' TAB.")
             utils.tomar_screenshot(driver, "DT_89_TAB_CLICK_FAILED")
             _capture_evidence(driver, "DT_89")
             return False
-        print("   ✅ STEP 1 COMPLETE — 'TRANSACCIONES' TAB REACHED.")
+        print("   ✅ STEP 1 COMPLETE.")
         time.sleep(3)
- 
-        # ── STEP 2: ENSURE "ÚLTIMOS 30 DÍAS" SUB-TAB IS ACTIVE ───────────────
+
         print("\n👉 STEP 2: ENSURING 'ÚLTIMOS 30 DÍAS' SUB-TAB IS THE ACTIVE VIEW...")
         _ensure_last_30_days_tab(driver, wait)
-        print("   ✅ STEP 2 COMPLETE — 'ÚLTIMOS 30 DÍAS' VIEW IS ACTIVE.")
+        print("   ✅ STEP 2 COMPLETE.")
         time.sleep(2)
- 
-        # ── STEP 3: WAIT FOR HISTORY LIST TO FULLY RENDER ────────────────────
+
         print("\n👉 STEP 3: WAITING FOR TRANSACTION HISTORY LIST TO RENDER...")
         time.sleep(3)
-        print("   ✅ STEP 3 COMPLETE — RENDER WAIT ELAPSED.")
- 
-        # ── STEP 4: SCREENSHOT OF LIST (BASELINE) ────────────────────────────
+        print("   ✅ STEP 3 COMPLETE.")
+
         print("\n👉 STEP 4: CAPTURING HISTORY LIST AS BASELINE...")
         utils.tomar_screenshot(driver, "DT_89_LIST_BASELINE")
         print("   ✅ STEP 4 COMPLETE.")
- 
-        # ── STEP 5: CLICK THE SECOND TRANSACTION ROW (OLD TRANSACTION) ────────
+
         print("\n👉 STEP 5: CLICKING SECOND TRANSACTION ROW (OLD/RECONCILED)...")
         clicked, row_text = _click_second_transaction_in_list(driver)
- 
         if not clicked:
             print("\n❌ DT-89: FAILED — COULD NOT CLICK SECOND TRANSACTION ROW.")
             utils.tomar_screenshot(driver, "DT_89_CLICK_FAILED")
             _capture_evidence(driver, "DT_89")
             return False
- 
         print(f"   ✅ STEP 5 COMPLETE — SECOND ROW TAPPED: '{row_text}'")
         time.sleep(3)
- 
-        # ── STEP 6: VERIFY DETAIL SCREEN LOADED ──────────────────────────────
+
         print("\n👉 STEP 6: VERIFYING DETAIL SCREEN IS DISPLAYED...")
         detail_loaded = False
         for xpath in (
@@ -1494,15 +1381,13 @@ def DT_89():
                     break
             except:
                 pass
- 
         if not detail_loaded:
             print("\n❌ DT-89: FAILED — DETAIL SCREEN DID NOT OPEN AFTER TAP.")
             utils.tomar_screenshot(driver, "DT_89_DETAIL_NOT_OPENED")
             _capture_evidence(driver, "DT_89")
             return False
         print("   ✅ STEP 6 COMPLETE — DETAIL SCREEN IS OPEN.")
- 
-        # ── STEP 7: LOG TRANSACTION DATE FOR TRACEABILITY ─────────────────────
+
         print("\n👉 STEP 7: READING TRANSACTION DATE FOR TRACEABILITY...")
         DATE_PATTERN     = re.compile(r"(\d{2})-(\d{2})-(\d{4}),\s*(\d{2}):(\d{2}):(\d{2})")
         transaction_date = None
@@ -1527,19 +1412,16 @@ def DT_89():
                     break
         except Exception as e:
             print(f"   ⚠️  COULD NOT READ DATE: {e}")
- 
-        # ── STEP 8: ASSERT "CANCELAR" BUTTON IS ABSENT ───────────────────────
+
         print("\n👉 STEP 8: ASSERTING 'CANCELAR' BUTTON IS ABSENT ON DETAIL SCREEN...")
         CANCEL_KEYWORDS = ["cancelar", "anular"]
         cancel_found    = False
         cancel_value    = None
- 
         try:
             for el in driver.find_elements(By.XPATH, "//*"):
                 for attr in ("text", "content-desc"):
                     val = (el.get_attribute(attr) or "").lower()
                     if any(kw in val for kw in CANCEL_KEYWORDS):
-                        # EXCLUDE "CANCELACIÓN" STATUS LABEL — THAT IS NOT THE BUTTON
                         if "cancelaci" not in val:
                             cancel_found = True
                             cancel_value = val
@@ -1548,13 +1430,12 @@ def DT_89():
                     break
         except Exception as e:
             print(f"   ⚠️  STEP 8 SCAN ERROR: {e}")
- 
+
         if cancel_found:
             print(f"   ❌ STEP 8 — 'CANCELAR' BUTTON FOUND UNEXPECTEDLY: '{cancel_value}'")
         else:
             print("   ✅ STEP 8 COMPLETE — 'CANCELAR' BUTTON IS ABSENT AS EXPECTED.")
- 
-        # ── DEBUG: LOG ALL VISIBLE TEXT ───────────────────────────────────────
+
         print("\n🔍 SCANNING ALL VISIBLE TEXT FOR DEBUGGING...")
         try:
             seen_debug = set()
@@ -1567,12 +1448,11 @@ def DT_89():
                         break
         except:
             pass
- 
+
         print("\n📸 TAKING SCREENSHOT — DETAIL WITHOUT 'CANCELAR' (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_89_NO_CANCEL_BUTTON")
         _capture_evidence(driver, "DT_89")
- 
-        # ── RESULT ────────────────────────────────────────────────────────────
+
         elapsed_str = f"{elapsed_h:.1f}h" if elapsed_h is not None else "UNKNOWN"
         print("\n" + "-" * 60)
         print("📊 DT-89 VALIDATION SUMMARY:")
@@ -1583,7 +1463,7 @@ def DT_89():
         print(f"   'CANCELAR' BUTTON ABSENT     : "
               f"{'✅ CORRECT — NOT FOUND' if not cancel_found else '❌ FOUND — UNEXPECTED'}")
         print("-" * 60)
- 
+
         if not cancel_found:
             print("\n✅ DT-89: SUCCESS — 'CANCELAR' BUTTON CORRECTLY ABSENT FOR OLD TRANSACTION.")
             return True
@@ -1591,7 +1471,7 @@ def DT_89():
             print("\n❌ DT-89: FAILED — 'CANCELAR' BUTTON APPEARED FOR AN OLD TRANSACTION.")
             print(f"   💡 VALUE FOUND: '{cancel_value}'")
             return False
- 
+
     except Exception as e:
         print(f"\n💥 DT-89 CRITICAL ERROR: {e}")
         try:
@@ -1602,19 +1482,19 @@ def DT_89():
     finally:
         utils.cerrar_driver(driver)
 
+
 # =================================================================================
 # INTERNAL HELPER: POLL THE DOM FOR THE "CARGANDO" LOADING INDICATOR
 # =================================================================================
 def _poll_for_loading_indicator(driver, wait):
     LOADING_KEYWORDS = ["cargando", "loading", "carga"]
-    MAX_POLLS        = 15       # 15 × 200ms = 3 SECONDS TOTAL POLL WINDOW
+    MAX_POLLS        = 15
     poll_count       = 0
     loading_detected = False
     loading_text     = None
 
     print("   ⚡ [LOADING POLL] STARTING AGGRESSIVE POLL (200ms INTERVAL, UP TO 3s)...")
 
-    # ── STRATEGY 1: RAPID ELEMENT SCAN ───────────────────────────────────────
     while poll_count < MAX_POLLS and not loading_detected:
         poll_count += 1
         try:
@@ -1631,7 +1511,7 @@ def _poll_for_loading_indicator(driver, wait):
                     if loading_detected:
                         break
                 except Exception:
-                    continue  # STALE ELEMENT — SKIP AND CONTINUE SCAN
+                    continue
         except Exception as e:
             print(f"   ⚠️  [LOADING POLL] POLL #{poll_count} FIND FAILED: {e}")
 
@@ -1641,7 +1521,6 @@ def _poll_for_loading_indicator(driver, wait):
     if loading_detected:
         return True, loading_text
 
-    # ── STRATEGY 2: WebDriverWait XPATH PRESENCE (FALLBACK) ──────────────────
     print("   🔍 [LOADING POLL] STRATEGY 2: WebDriverWait XPATH CHECK...")
     try:
         wait_short = WebDriverWait(driver, 3)
@@ -1661,11 +1540,11 @@ def _poll_for_loading_indicator(driver, wait):
 
 
 # =================================================================================
-# DT-91: DETAILED CARGO HANDLING. 
+# DT-91: DETAILED CARGO HANDLING.
 # =================================================================================
 def DT_91():
     print("\n" + "=" * 60)
-    print("🧪 DT-91: DETAILED CARGO HANDLING. ")
+    print("🧪 DT-91: DETAILED CARGO HANDLING.")
     print("=" * 60)
     print("   ℹ️  NOTE: THE LOADING SPINNER IS TRANSIENT (~1-2s). THIS TEST")
     print("   POLLS IMMEDIATELY AFTER THE TAP WITH 200ms INTERVALS.")
@@ -1673,12 +1552,10 @@ def DT_91():
     driver, wait = utils.iniciar_driver()
 
     try:
-        # ── PRECONDITION: FULL LOGIN + BUSINESS REGISTRATION ─────────────────
         print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN AND REGISTRATION FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ PRECONDITION MET — MAIN CHARGING SCREEN REACHED.")
 
-        # ── STEP 1: NAVIGATE TO "INICIO" TAB TO ENSURE FRESH STATE ───────────
         print("\n👉 STEP 1: NAVIGATING TO 'INICIO' TAB TO RESET STATE...")
         try:
             driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_INICIO).click()
@@ -1686,13 +1563,9 @@ def DT_91():
             print("   ✅ STEP 1 COMPLETE — NOW ON 'INICIO' TAB.")
         except Exception as e:
             print(f"   ⚠️  STEP 1 WARNING — COULD NOT TAP 'INICIO': {e}")
-            print("   💡 PROCEEDING — LOADING STATE MAY STILL APPEAR FROM CURRENT SCREEN.")
 
-        # ── STEP 2: TAP "TRANSACCIONES" AND IMMEDIATELY START POLLING ─────────
         print("\n👉 STEP 2: TAPPING 'TRANSACCIONES' TAB AND IMMEDIATELY POLLING...")
-        print("   ⚡ TAPPING NOW — POLL STARTS IMMEDIATELY AFTER...")
         tab_tapped = False
-
         try:
             driver.find_element(By.XPATH, config.XPATH_PÑ_TAB_TRANSACCIONES).click()
             tab_tapped = True
@@ -1711,10 +1584,8 @@ def DT_91():
             utils.tomar_screenshot(driver, "DT_91_TAB_TAP_FAILED")
             _capture_evidence(driver, "DT_91")
             return False
-
         print("   ✅ STEP 2 COMPLETE — TAB TAPPED.")
 
-        # ── STEP 3: POLL FOR "CARGANDO" IMMEDIATELY AFTER TAP ────────────────
         print("\n👉 STEP 3: POLLING FOR 'CARGANDO' LOADING INDICATOR...")
         loading_detected, loading_text = _poll_for_loading_indicator(driver, wait)
 
@@ -1726,7 +1597,6 @@ def DT_91():
             print("   ⚠️  STEP 3 — LOADING INDICATOR NOT CAPTURED BY APPIUM.")
             print("   💡 THIS IS EXPECTED IF THE STATE IS SHORTER THAN APPIUM'S RESPONSE TIME.")
 
-        # ── STEP 4: WAIT FOR LOADING TO FINISH AND VERIFY FINAL SCREEN ────────
         print("\n👉 STEP 4: WAITING FOR LOADING TO FINISH AND VERIFYING FINAL SCREEN...")
         time.sleep(3)
         final_screen_ok = False
@@ -1746,12 +1616,10 @@ def DT_91():
         else:
             print("   ⚠️  STEP 4 — TRANSACTIONS SCREEN COULD NOT BE VERIFIED.")
 
-        # ── EVIDENCE ──────────────────────────────────────────────────────────
         print("\n📸 TAKING SCREENSHOT — FINAL STATE AFTER LOADING (SUCCESS EVIDENCE)...")
         utils.tomar_screenshot(driver, "DT_91_FINAL_STATE")
         _capture_evidence(driver, "DT_91")
 
-        # ── DEBUG: LOG ALL VISIBLE TEXT ───────────────────────────────────────
         print("\n🔍 SCANNING ALL VISIBLE TEXT FOR DEBUGGING...")
         try:
             seen_debug = set()
@@ -1765,7 +1633,6 @@ def DT_91():
         except:
             pass
 
-        # ── RESULT ────────────────────────────────────────────────────────────
         print("\n" + "-" * 60)
         print("📊 DT-91 VALIDATION SUMMARY:")
         print(f"   'INICIO' TAB RESET           : ✅")
@@ -1775,8 +1642,6 @@ def DT_91():
         print(f"   FINAL SCREEN LOADED OK       : {'✅' if final_screen_ok else '⚠️  WARNING'}")
         print("-" * 60)
 
-        # SUCCESS CRITERIA: FINAL SCREEN LOADED. LOADING CAPTURE IS BEST-EFFORT
-        # BECAUSE APPIUM'S POLL LATENCY MAY EXCEED THE SPINNER DURATION.
         if loading_detected and final_screen_ok:
             print("\n✅ DT-91: SUCCESS — LOADING INDICATOR DETECTED AND SCREEN LOADED CORRECTLY.")
             return True
