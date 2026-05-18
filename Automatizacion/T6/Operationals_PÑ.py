@@ -17,9 +17,9 @@ import sys
 import os
 import time
 
-ruta_proyecto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if ruta_proyecto not in sys.path:
-    sys.path.append(ruta_proyecto)
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_path not in sys.path:
+    sys.path.append(project_path)
 
 import config
 import utils
