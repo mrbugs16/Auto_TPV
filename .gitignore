@@ -48,3 +48,28 @@ Thumbs.db
 *.mov
 *.wmv
 
+# ============================================================
+# EVIDENCE FILES — NEVER COMMIT
+# ============================================================
+
+# EVIDENCE FOLDERS
+evidencias/
+evidencias_zip/
+
+# COMPRESSED EVIDENCE
+*.zip
+
+# TEST RUN ARTIFACTS (LOG + REPORT FILES)
+MER_LOG_*.txt
+MER_REPORT_*.html
+
+# SCREENSHOTS AND HTML REPORTS (ANY LOCATION)
+*.png
+*.html
+
+# PYTHON BYTECODE
+*.py[cod]
+
+# LOG FILES
+*.log
+"@ | Set-Content .gitignore -Encoding UTF8
