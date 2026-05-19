@@ -28,9 +28,9 @@ import os
 import re 
 import time
 
-ruta_proyecto = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-if ruta_proyecto not in sys.path:
-    sys.path.append(ruta_proyecto)
+project_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if project_path not in sys.path:
+    sys.path.append(project_path)
 
 import config
 import utils
@@ -42,11 +42,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 # =================================================================================
 # INTERNAL HELPER: CAPTURE EVIDENCE WITHOUT SILENCING ERRORS
 # =================================================================================
-def _capture_evidence(driver, nombre_test):
+def _capture_evidence(driver, test_name):
     try:
-        utils.print_http_evidence_appium(driver, nombre_test)
+        utils.print_http_evidence_appium(driver, test_name)
     except Exception as ev_err:
-        print(f"   ⚠️  HTTP EVIDENCE CAPTURE FAILED FOR [{nombre_test}]: {ev_err}")
+        print(f"   ⚠️  HTTP EVIDENCE CAPTURE FAILED FOR [{test_name}]: {ev_err}")
         print(f"   💡 MAKE SURE APPIUM IS STARTED WITH: appium --allow-insecure=*:get_server_logs")
 
 
@@ -138,7 +138,7 @@ def _navigate_to_transactions_tab(driver, wait):
 
     print("   🔍 [NAV] ATTEMPTING STRATEGY 2: PARTIAL CONTENT-DESC MATCH...")
     try:
-        driver.find_element(By.XPATH, config.XPATH_TS_TAB_TRANSACCIONES_ALT).click()
+        driver.find_element(By.XPATH, config.XPATH_TS_HEADER_TITLE).click()
         time.sleep(2)
         print("   ✅ [NAV] STRATEGY 2 SUCCEEDED.")
         return True
@@ -207,7 +207,7 @@ def _verify_transactions_screen_loaded(driver, wait):
 # =================================================================================
 # INTERNAL HELPER: CLICK THE "CORTE POR DÍA" SUB-TAB
 # =================================================================================
-def _click_corte_por_dia_tab(driver, wait):
+def _click_daily_cut_tab(driver, wait):
     print("   🔍 [NAV] ATTEMPTING STRATEGY 1: CONTENT-DESC 'CORTE POR DÍA'...")
     try:
         driver.find_element(By.XPATH, config.XPATH_TS_TAB_DAILY_CUT).click()
@@ -363,7 +363,7 @@ def _date_did_change(driver, date_before):
 # =================================================================================
 # INTERNAL HELPER: READ FIRST "APROBACIÓN" ITEM DATA FROM THE LIST
 # =================================================================================
-def _get_first_aprobacion_item(driver):
+def _get_first_approval_item(driver):
     
     import re
     DATE_PATTERN   = re.compile(r"\d{2}-\d{2}-\d{4},?\s*\d{2}:\d{2}:\d{2}")
@@ -371,19 +371,19 @@ def _get_first_aprobacion_item(driver):
 
     print("   🔍 [LIST READER] SCANNING FOR FIRST 'APROBACIÓN' ITEM...")
 
-    aprobacion_elements = driver.find_elements(
+    approval_elements = driver.find_elements(
         By.XPATH, config.XPATH_TS_ITEM_APPROVAL_STATUS
     )
-    print(f"   📊 [LIST READER] 'APROBACIÓN' ELEMENTS FOUND: {len(aprobacion_elements)}")
+    print(f"   📊 [LIST READER] 'APROBACIÓN' ELEMENTS FOUND: {len(approval_elements)}")
 
-    if not aprobacion_elements:
+    if not approval_elements:
         print("   ⚠️  [LIST READER] NO 'APROBACIÓN' ITEMS FOUND.")
         return None
 
     
     print("   🔍 [LIST READER] STRATEGY A: SCANNING content-desc OF ALL ELEMENTS...")
-    fecha_found  = None
-    monto_found  = None
+    date_found  = None
+    amount_found  = None
     all_descs    = []
 
     try:
@@ -400,50 +400,50 @@ def _get_first_aprobacion_item(driver):
         print(f"   📝 [LIST READER] ALL ACCESSIBLE VALUES ({len(all_descs)}): {all_descs[:30]}")
 
         for val in all_descs:
-            if not fecha_found and DATE_PATTERN.search(val):
-                fecha_found = DATE_PATTERN.search(val).group()
-                print(f"   📅 [LIST READER] DATE FOUND: '{fecha_found}'")
-            if not monto_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
-                monto_found = AMOUNT_PATTERN.search(val).group()
-                print(f"   💰 [LIST READER] AMOUNT FOUND: '{monto_found}'")
-            if fecha_found and monto_found:
+            if not date_found and DATE_PATTERN.search(val):
+                date_found = DATE_PATTERN.search(val).group()
+                print(f"   📅 [LIST READER] DATE FOUND: '{date_found}'")
+            if not amount_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
+                amount_found = AMOUNT_PATTERN.search(val).group()
+                print(f"   💰 [LIST READER] AMOUNT FOUND: '{amount_found}'")
+            if date_found and amount_found:
                 break
 
     except Exception as e:
         print(f"   ⚠️  [LIST READER] STRATEGY A FAILED: {e}")
 
-    if fecha_found and monto_found:
+    if date_found and amount_found:
         print(f"   ✅ [LIST READER] STRATEGY A SUCCESS — "
-              f"FECHA: '{fecha_found}' | MONTO: '{monto_found}'")
-        return {"fecha": fecha_found, "monto": monto_found}
+              f"FECHA: '{date_found}' | MONTO: '{amount_found}'")
+        return {"date": date_found, "amount": amount_found}
 
     # ── STRATEGY B: READ content-desc OF THE APROBACIÓN ELEMENT ITSELF ───────
     
     print("   🔍 [LIST READER] STRATEGY B: READING content-desc OF APROBACIÓN ELEMENT...")
     try:
-        first_aprobacion = aprobacion_elements[0]
+        first_aprobacion = approval_elements[0]
         full_desc = first_aprobacion.get_attribute("content-desc") or ""
         print(f"   📝 [LIST READER] APROBACIÓN ELEMENT content-desc: '{full_desc}'")
 
-        if not fecha_found:
+        if not date_found:
             m = DATE_PATTERN.search(full_desc)
             if m:
-                fecha_found = m.group()
-                print(f"   📅 [LIST READER] DATE FROM STRATEGY B: '{fecha_found}'")
+                date_found = m.group()
+                print(f"   📅 [LIST READER] DATE FROM STRATEGY B: '{date_found}'")
 
-        if not monto_found:
+        if not amount_found:
             m = AMOUNT_PATTERN.search(full_desc)
             if m and "$0.00" not in m.group():
-                monto_found = m.group()
-                print(f"   💰 [LIST READER] AMOUNT FROM STRATEGY B: '{monto_found}'")
+                amount_found = m.group()
+                print(f"   💰 [LIST READER] AMOUNT FROM STRATEGY B: '{amount_found}'")
 
     except Exception as e:
         print(f"   ⚠️  [LIST READER] STRATEGY B FAILED: {e}")
 
-    if fecha_found and monto_found:
+    if date_found and amount_found:
         print(f"   ✅ [LIST READER] STRATEGY B SUCCESS — "
-              f"FECHA: '{fecha_found}' | MONTO: '{monto_found}'")
-        return {"fecha": fecha_found, "monto": monto_found}
+              f"FECHA: '{date_found}' | MONTO: '{amount_found}'")
+        return {"date": date_found, "amount": amount_found}
 
     # ── STRATEGY C: UIAUTOMATOR DIRECT QUERY ─────────────────────────────────
     
@@ -458,20 +458,20 @@ def _get_first_aprobacion_item(driver):
         for node in nodes:
             val = node.get_attribute("text") or node.get_attribute("content-desc") or ""
             print(f"      → '{val}'")
-            if not fecha_found and DATE_PATTERN.search(val):
-                fecha_found = DATE_PATTERN.search(val).group()
-            if not monto_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
-                monto_found = AMOUNT_PATTERN.search(val).group()
-            if fecha_found and monto_found:
+            if not date_found and DATE_PATTERN.search(val):
+                date_found = DATE_PATTERN.search(val).group()
+            if not amount_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
+                amount_found = AMOUNT_PATTERN.search(val).group()
+            if date_found and amount_found:
                 break
 
     except Exception as e:
         print(f"   ⚠️  [LIST READER] STRATEGY C FAILED: {e}")
 
-    if fecha_found or monto_found:
+    if date_found or amount_found:
         print(f"   ✅ [LIST READER] STRATEGY C PARTIAL/FULL — "
-              f"FECHA: '{fecha_found}' | MONTO: '{monto_found}'")
-        return {"fecha": fecha_found, "monto": monto_found}
+              f"FECHA: '{date_found}' | MONTO: '{amount_found}'")
+        return {"date": date_found, "amount": amount_found}
 
     print("   ❌ [LIST READER] ALL STRATEGIES EXHAUSTED — NO DATA READABLE FROM LIST.")
     return None
@@ -479,10 +479,10 @@ def _get_first_aprobacion_item(driver):
 # =================================================================================
 # INTERNAL HELPER: CLICK THE FIRST "APROBACIÓN" ITEM IN THE LIST
 # =================================================================================
-def _click_first_aprobacion_item(driver, wait):
+def _click_first_approval_item(driver, wait):
     print("   🔍 [CLICK ITEM] STRATEGY 1: CLICKING 'APROBACIÓN' STATUS ELEMENT...")
     try:
-        elements = driver.find_elements(By.XPATH, config.XPATH_TS_ITEM_APROBACION_STATUS)
+        elements = driver.find_elements(By.XPATH, config.XPATH_TS_ITEM_APPROVAL_STATUS)
         if elements:
             elements[0].click()
             print("   ✅ [CLICK ITEM] STRATEGY 1 SUCCEEDED.")
@@ -605,24 +605,24 @@ def _click_detail_tab(driver, wait, tab_name):
 # =================================================================================
 # INTERNAL HELPER
 # =================================================================================
-def _get_first_cancelacion_item(driver):
+def _get_first_cancelation_item(driver):
     import re
     DATE_PATTERN   = re.compile(r"\d{2}-\d{2}-\d{4},?\s*\d{2}:\d{2}:\d{2}")
     AMOUNT_PATTERN = re.compile(r"\$[\d,]+\.\d{2}")
 
     print("   🔍 [LIST READER] SCANNING FOR FIRST 'CANCELACIÓN' ITEM...")
 
-    cancelacion_elements = driver.find_elements(
+    cancelation_elements = driver.find_elements(
         By.XPATH, config.XPATH_TS_ITEM_STATUS_CANCELATION
     )
-    print(f"   📊 [LIST READER] 'CANCELACIÓN' ELEMENTS FOUND: {len(cancelacion_elements)}")
+    print(f"   📊 [LIST READER] 'CANCELACIÓN' ELEMENTS FOUND: {len(cancelation_elements)}")
 
-    if not cancelacion_elements:
+    if not cancelation_elements:
         print("   ⚠️  [LIST READER] NO 'CANCELACIÓN' ITEMS IN LIST.")
         return None
 
-    fecha_found = None
-    monto_found = None
+    date_found = None
+    amount_found = None
     all_vals    = []
 
     # STRATEGY A
@@ -638,45 +638,45 @@ def _get_first_cancelacion_item(driver):
 
         
         for val in reversed(all_vals):
-            if not fecha_found and DATE_PATTERN.search(val):
-                fecha_found = DATE_PATTERN.search(val).group()
-            if not monto_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
-                monto_found = AMOUNT_PATTERN.search(val).group()
-            if fecha_found and monto_found:
+            if not date_found and DATE_PATTERN.search(val):
+                date_found = DATE_PATTERN.search(val).group()
+            if not amount_found and AMOUNT_PATTERN.search(val) and "$0.00" not in val:
+                amount_found = AMOUNT_PATTERN.search(val).group()
+            if date_found and amount_found:
                 break
     except Exception as e:
         print(f"   ⚠️  [LIST READER] STRATEGY A FAILED: {e}")
 
     # STRATEGY B
-    if not (fecha_found and monto_found):
+    if not (date_found and amount_found):
         try:
-            full_desc = cancelacion_elements[0].get_attribute("content-desc") or ""
+            full_desc = cancelation_elements[0].get_attribute("content-desc") or ""
             print(f"   📝 [LIST READER] CANCELACIÓN ELEMENT DESC: '{full_desc}'")
-            if not fecha_found:
+            if not date_found:
                 m = DATE_PATTERN.search(full_desc)
                 if m:
-                    fecha_found = m.group()
-            if not monto_found:
+                    date_found = m.group()
+            if not amount_found:
                 m = AMOUNT_PATTERN.search(full_desc)
                 if m and "$0.00" not in m.group():
-                    monto_found = m.group()
+                    amount_found = m.group()
         except Exception as e:
             print(f"   ⚠️  [LIST READER] STRATEGY B FAILED: {e}")
 
-    print(f"   {'✅' if fecha_found or monto_found else '❌'} [LIST READER] "
-          f"FECHA: '{fecha_found}' | MONTO: '{monto_found}'")
-    return {"fecha": fecha_found, "monto": monto_found} if (fecha_found or monto_found) else None
+    print(f"   {'✅' if date_found or amount_found else '❌'} [LIST READER] "
+          f"FECHA: '{date_found}' | MONTO: '{amount_found}'")
+    return {"date": date_found, "amount": amount_found} if (date_found or amount_found) else None
 
 # =================================================================================
 # INTERNAL HELPER
 # =================================================================================
-def _click_first_cancelacion_item(driver, wait):
+def _click_first_cancelation_item(driver, wait):
     import re
     DATE_PATTERN = re.compile(r"\d{2}-\d{2}-\d{4},?\s*\d{2}:\d{2}:\d{2}")
 
     print("   🔍 [CLICK ITEM] STRATEGY 1: CLICKING 'CANCELACIÓN' STATUS ELEMENT...")
     try:
-        elements = driver.find_elements(By.XPATH, config.XPATH_TS_ITEM_CANCELACION_STATUS)
+        elements = driver.find_elements(By.XPATH, config.XPATH_TS_ITEM_STATUS_CANCELATION)
         if elements:
             elements[0].click()
             print("   ✅ [CLICK ITEM] STRATEGY 1 SUCCEEDED.")
@@ -950,7 +950,7 @@ def TS_72():
         print("\n👉 STEP 2: VERIFYING 'ÚLTIMOS 30 DÍAS' TAB IS ACTIVE BY DEFAULT...")
         tab_30_dias_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_TAB_30_DIAS,
+            config.XPATH_TS_TAB_30_DAYS,
             "ÚLTIMOS 30 DÍAS TAB",
             driver
         )
@@ -1070,9 +1070,9 @@ def TS_73():
     hoy = datetime.now()
     dia_num   = str(hoy.day)                    # e.g. "15"
     mes_str   = MESES_ES[hoy.month]             # e.g. "abril"
-    fecha_str = f"{dia_num} {mes_str}"          # e.g. "15 abril"
+    date_str = f"{dia_num} {mes_str}"          # e.g. "15 abril"
 
-    print(f"   📅 CURRENT DATE FOR VALIDATION: '{fecha_str}' (DAY={dia_num}, MONTH={mes_str})")
+    print(f"   📅 CURRENT DATE FOR VALIDATION: '{date_str}' (DAY={dia_num}, MONTH={mes_str})")
 
     driver, wait = utils.iniciar_driver()
 
@@ -1097,9 +1097,9 @@ def TS_73():
 
         # ── STEP 2: TAP THE "CORTE POR DÍA" TAB ─────────────────────────────
         print("\n👉 STEP 2: TAPPING 'CORTE POR DÍA' TAB...")
-        corte_tab_clicked = _click_corte_por_dia_tab(driver, wait)
+        daily_cut_tab_clicked = _click_daily_cut_tab(driver, wait)
 
-        if not corte_tab_clicked:
+        if not daily_cut_tab_clicked:
             print("\n❌ TS-73: FAILED — COULD NOT TAP 'CORTE POR DÍA' TAB.")
             utils.tomar_screenshot(driver, "TS_73_CORTE_TAB_FAILED")
             _capture_evidence(driver, "TS_73")
@@ -1109,20 +1109,20 @@ def TS_73():
         time.sleep(2)
 
         # ── STEP 3: VERIFY DATE NAVIGATOR SHOWS TODAY'S DATE ─────────────────
-        print(f"\n👉 STEP 3: VERIFYING DATE NAVIGATOR SHOWS TODAY: '{fecha_str}'...")
-        xpath_fecha_hoy = (
+        print(f"\n👉 STEP 3: VERIFYING DATE NAVIGATOR SHOWS TODAY: '{date_str}'...")
+        xpath_today_date = (
             f'//*[contains(@text, "{dia_num}") and contains(@text, "{mes_str}") or '
             f'contains(@content-desc, "{dia_num}") and contains(@content-desc, "{mes_str}")]'
         )
         date_found = utils.verificar_existencia(
             wait,
-            xpath_fecha_hoy,
-            f"TODAY'S DATE IN NAVIGATOR: '{fecha_str}'",
+            xpath_today_date,
+            f"TODAY'S DATE IN NAVIGATOR: '{date_str}'",
             driver
         )
 
         if not date_found:
-            print(f"   ⚠️  DATE '{fecha_str}' NOT FOUND IN NAVIGATOR — CHECKING RAW TEXT...")
+            print(f"   ⚠️  DATE '{date_str}' NOT FOUND IN NAVIGATOR — CHECKING RAW TEXT...")
             
             xpath_dia_fallback = f'//*[contains(@text, "{dia_num}") or contains(@content-desc, "{dia_num}")]'
             date_found = utils.verificar_existencia(
@@ -1142,7 +1142,7 @@ def TS_73():
 
         monto_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_TOTAL_AMOUNT,
+            config.XPATH_TS_TOTAL_COUNT_AMOUNT,
             "MONTO TOTAL LABEL",
             driver
         )
@@ -1203,10 +1203,10 @@ def TS_73():
         except:
             pass
 
-        core_ok = corte_tab_clicked and (monto_visible or subtotal_visible)
+        core_ok = daily_cut_tab_clicked and (monto_visible or subtotal_visible)
 
         if core_ok:
-            print(f"\n✅ TS-73: SUCCESS — 'CORTE POR DÍA' VIEW LOADED CORRECTLY FOR TODAY ({fecha_str}).")
+            print(f"\n✅ TS-73: SUCCESS — 'CORTE POR DÍA' VIEW LOADED CORRECTLY FOR TODAY ({date_str}).")
             return True
         else:
             print("\n❌ TS-73: FAILED — 'CORTE POR DÍA' VIEW DID NOT LOAD CORRECTLY.")
@@ -1242,9 +1242,9 @@ def TS_74():
     hoy = datetime.now()
     dia_num   = str(hoy.day)                    # e.g. "15"
     mes_str   = MESES_ES[hoy.month]             # e.g. "abril"
-    fecha_str = f"{dia_num} {mes_str}"          # e.g. "15 abril"
+    date_str = f"{dia_num} {mes_str}"          # e.g. "15 abril"
 
-    print(f"   📅 CURRENT DATE FOR VALIDATION: '{fecha_str}' (DAY={dia_num}, MONTH={mes_str})")
+    print(f"   📅 CURRENT DATE FOR VALIDATION: '{date_str}' (DAY={dia_num}, MONTH={mes_str})")
 
     driver, wait = utils.iniciar_driver()
 
@@ -1269,9 +1269,9 @@ def TS_74():
 
         # ── STEP 2: TAP THE "CORTE POR DÍA" TAB ─────────────────────────────
         print("\n👉 STEP 2: TAPPING 'CORTE POR DÍA' TAB...")
-        corte_tab_clicked = _click_corte_por_dia_tab(driver, wait)
+        daily_cut_tab_clicked = _click_daily_cut_tab(driver, wait)
 
-        if not corte_tab_clicked:
+        if not daily_cut_tab_clicked:
             print("\n❌ TS-74: FAILED — COULD NOT TAP 'CORTE POR DÍA' TAB.")
             utils.tomar_screenshot(driver, "TS_74_CORTE_TAB_FAILED")
             _capture_evidence(driver, "TS_74")
@@ -1281,20 +1281,20 @@ def TS_74():
         time.sleep(2)
 
         # ── STEP 3: VERIFY DATE NAVIGATOR SHOWS TODAY'S DATE ─────────────────
-        print(f"\n👉 STEP 3: VERIFYING DATE NAVIGATOR SHOWS TODAY: '{fecha_str}'...")
-        xpath_fecha_hoy = (
+        print(f"\n👉 STEP 3: VERIFYING DATE NAVIGATOR SHOWS TODAY: '{date_str}'...")
+        xpath_today_date = (
             f'//*[contains(@text, "{dia_num}") and contains(@text, "{mes_str}") or '
             f'contains(@content-desc, "{dia_num}") and contains(@content-desc, "{mes_str}")]'
         )
         date_found = utils.verificar_existencia(
             wait,
-            xpath_fecha_hoy,
-            f"TODAY'S DATE IN NAVIGATOR: '{fecha_str}'",
+            xpath_today_date,
+            f"TODAY'S DATE IN NAVIGATOR: '{date_str}'",
             driver
         )
 
         if not date_found:
-            print(f"   ⚠️  DATE '{fecha_str}' NOT FOUND IN NAVIGATOR — CHECKING RAW TEXT...")
+            print(f"   ⚠️  DATE '{date_str}' NOT FOUND IN NAVIGATOR — CHECKING RAW TEXT...")
             
             xpath_dia_fallback = f'//*[contains(@text, "{dia_num}") or contains(@content-desc, "{dia_num}")]'
             date_found = utils.verificar_existencia(
@@ -1320,7 +1320,7 @@ def TS_74():
         )
         subtotal_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_CORTE_SUBTOTAL_PAGOS,
+            config.XPATH_TS_SUBTOTAL_CUT_PAYMENTS,
             "SUBTOTAL DE PAGOS LABEL",
             driver
         )
@@ -1336,7 +1336,7 @@ def TS_74():
         print("\n👉 STEP 5: VERIFYING 'IMPRIMIR CORTE' BUTTON IS PRESENT...")
         btn_imprimir = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_BTN_IMPRIMIR_CORTE,
+            config.XPATH_TS_BTN_PRINT_CUT,
             "IMPRIMIR CORTE BUTTON",
             driver
         )
@@ -1350,7 +1350,7 @@ def TS_74():
         print("\n👉 STEP 6: VERIFYING 'MOVIMIENTOS' SECTION IS PRESENT...")
         movimientos_visible = utils.verificar_existencia(
             wait,
-            config.XPATH_TS_CORTE_MOVIMIENTOS,
+            config.XPATH_TS_CUT_MOVEMENTS,
             "MOVIMIENTOS SECTION",
             driver
         )
@@ -1375,10 +1375,10 @@ def TS_74():
         except:
             pass
 
-        core_ok = corte_tab_clicked and (monto_visible or subtotal_visible)
+        core_ok = daily_cut_tab_clicked and (monto_visible or subtotal_visible)
 
         if core_ok:
-            print(f"\n✅ TS-74: SUCCESS — 'CORTE POR DÍA' VIEW LOADED CORRECTLY FOR TODAY ({fecha_str}).")
+            print(f"\n✅ TS-74: SUCCESS — 'CORTE POR DÍA' VIEW LOADED CORRECTLY FOR TODAY ({date_str}).")
             return True
         else:
             print("\n❌ TS-74: FAILED — 'CORTE POR DÍA' VIEW DID NOT LOAD CORRECTLY.")
@@ -1441,7 +1441,7 @@ def TS_75():
 
         # ── STEP 2: TAP "CORTE POR DÍA" SUB-TAB ─────────────────────────────
         print("\n👉 STEP 2: TAPPING 'CORTE POR DÍA' TAB...")
-        if not _click_corte_por_dia_tab(driver, wait):
+        if not _click_daily_cut_tab(driver, wait):
             print("\n❌ TS-75: FAILED — COULD NOT TAP 'CORTE POR DÍA' TAB.")
             utils.tomar_screenshot(driver, "TS_75_CORTE_TAB_FAILED")
             _capture_evidence(driver, "TS_75")
@@ -1615,7 +1615,7 @@ def TS_76():
 
         # ── STEP 2: READ FIRST APROBACIÓN ITEM DATA FROM THE LIST ────────────
         print("\n👉 STEP 2: READING DATA FROM FIRST 'APROBACIÓN' ITEM IN LIST...")
-        item_data = _get_first_aprobacion_item(driver)
+        item_data = _get_first_approval_item(driver)
 
         if not item_data or (not item_data.get("fecha") and not item_data.get("monto")):
             print("\n❌ TS-76: FAILED — COULD NOT READ ANY ITEM DATA FROM THE LIST.")
@@ -1633,7 +1633,7 @@ def TS_76():
 
         # ── STEP 3: TAP THE FIRST APROBACIÓN ITEM ────────────────────────────
         print("\n👉 STEP 3: TAPPING FIRST 'APROBACIÓN' ITEM TO OPEN DETAIL...")
-        if not _click_first_aprobacion_item(driver, wait):
+        if not _click_first_approval_item(driver, wait):
             print("\n❌ TS-76: FAILED — COULD NOT TAP TRANSACTION ITEM.")
             utils.tomar_screenshot(driver, "TS_76_ITEM_CLICK_FAILED")
             _capture_evidence(driver, "TS_76")
@@ -1824,7 +1824,7 @@ def TS_77():
 
         # ── STEP 2: READ CANCELACIÓN ITEM DATA FROM LIST ──────────────────────
         print("\n👉 STEP 2: READING DATA FROM FIRST 'CANCELACIÓN' ITEM IN LIST...")
-        item_data = _get_first_cancelacion_item(driver)
+        item_data = _get_first_cancelation_item(driver)
 
         if not item_data or (not item_data.get("fecha") and not item_data.get("monto")):
             print("\n❌ TS-77: FAILED — COULD NOT READ ANY CANCELACIÓN ITEM FROM LIST.")
@@ -1841,7 +1841,7 @@ def TS_77():
 
         # ── STEP 3: TAP THE CANCELACIÓN ITEM ─────────────────────────────────
         print("\n👉 STEP 3: TAPPING 'CANCELACIÓN' ITEM TO OPEN DETAIL...")
-        if not _click_first_cancelacion_item(driver, wait):
+        if not _click_first_cancelation_item(driver, wait):
             print("\n❌ TS-77: FAILED — COULD NOT TAP CANCELACIÓN ITEM.")
             utils.tomar_screenshot(driver, "TS_77_ITEM_CLICK_FAILED")
             _capture_evidence(driver, "TS_77")
@@ -2303,7 +2303,7 @@ def TS_79():
 
         # ── STEP 2: TAP "CORTE POR DÍA" SUB-TAB ─────────────────────────────
         print("\n👉 STEP 2: TAPPING 'CORTE POR DÍA' TAB...")
-        if not _click_corte_por_dia_tab(driver, wait):
+        if not _click_daily_cut_tab(driver, wait):
             print("\n❌ TS-79: FAILED — COULD NOT TAP 'CORTE POR DÍA' TAB.")
             utils.tomar_screenshot(driver, "TS_79_CORTE_TAB_FAILED")
             _capture_evidence(driver, "TS_79")
@@ -2318,7 +2318,7 @@ def TS_79():
 
         days_navigated   = 0
         date_found       = None
-        monto_found      = None
+        amount_found      = None
         subtotal_found   = None
         max_days         = config.TS_MAX_SEARCH_DAYS
 
@@ -2330,7 +2330,7 @@ def TS_79():
             if monto and subtotal:
                 
                 date_found     = _get_current_navigator_date(driver)
-                monto_found    = monto
+                amount_found    = monto
                 subtotal_found = subtotal
                 days_navigated = i
                 break
@@ -2353,7 +2353,7 @@ def TS_79():
         if date_found:
             print(f"   ✅ DATE WITH TRANSACTIONS FOUND AFTER {days_navigated} DAY(S) BACK.")
             print(f"   📅 DATE    : '{date_found}'")
-            print(f"   💰 MONTO   : '{monto_found}'")
+            print(f"   💰 MONTO   : '{amount_found}'")
             print(f"   🔢 SUBTOTAL: '{subtotal_found}'")
         else:
             print(f"   ⚠️  NO DATE WITH TRANSACTIONS FOUND IN {max_days} DAYS.")
@@ -2370,16 +2370,16 @@ def TS_79():
         print("\n👉 STEP 4: VALIDATING MONTO TOTAL VALUE...")
         monto_ok = False
         try:
-            amount_str   = monto_found.replace("$", "").replace(",", "").strip()
+            amount_str   = amount_found.replace("$", "").replace(",", "").strip()
             amount_float = float(amount_str)
             monto_ok     = amount_float > 0.0
         except:
             pass
 
         if monto_ok:
-            print(f"   ✅ STEP 4 COMPLETE — MONTO TOTAL IS VALID: '{monto_found}' > $0.00")
+            print(f"   ✅ STEP 4 COMPLETE — MONTO TOTAL IS VALID: '{amount_found}' > $0.00")
         else:
-            print(f"   ❌ STEP 4 FAILED — MONTO TOTAL '{monto_found}' IS NOT > $0.00")
+            print(f"   ❌ STEP 4 FAILED — MONTO TOTAL '{amount_found}' IS NOT > $0.00")
 
         # ── STEP 5: VALIDATE SUBTOTAL DE PAGOS ≥ 1 ───────────────────────────
         print("\n👉 STEP 5: VALIDATING SUBTOTAL DE PAGOS VALUE...")
@@ -2398,16 +2398,16 @@ def TS_79():
         print("\n👉 STEP 6: CROSS-VALIDATING MONTO vs SUBTOTAL CONSISTENCY...")
         cross_ok = monto_ok and subtotal_ok
         if cross_ok:
-            print(f"   ✅ STEP 6 COMPLETE — MONTO '{monto_found}' AND "
+            print(f"   ✅ STEP 6 COMPLETE — MONTO '{amount_found}' AND "
                   f"SUBTOTAL '{subtotal_found}' ARE CONSISTENT.")
         else:
             print(f"   ❌ STEP 6 FAILED — INCONSISTENT: "
-                  f"MONTO='{monto_found}' | SUBTOTAL='{subtotal_found}'")
+                  f"MONTO='{amount_found}' | SUBTOTAL='{subtotal_found}'")
 
         # ── STEP 7: VERIFY LABELS ARE PRESENT ON SCREEN ───────────────────────
         print("\n👉 STEP 7: VERIFYING 'MONTO TOTAL' AND 'SUBTOTAL DE PAGOS' LABELS...")
         monto_label_ok    = utils.verificar_existencia(
-            wait, config.XPATH_TS_TOTAL_CUT_AMOUNT, "MONTO TOTAL LABEL", driver
+            wait, config.XPATH_TS_TOTAL_COUNT_AMOUNT, "MONTO TOTAL LABEL", driver
         )
         subtotal_label_ok = utils.verificar_existencia(
             wait, config.XPATH_TS_SUBTOTAL_CUT_PAYMENTS, "SUBTOTAL DE PAGOS LABEL", driver
@@ -2430,7 +2430,7 @@ def TS_79():
         print("📊 TS-79 VALIDATION SUMMARY:")
         print(f"   DAYS NAVIGATED TO FIND DATA   : {days_navigated}")
         print(f"   DATE FOUND                    : '{date_found}'")
-        print(f"   MONTO TOTAL                   : '{monto_found}' "
+        print(f"   MONTO TOTAL                   : '{amount_found}' "
               f"{'✅' if monto_ok else '❌'}")
         print(f"   SUBTOTAL DE PAGOS             : '{subtotal_found}' "
               f"{'✅' if subtotal_ok else '❌'}")
@@ -2440,7 +2440,7 @@ def TS_79():
         print("-" * 60)
 
         if monto_ok and subtotal_ok:
-            print(f"\n✅ TS-79: SUCCESS — MONTO TOTAL '{monto_found}' AND "
+            print(f"\n✅ TS-79: SUCCESS — MONTO TOTAL '{amount_found}' AND "
                   f"SUBTOTAL '{subtotal_found}' ARE CORRECTLY DISPLAYED.")
             return True
         else:
@@ -2501,7 +2501,7 @@ def TS_80():
         except Exception as e:
             print(f"   ⚠️  TAP FAILED WITH PRIMARY XPATH: {e} — TRYING FALLBACK...")
             try:
-                driver.find_element(By.XPATH, config.XPATH_TS_TAB_TRANSACCIONES_ALT).click()
+                driver.find_element(By.XPATH, config.XPATH_TS_HEADER_TITLE).click()
             except Exception as e2:
                 print(f"   💥 TAB CLICK FAILED: {e2}")
                 utils.tomar_screenshot(driver, "TS_80_TAB_CLICK_FAILED")
@@ -2547,7 +2547,7 @@ def TS_80():
             print("\n👉 STEP 4: FALLBACK — TRYING WebDriverWait FOR 'CARGANDO'...")
             try:
                 wait_short.until(EC.presence_of_element_located(
-                    (By.XPATH, config.XPATH_TS_LOADING)
+                    (By.XPATH, config.XPATH_TS_LOADING_INDICATOR)
                 ))
                 loading_detected = True
                 print("   ✅ STEP 4 FALLBACK SUCCESS — 'CARGANDO' FOUND VIA WebDriverWait.")

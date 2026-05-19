@@ -426,40 +426,28 @@ XPATH_TS_CUT_MOVEMENTS = (
 # ==================================================================================
 # [13] T6 MOBILE — XPATHS: TRANSACCIONES [TS-74]
 # ==================================================================================
-XPATH_TS_BTN_PREVIOUS_DATE = (
-    '//*[@content-desc="◄" or @text="◄" or '
-    'contains(@content-desc, "anterior") or '
-    'contains(@content-desc, "atr")]'
-)
 # STRATEGY 2: FIRST ARROW-LIKE ELEMENT NEAR THE DATE DISPLAY
-XPATH_TS_BTN_FECHA_ANTERIOR_ALT = (
+XPATH_TS_BTN_PREVIOUS_DATE_ALT = (
     '(//android.view.View[@clickable="true"])[1]'
 )
 
 # EMPTY STATE MESSAGE
-XPATH_TS_FECHA_SIN_REGISTROS = (
+XPATH_TS_NO_RECORDS_DATE = (
     '//*[contains(@text, "sin registros") or '
     'contains(@content-desc, "sin registros") or '
     'contains(@text, "Sin registros") or '
     'contains(@content-desc, "Sin registros")]'
 )
 
-XPATH_TS_CORTE_MONTO_CERO = (
+XPATH_TS_CUT_ZERO_AMOUNT = (
     '//*[@text="$0.00" or @content-desc="$0.00"]'
 )
 
-TS_DIAS_ATRAS_SIN_REGISTRO = 60
-TS_FECHA_SIN_REGISTROS = "~60 DAYS AGO (EXPECTED EMPTY)"
+TS_DAYS_BACK_NO_RECORD = 60
+TS_DATE_NO_RECORDS = "~60 DAYS AGO (EXPECTED EMPTY)"
 
 # ==============================================================================================
 # [14] T6 MOBILE — XPATHS: TRANSACCIONES [TS-75] ◄ BACK ARROW — STRATEGY 2: ATTRIBUTE-BASED
-# ==============================================================================================
-XPATH_TS_BTN_PREVIOUS_DATE = (
-    '//*[contains(@content-desc, "anterior") or '
-    'contains(@content-desc, "atr") or '
-    'contains(@content-desc, "prev") or '
-    '@content-desc="◄" or @text="◄"]'
-)
 # ◄ BACK ARROW — FROM APPIUM INSPECTOR (ABSOLUTE — MOST RELIABLE)
 XPATH_TS_BTN_PREVIOUS_DATE = (
     '//android.widget.ScrollView/android.widget.Button[1]'
@@ -548,7 +536,7 @@ XPATH_TS_DETAIL_CANCELATION_TAB = (
 # [16] T6 MOBILE — XPATHS: TRANSACCIONES [TS-79 - TS-80]
 # ==============================================================================================
 TS_MAX_SEARCH_DAYS = 120
-XPATH_TS_LOADING_CARGANDO = (
+XPATH_TS_LOADING_INDICATOR = (
     '//*[contains(@text, "Cargando") or contains(@content-desc, "Cargando") or '
     'contains(@text, "cargando") or contains(@content-desc, "cargando") or '
     'contains(@text, "Loading") or contains(@content-desc, "Loading")]'
