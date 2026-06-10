@@ -55,6 +55,8 @@ Thumbs.db
 # EVIDENCE FOLDERS
 evidencias/
 evidencias_zip/
+evidence/
+zip_evidence/
 
 # COMPRESSED EVIDENCE
 *.zip
