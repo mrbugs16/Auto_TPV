@@ -53,7 +53,7 @@ CAPABILITIES = {
 # ==================================================================================
 
 USUARIO_VALIDO   = "david.santos@ijuba.solutions"
-PASS_VALIDO      = "Memphis@2021"
+PASS_VALIDO      = "Memphis@2026"
 USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
 PASS_INVALIDO    = "ContrasenaFalsa123"
 
@@ -353,13 +353,13 @@ XPATH_C_ERROR_CANTIDAD_VALIDA = (
 # [6] T6 MOBILE — XPATHS: PESTAÑAS (PÑ) — BOTTOM NAV TABS
 # ==================================================================================
 
-XPATH_C_TAB_INICIO       = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
-XPATH_C_TAB_AJUSTES      = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+XPATH_C_TAB_HOME       = '//*[contains(@content-desc, "Inicio") or @content-desc="Inicio"]'
+XPATH_C_TAB_AJUSTES      = '//*[contains(@content-desc, "Ajustes") or @content-desc="Ajustes"]'
 
-XPATH_PÑ_TAB_HOME       = '//*[contains(@content-desc, "Inicio") and contains(@content-desc, "1")]'
-XPATH_PÑ_TAB_TRANSACTIONS = '//*[contains(@content-desc, "Transacciones") and contains(@content-desc, "2")]'
-XPATH_PÑ_TAB_SERVICIOS     = '//*[contains(@content-desc, "Servicios") and contains(@content-desc, "3")]'
-XPATH_PÑ_TAB_AJUSTES       = '//*[contains(@content-desc, "Ajustes") and contains(@content-desc, "4")]'
+XPATH_PÑ_TAB_HOME       = '//*[contains(@content-desc, "Inicio") or @content-desc="Inicio"]'
+XPATH_PÑ_TAB_TRANSACTIONS = '//*[contains(@content-desc, "Transacciones") or @content-desc="Transacciones"]'
+XPATH_PÑ_TAB_SERVICES     = '//*[contains(@content-desc, "Servicios") or @content-desc="Servicios"]'
+XPATH_PÑ_TAB_AJUSTES       = '//*[contains(@content-desc, "Ajustes") or @content-desc="Ajustes"]'
 
 
 # ==================================================================================
@@ -806,3 +806,186 @@ XPATH_BTN_APPLY_FILTER       = "//button[contains(text(), 'CREADO') or contains(
 # ==================================================================================
 USUARIOS_URL      = "https://fat.memphis.mx/cat/users"
 NUEVO_USUARIO_URL = "https://fat.memphis.mx/cat/users/create"
+
+# ==================================================================================
+# [AJ] T6 MOBILE — XPATHS & DATA: AJUSTES (SETTINGS) MODULE
+# ==================================================================================
+# SCREEN: "Ajustes" — bottom nav tab [4]
+# SECTIONS: Cuenta | Lector | PinPad | Desarrollador
+
+# --- TAB NAVIGATION ---
+XPATH_AJ_TAB_SETTINGS   = '//*[contains(@content-desc, "Ajustes") or @content-desc="Ajustes"]'
+
+# --- SETTINGS SCREEN IDENTIFIERS ---
+XPATH_AJ_SCREEN_TITLE   = (
+    '//*[@text="Ajustes" or @content-desc="Ajustes"]'
+)
+XPATH_AJ_SECTION_CUENTA = (
+    '//*[@text="Cuenta" or @content-desc="Cuenta"]'
+)
+XPATH_AJ_SECTION_LECTOR = (
+    '//*[@text="Lector" or @content-desc="Lector"]'
+)
+
+# --- SETTINGS MENU ITEMS (CONFIRMED FROM SCREENSHOT 2) ---
+XPATH_AJ_BTN_INFO_PERSONAL = (
+    '//*[contains(@text,"Información personal") or '
+    'contains(@content-desc,"Información personal")]'
+)
+XPATH_AJ_BTN_CAMBIAR_PASS = (
+    '//*[contains(@text,"Cambiar contraseña") or '
+    'contains(@content-desc,"Cambiar contraseña")]'
+)
+XPATH_AJ_BTN_CAMBIAR_COMERCIO = (
+    '//*[contains(@text,"Cambiar comercio") or '
+    'contains(@content-desc,"Cambiar comercio")]'
+)
+XPATH_AJ_BTN_ACTUALIZAR_CONFIG = (
+    '//*[contains(@text,"Actualizar configuraciones") or '
+    'contains(@content-desc,"Actualizar configuraciones")]'
+)
+XPATH_AJ_BTN_CERRAR_SESION = (
+    '//*[contains(@text,"Cerrar sesión") or '
+    'contains(@content-desc,"Cerrar sesión")]'
+)
+
+# --- PERSONAL INFO SCREEN (SCREENSHOT 3) ---
+XPATH_AJ_INFO_SCREEN_TITLE = (
+    '//*[@text="Información personal" or @content-desc="Información personal"]'
+)
+XPATH_AJ_INFO_AFILIACION   = '//*[@text="Afiliación" or @content-desc="Afiliación"]'
+XPATH_AJ_INFO_NOMBRE       = '//*[@text="Nombre" or @content-desc="Nombre"]'
+XPATH_AJ_INFO_LECTOR       = '//*[@text="Lector asociado" or @content-desc="Lector asociado"]'
+XPATH_AJ_INFO_EMAIL        = '//*[@text="Correo electrónico" or @content-desc="Correo electrónico"]'
+XPATH_AJ_INFO_UUID         = '//*[@text="UUID" or @content-desc="UUID"]'
+XPATH_AJ_INFO_VERSION      = (
+    '//*[contains(@text,"Versión") or contains(@content-desc,"Versión")]'
+)
+
+# --- PERSONAL INFO: EXPECTED DATA VALUES (CONFIRMED FROM SCREENSHOT 3) ---
+AJ_EXPECTED_AFILIACION  = "8920377"
+AJ_EXPECTED_EMAIL       = "david.santos@ijuba.solutions"
+
+# --- CHANGE PASSWORD SCREEN (SCREENSHOTS 4-8) ---
+XPATH_AJ_PASS_SCREEN_TITLE  = (
+    '//*[@text="Cambiar contraseña" or @content-desc="Cambiar contraseña"]'
+)
+# INPUT FIELDS — ORDER: current(1) → new(2) → confirm(3)
+XPATH_AJ_INPUT_PASS_CURRENT = '//android.widget.EditText[1]'
+XPATH_AJ_INPUT_PASS_NEW     = '//android.widget.EditText[2]'
+XPATH_AJ_INPUT_PASS_CONFIRM = '//android.widget.EditText[3]'
+
+# SUBMIT BUTTON
+XPATH_AJ_BTN_ACTUALIZAR = (
+    '//*[@text="Actualizar" or @content-desc="Actualizar"]'
+)
+
+# VISIBILITY TOGGLE ICONS (eye icons — one per field)
+XPATH_AJ_EYE_CURRENT  = '//android.widget.EditText[1]/..//*[@content-desc="Toggle password visibility"]'
+XPATH_AJ_EYE_NEW      = '//android.widget.EditText[2]/..//*[@content-desc="Toggle password visibility"]'
+XPATH_AJ_EYE_CONFIRM  = '//android.widget.EditText[3]/..//*[@content-desc="Toggle password visibility"]'
+
+# --- CHANGE PASSWORD: TEST DATA (CONFIRMED FROM SCREENSHOTS 5, 8) ---
+AJ_PASS_CURRENT_VALID      = "Memphis@2021"   # VALID CURRENT PASSWORD
+AJ_PASS_NEW_VALID          = "Memphis@2026"   # VALID NEW PASSWORD (AJ-109)
+AJ_PASS_WRONG_CURRENT      = "Memphis@2004"   # WRONG CURRENT PASSWORD (AJ-110)
+AJ_PASS_NEW_MISMATCH_A     = "123456$M"       # NEW PASS (AJ-111 — mismatch test)
+AJ_PASS_NEW_MISMATCH_B     = "123456$"        # CONFIRM PASS (AJ-111 — different)
+AJ_PASS_TOO_SHORT          = "123456$"        # < 8 CHARS (AJ-112)
+AJ_PASS_TOO_SHORT_CONFIRM  = "........"       # CONFIRM FILLER (AJ-112)
+AJ_PASS_VISIBILITY_CURRENT = "Memphis@2004"   # (AJ-113)
+AJ_PASS_VISIBILITY_NEW     = "123456$M"       # (AJ-113)
+
+# --- CHANGE PASSWORD: RESPONSE TOASTS ---
+XPATH_AJ_TOAST_SUCCESS = (
+    '//*[contains(@text,"actualiz") or contains(@content-desc,"actualiz") or '
+    'contains(@text,"éxito") or contains(@content-desc,"éxito") or '
+    'contains(@text,"correcta") or contains(@content-desc,"correcta")]'
+)
+XPATH_AJ_TOAST_WRONG_PASS = (
+    '//*[contains(@text,"incorrecta") or contains(@content-desc,"incorrecta") or '
+    'contains(@text,"actual") or contains(@content-desc,"actual") or '
+    'contains(@text,"anterior") or contains(@content-desc,"anterior")]'
+)
+XPATH_AJ_ERROR_NO_MATCH = (
+    '//*[contains(@text,"no coinciden") or contains(@content-desc,"no coinciden")]'
+)
+XPATH_AJ_ERROR_MIN_CHARS = (
+    '//*[contains(@text,"8 caracteres") or contains(@content-desc,"8 caracteres") or '
+    'contains(@text,"Mínimo") or contains(@content-desc,"Mínimo")]'
+)
+
+# ==================================================================================
+# [AJ-EXT] T6 MOBILE — XPATHS & DATA: CAMBIAR COMERCIO + CERRAR SESIÓN + LECTOR
+# ==================================================================================
+
+# --- CAMBIAR COMERCIO SCREEN (SCREENSHOTS 2-5) ---
+XPATH_AJ_BTN_CAMBIAR_COMERCIO_MENU = (
+    '//*[contains(@text,"Cambiar comercio") or '
+    'contains(@content-desc,"Cambiar comercio")]'
+)
+XPATH_AJ_CC_SCREEN_TITLE = (
+    '//*[@text="Cambiar comercio" or @content-desc="Cambiar comercio"]'
+)
+# FIELD 1: "Número de afiliación"
+XPATH_AJ_CC_INPUT_AFILIACION = '//android.widget.EditText[1]'
+# FIELD 2: "Token de registro"
+XPATH_AJ_CC_INPUT_TOKEN = '//android.widget.EditText[2]'
+# SUBMIT BUTTON
+XPATH_AJ_CC_BTN_ACEPTAR = (
+    '//*[@text="Aceptar" or @content-desc="Aceptar"]'
+)
+
+# --- CAMBIAR COMERCIO: VALIDATION ERRORS (SCREENSHOT 4) ---
+XPATH_AJ_CC_ERROR_AFILIACION = (
+    '//*[contains(@text,"ingresa el número de afiliación") or '
+    'contains(@content-desc,"ingresa el número de afiliación") or '
+    'contains(@text,"afiliación") or contains(@content-desc,"afiliación")]'
+)
+XPATH_AJ_CC_ERROR_TOKEN = (
+    '//*[contains(@text,"ingresa el token") or '
+    'contains(@content-desc,"ingresa el token") or '
+    'contains(@text,"token de registro") or contains(@content-desc,"token de registro")]'
+)
+# RED TOAST: "Error de registro" (SCREENSHOTS 3 AND 5)
+XPATH_AJ_CC_TOAST_ERROR = (
+    '//*[contains(@text,"Error de registro") or '
+    'contains(@content-desc,"Error de registro") or '
+    'contains(@text,"Error") or contains(@content-desc,"Error")]'
+)
+
+# --- CAMBIAR COMERCIO: TEST DATA ---
+# INVALID CREDENTIALS (SCREENSHOT 3)
+AJ_CC_INVALID_AFILIACION = "2342423"
+AJ_CC_INVALID_TOKEN      = "2343242342343242"
+# FORMAT-VALID BUT NON-EXISTENT CREDENTIALS (SCREENSHOT 5)
+AJ_CC_FAKE_AFILIACION    = "1234567"
+AJ_CC_FAKE_TOKEN         = "1234567891234567"
+
+# --- CERRAR SESIÓN (SCREENSHOT 6) ---
+XPATH_AJ_BTN_CERRAR_SESION_MENU = (
+    '//*[contains(@text,"Cerrar sesión") or '
+    'contains(@content-desc,"Cerrar sesión")]'
+)
+# CONFIRMATION DIALOG (IF ANY)
+XPATH_AJ_CERRAR_CONFIRM = (
+    '//*[contains(@text,"Cerrar") or contains(@content-desc,"Cerrar") or '
+    'contains(@text,"Confirmar") or contains(@content-desc,"Confirmar")]'
+)
+# LOGIN SCREEN IDENTIFIER (SCREENSHOT 6 — AFTER LOGOUT)
+XPATH_AJ_LOGIN_SCREEN_AFTER_LOGOUT = (
+    '//*[@text="Iniciar sesión" or @content-desc="Iniciar sesión" or '
+    'contains(@text,"Ingresa tu correo") or contains(@content-desc,"Ingresa tu correo")]'
+)
+
+# --- CONFIGURAR NUEVAMENTE (LECTOR SETUP FROM SETTINGS) ---
+XPATH_AJ_BTN_CONFIGURAR_NUEVAMENTE = (
+    '//*[contains(@text,"Configurar nuevamente") or '
+    'contains(@content-desc,"Configurar nuevamente")]'
+)
+# LECTOR SETUP SCREEN IDENTIFIER
+XPATH_AJ_LECTOR_SETUP_SCREEN = (
+    '//*[contains(@text,"Lector") or contains(@content-desc,"Lector") or '
+    'contains(@text,"configurar") or contains(@content-desc,"configurar") or '
+    'contains(@text,"cifrado") or contains(@content-desc,"cifrado")]'
+)
