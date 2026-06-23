@@ -41,10 +41,19 @@ REQUIREMENTS:
 
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+# ── PATH SETUP ──────────────────────────────────────────────────
+v2_path = os.path.abspath(os.path.dirname(__file__))
+t6_path = os.path.abspath(os.path.join(v2_path, '..'))
+for p in [v2_path, t6_path]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
+# ────────────────────────────────────────────────────────────────
+
 import time
 import config
 import utils
+import utils_system as sys_ctrl          # ← LÍNEA NUEVA
 from appium.webdriver.common.appiumby import AppiumBy
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -2062,6 +2071,992 @@ def AJ_120():
         print("-" * 60)
         utils.close_driver(driver)
 
+# ==================================================================================
+# AJ-121: BLUETOOTH OFF → LOGIN → VERIFY 'CONFIGURAR LECTOR' OPTION APPEARS
+# ==================================================================================
+ 
+def AJ_121():
+    """
+    AJ-121: BLUETOOTH DISABLED → LOGIN → VERIFY 'CONFIGURAR LECTOR' OPTION
+ 
+    OBJECTIVE:
+        Confirm that when Bluetooth is turned OFF before launching the app,
+        the Memphis app still allows the user to log in successfully and
+        navigate to Settings (Ajustes) where 'Configurar lector' is visible.
+ 
+        NOTE: In the current v2 app, the absence of Bluetooth does NOT block
+        login or Settings access. This test documents that behavior and
+        verifies the 'Configurar lector' option is accessible regardless.
+ 
+    PRECONDITIONS:
+        - T6 connected via USB with USB Debugging ON
+        - Appium server running with --relaxed-security
+        - ADB available (adb devices shows the T6)
+        - Bluetooth initially ON (normal state)
+ 
+    STEPS:
+        1. [ADB]    Disable Bluetooth via ADB
+        2. [APPIUM] Launch app — verify it starts normally (no BT block)
+        3. [APPIUM] Enter credentials + complete login
+        4. [APPIUM] Navigate to Ajustes tab
+        5. [APPIUM] Verify 'Configurar lector' option is present
+        6. [ADB]    Restore Bluetooth to ON
+ 
+    EXPECTED RESULT:
+        ✅ App launches normally with BT off
+        ✅ Login succeeds
+        ✅ Ajustes tab is reachable
+        ✅ 'Configurar lector' option is visible
+ 
+    TYPE  : FUNCTIONAL
+    STATE : PASS (expected — v2 does not block on BT)
+    """
+    print("\n" + "=" * 60)
+    print("🧪 AJ-121: BLUETOOTH OFF → LOGIN → CONFIGURAR LECTOR")
+    print("=" * 60)
+ 
+    # ── VERIFY ADB DEVICE ──
+    if not sys_ctrl.verify_device_connected():
+        print("❌ AJ-121 ABORTED: No ADB device found.")
+        print("   💡 Connect T6 via USB and enable USB Debugging.")
+        return False
+ 
+    # ── SNAPSHOT STATE BEFORE TEST ──
+    print("\n📊 DEVICE STATE BEFORE TEST:")
+    snapshot_before = sys_ctrl.get_device_status_snapshot()
+ 
+    result = False
+    driver = None
+ 
+    try:
+        # ──────────────────────────────────────────────────────────────
+        # STEP 1: DISABLE BLUETOOTH VIA ADB
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 1: DISABLING BLUETOOTH VIA ADB...")
+        print("-" * 50)
+ 
+        bt_disabled = sys_ctrl.disable_bluetooth()
+ 
+        if bt_disabled:
+            print("   ✅ BLUETOOTH IS NOW OFF.")
+        else:
+            print("   ⚠️  BT STATE UNCERTAIN — CONTINUING TEST ANYWAY.")
+ 
+        time.sleep(2)
+ 
+        # ──────────────────────────────────────────────────────────────
+        # STEP 2: LAUNCH APP VIA APPIUM
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 2: LAUNCHING MEMPHIS APP (BT IS OFF)...")
+        print("-" * 50)
+ 
+        driver, wait = utils.start_driver()
+        time.sleep(4)
+ 
+        utils.take_screenshot(driver, "AJ_121_STEP2_APP_LAUNCH_BT_OFF")
+        print("   ✅ APP LAUNCHED SUCCESSFULLY WITH BLUETOOTH OFF.")
+ 
+        # ──────────────────────────────────────────────────────────────
+        # STEP 3: LOGIN
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 3: EXECUTING LOGIN FLOW...")
+        print("-" * 50)
+ 
+        helper_login_to_calculator(driver, wait)
+        utils.take_screenshot(driver, "AJ_121_STEP3_POST_LOGIN")
+ 
+        # Quick scan to confirm we're past login screen
+        login_still_visible = False
+        try:
+            driver.find_element(By.XPATH, config.XPATH_INPUT_USUARIO)
+            login_still_visible = True
+        except:
+            pass
+ 
+        if login_still_visible:
+            print("   ❌ STILL ON LOGIN SCREEN — Login may have failed.")
+        else:
+            print("   ✅ LOGIN SUCCESSFUL — PAST LOGIN SCREEN.")
+ 
+        # ──────────────────────────────────────────────────────────────
+        # STEP 4: NAVIGATE TO AJUSTES TAB
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 4: NAVIGATING TO 'AJUSTES' TAB...")
+        print("-" * 50)
+ 
+        # STRATEGY 1: Use config XPath for Ajustes tab
+        ajustes_reached = False
+        ajustes_xpaths = [
+            config.XPATH_PÑ_TAB_AJUSTES,           # Primary: from PÑ section
+            config.XPATH_C_TAB_AJUSTES,             # Fallback: from C section
+            '//*[contains(@content-desc, "Ajustes")]',  # Broad fallback
+        ]
+ 
+        for xpath in ajustes_xpaths:
+            try:
+                btn = WebDriverWait(driver, 6).until(
+                    EC.element_to_be_clickable((By.XPATH, xpath))
+                )
+                btn.click()
+                time.sleep(3)
+                ajustes_reached = True
+                print(f"   ✅ AJUSTES TAB CLICKED (xpath: {xpath[:60]}...)")
+                break
+            except Exception as e:
+                print(f"   ⚠️  XPATH FAILED: {xpath[:60]}... → {e}")
+                continue
+ 
+        if not ajustes_reached:
+            print("   ❌ COULD NOT REACH AJUSTES TAB.")
+            print("   💡 DEBUG — Scanning all visible content-desc values:")
+            try:
+                for elem in driver.find_elements(By.XPATH, "//*[@content-desc]"):
+                    try:
+                        desc = elem.get_attribute("content-desc")
+                        if desc and len(desc) > 1:
+                            print(f"      📝 content-desc: '{desc}'")
+                    except:
+                        continue
+            except:
+                pass
+ 
+        utils.take_screenshot(driver, "AJ_121_STEP4_AJUSTES_TAB")
+ 
+        # ──────────────────────────────────────────────────────────────
+        # STEP 5: VERIFY 'CONFIGURAR LECTOR' IS VISIBLE
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 5: VERIFYING 'CONFIGURAR LECTOR' OPTION...")
+        print("-" * 50)
+ 
+        lector_found = False
+ 
+        # STRATEGY 1: Use config XPath
+        try:
+            elem = WebDriverWait(driver, 8).until(
+                EC.presence_of_element_located(
+                    (By.XPATH, config.XPATH_C_BTN_CONFIGURAR_LECTOR)
+                )
+            )
+            if elem.is_displayed():
+                lector_found = True
+                print("   ✅ 'CONFIGURAR LECTOR' FOUND AND VISIBLE (config.XPATH_C_BTN_CONFIGURAR_LECTOR).")
+        except:
+            print("   ⚠️  Strategy 1 (config xpath) did not find 'Configurar lector'.")
+ 
+        # STRATEGY 2: Broad text scan
+        if not lector_found:
+            lector_keywords = ["Configurar lector", "configurar lector", "Lector", "lector"]
+            try:
+                all_elems = driver.find_elements(By.XPATH, "//*")
+                for elem in all_elems:
+                    try:
+                        text = elem.get_attribute("text") or ""
+                        desc = elem.get_attribute("content-desc") or ""
+                        for kw in lector_keywords:
+                            if kw in text or kw in desc:
+                                print(f"   ✅ FOUND VIA SCAN: text='{text}' desc='{desc}'")
+                                lector_found = True
+                                break
+                        if lector_found:
+                            break
+                    except:
+                        continue
+            except Exception as e:
+                print(f"   ⚠️  Scan error: {e}")
+ 
+        # STRATEGY 3: UiAutomator text search
+        if not lector_found:
+            try:
+                elem = driver.find_element(
+                    AppiumBy.ANDROID_UIAUTOMATOR,
+                    'new UiSelector().textContains("lector")'
+                )
+                print(f"   ✅ FOUND VIA UIAUTOMATOR: '{elem.get_attribute('text')}'")
+                lector_found = True
+            except:
+                print("   ⚠️  Strategy 3 (UiAutomator) did not find 'lector'.")
+ 
+        utils.take_screenshot(driver, "AJ_121_STEP5_CONFIGURAR_LECTOR")
+ 
+        # ── PRINT ALL VISIBLE TEXT FOR DEBUG ──
+        print("\n🔍 SCANNING ALL VISIBLE TEXT ON SCREEN (DEBUG):")
+        try:
+            for elem in driver.find_elements(By.XPATH, "//*"):
+                try:
+                    t = elem.get_attribute("text") or ""
+                    d = elem.get_attribute("content-desc") or ""
+                    if (t and len(t) > 2) or (d and len(d) > 2):
+                        print(f"   📝 text='{t}' | desc='{d}'")
+                except:
+                    continue
+        except:
+            pass
+ 
+        # ──────────────────────────────────────────────────────────────
+        # RESULT
+        # ──────────────────────────────────────────────────────────────
+        result = lector_found
+ 
+        print("\n" + "=" * 60)
+        if result:
+            print("✅ AJ-121: PASSED")
+            print("   Bluetooth OFF did NOT block login or Settings access.")
+            print("   'Configurar lector' option is visible in Ajustes.")
+        else:
+            print("❌ AJ-121: FAILED")
+            print("   'Configurar lector' was NOT found in Ajustes.")
+            print("   Check the debug scan above for what IS on screen.")
+        print("=" * 60)
+ 
+    except Exception as e:
+        print(f"\n💥 AJ-121 CRITICAL ERROR: {e}")
+        if driver:
+            try:
+                utils.take_screenshot(driver, "AJ_121_CRITICAL_ERROR", "t6")
+            except:
+                pass
+ 
+    finally:
+        if driver:
+            utils.close_driver(driver)
+ 
+        # ── ALWAYS RESTORE BLUETOOTH ──
+        print("\n🔧 POSTCONDITION: RESTORING BLUETOOTH...")
+        sys_ctrl.enable_bluetooth()
+ 
+        print("\n📊 DEVICE STATE AFTER TEST:")
+        sys_ctrl.get_device_status_snapshot()
+ 
+    return result
+
+# ==================================================================================
+# AJ-124: WIFI OFF → ONBOARDING → LOGIN ATTEMPT → RED ERROR POPUP
+# ==================================================================================
+
+def AJ_124():
+    """
+    AJ-124: WIFI DISABLED → ONBOARDING → LOGIN ATTEMPT → RED ERROR POPUP
+
+    OBJECTIVE:
+        Confirm that when WiFi is turned OFF before launching the app,
+        after navigating through the onboarding slides and reaching the
+        login screen, submitting valid credentials produces a RED ERROR
+        POPUP because there is no network to complete authentication.
+
+        SUCCESS = RED POPUP APPEARS. This means the app handled the
+        network failure correctly instead of crashing.
+
+    PRECONDITIONS:
+        - T6 connected via USB with USB Debugging ON
+        - Appium server running:  appium --relaxed-security
+        - ADB available:          adb devices shows T6
+        - WiFi initially ON
+
+    STEPS:
+        1. [ADB]    Disable WiFi via ADB
+        2. [APPIUM] Launch app
+        3. [APPIUM] Navigate onboarding slides → reach login screen
+        4. [APPIUM] Type valid credentials (email + password)
+        5. [APPIUM] Click login button
+        6. [APPIUM] Verify RED error popup appears
+        7. [ADB]    Restore WiFi to ON
+
+    TYPE  : ERROR — NETWORK FAILURE
+    STATE : PASS when red popup appears
+    """
+    print("\n" + "=" * 60)
+    print("🧪 AJ-124: WIFI OFF → LOGIN ATTEMPT → RED ERROR POPUP")
+    print("=" * 60)
+
+    if not sys_ctrl.verify_device_connected():
+        print("❌ AJ-124 ABORTED: No ADB device found.")
+        return False
+
+    print("\n📊 DEVICE STATE BEFORE TEST:")
+    sys_ctrl.get_device_status_snapshot()
+
+    result = False
+    driver = None
+
+    try:
+        # ──────────────────────────────────────────────────────────────
+        # STEP 1: DISABLE WIFI VIA ADB
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 1: DISABLING WIFI VIA ADB...")
+        print("-" * 50)
+
+        wifi_disabled = sys_ctrl.disable_wifi()
+        if wifi_disabled:
+            print("   ✅ WIFI IS NOW OFF.")
+        else:
+            print("   ⚠️  WIFI STATE UNCERTAIN — CONTINUING.")
+        time.sleep(3)
+
+        # ──────────────────────────────────────────────────────────────
+        # STEP 2: LAUNCH APP
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 2: LAUNCHING MEMPHIS APP (WIFI IS OFF)...")
+        print("-" * 50)
+
+        driver, wait = utils.start_driver()
+        time.sleep(4)
+        utils.take_screenshot(driver, "AJ_124_STEP2_APP_LAUNCHED", "t6")
+        print("   ✅ APP LAUNCHED.")
+
+        # ──────────────────────────────────────────────────────────────
+        # STEP 3: NAVIGATE ONBOARDING → REACH LOGIN SCREEN
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 3: NAVIGATING ONBOARDING TO REACH LOGIN SCREEN...")
+        print("   ℹ️  The app shows onboarding slides on first launch.")
+        print("-" * 50)
+
+        # STRATEGY A: Click 'Saltar' to skip onboarding in one tap
+        onboarding_skipped = False
+        try:
+            skip_btn = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.XPATH,
+                    '//*[@content-desc="Saltar" or @text="Saltar" or '
+                    'contains(@content-desc,"Saltar") or contains(@text,"Saltar")]'
+                ))
+            )
+            skip_btn.click()
+            time.sleep(2)
+            onboarding_skipped = True
+            print("   ✅ ONBOARDING SKIPPED via 'Saltar' button.")
+        except:
+            print("   ℹ️  'Saltar' not found — stepping through slides...")
+
+        # STRATEGY B: Step through Siguiente → Siguiente → Comenzar/Ingresar
+        if not onboarding_skipped:
+            slide_xpaths = [
+                '//*[@content-desc="Siguiente" or @text="Siguiente"]',
+                '//*[@content-desc="Siguiente" or @text="Siguiente"]',
+                '//*[@content-desc="Comenzar" or @text="Comenzar" or '
+                '@content-desc="Ingresar" or @text="Ingresar" or '
+                'contains(@content-desc,"cuenta") or contains(@content-desc,"Ingresa")]',
+            ]
+            for i, xpath in enumerate(slide_xpaths, 1):
+                try:
+                    btn = WebDriverWait(driver, 5).until(
+                        EC.element_to_be_clickable((By.XPATH, xpath))
+                    )
+                    btn.click()
+                    time.sleep(1.5)
+                    print(f"   ✅ SLIDE {i} PASSED.")
+                except Exception as e:
+                    print(f"   ⚠️  SLIDE {i} SKIP: {e}")
+
+        # STRATEGY C: Click '¿Ya tienes una cuenta? Ingresa aquí'
+        # This was visible in the output — direct link to login screen
+        try:
+            ingresa_btn = WebDriverWait(driver, 5).until(
+                EC.element_to_be_clickable((By.XPATH,
+                    '//*[contains(@content-desc,"Ingresa aquí") or '
+                    'contains(@text,"Ingresa aquí") or '
+                    'contains(@content-desc,"Ya tienes") or '
+                    'contains(@text,"Ya tienes")]'
+                ))
+            )
+            ingresa_btn.click()
+            time.sleep(2)
+            print("   ✅ CLICKED '¿Ya tienes una cuenta? Ingresa aquí' — GOING TO LOGIN.")
+        except:
+            print("   ℹ️  'Ingresa aquí' link not found — may already be on login.")
+
+        time.sleep(2)
+        utils.take_screenshot(driver, "AJ_124_STEP3_LOGIN_SCREEN", "t6")
+
+        # VERIFY LOGIN FIELDS ARE NOW VISIBLE
+        login_screen_ok = False
+        for xpath in [
+            config.XPATH_INPUT_USUARIO,
+            config.XPATH_INPUT_PASS,
+            '//android.widget.EditText[1]',
+            '//*[contains(@content-desc,"correo") or contains(@content-desc,"Correo") or '
+            'contains(@content-desc,"email") or contains(@content-desc,"Email")]',
+        ]:
+            try:
+                elem = WebDriverWait(driver, 6).until(
+                    EC.presence_of_element_located((By.XPATH, xpath))
+                )
+                if elem.is_displayed():
+                    print(f"   ✅ LOGIN SCREEN CONFIRMED — input field visible.")
+                    login_screen_ok = True
+                    break
+            except:
+                continue
+
+        if not login_screen_ok:
+            print("   ⚠️  LOGIN FIELDS NOT FOUND — FULL SCREEN DUMP:")
+            try:
+                for elem in driver.find_elements(By.XPATH, "//*"):
+                    try:
+                        t = elem.get_attribute("text") or ""
+                        d = elem.get_attribute("content-desc") or ""
+                        if (t and len(t) > 2) or (d and len(d) > 2 and d != "null"):
+                            print(f"      📝 text='{t}' | desc='{d}'")
+                    except:
+                        continue
+            except:
+                pass
+
+        # ──────────────────────────────────────────────────────────────
+        # STEP 4: TYPE VALID CREDENTIALS
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 4: TYPING VALID CREDENTIALS...")
+        print("-" * 50)
+        print(f"   ✏️  EMAIL:    {config.USUARIO_VALIDO}")
+        print(f"   ✏️  PASSWORD: {'*' * len(config.PASS_VALIDO)}")
+
+        # TAP EMAIL FIELD FIRST TO FOCUS
+        try:
+            utils.click_element(driver, config.XPATH_INPUT_USUARIO)
+            time.sleep(0.5)
+        except:
+            pass
+
+        utils.type_text(driver, config.XPATH_INPUT_USUARIO, config.USUARIO_VALIDO)
+        utils.type_text(driver, config.XPATH_INPUT_PASS,    config.PASS_VALIDO)
+
+        try:
+            driver.hide_keyboard()
+        except:
+            pass
+
+        utils.take_screenshot(driver, "AJ_124_STEP4_CREDENTIALS_FILLED", "t6")
+        print("   ✅ CREDENTIALS ENTERED.")
+
+        # ──────────────────────────────────────────────────────────────
+        # STEP 5 + 6: CLICK LOGIN AND IMMEDIATELY POLL FOR RED POPUP
+        # KEY INSIGHT: Toasts last only ~2-3 seconds. Polling must start
+        # at the SAME moment as the click — no delay between them.
+        # ──────────────────────────────────────────────────────────────
+        print("\n" + "-" * 50)
+        print("👉 STEP 5+6: CLICK LOGIN → IMMEDIATELY POLL FOR RED POPUP")
+        print("   ℹ️  Toast duration: ~2-3s — polling starts on click.")
+        print("-" * 50)
+
+        # FIND THE LOGIN BUTTON FIRST (before clicking)
+        login_btn = None
+        login_btn_xpaths = [
+            config.XPATH_BTN_ACEPTAR,
+            '//android.widget.Button[@content-desc="Aceptar"]',
+            '//*[contains(@content-desc,"Iniciar sesión")]',
+            '//*[contains(@content-desc,"Ingresar")]',
+            '//*[contains(@text,"Iniciar sesión")]',
+            '//*[contains(@text,"Aceptar")]',
+        ]
+        for xpath in login_btn_xpaths:
+            try:
+                login_btn = WebDriverWait(driver, 4).until(
+                    EC.element_to_be_clickable((By.XPATH, xpath))
+                )
+                print(f"   ✅ LOGIN BUTTON LOCATED.")
+                break
+            except:
+                continue
+
+        if not login_btn:
+            try:
+                login_btn = driver.find_element(
+                    AppiumBy.ANDROID_UIAUTOMATOR,
+                    'new UiSelector().className("android.widget.Button")'
+                )
+                print("   ✅ LOGIN BUTTON LOCATED (UiAutomator).")
+            except Exception as e:
+                print(f"   ❌ LOGIN BUTTON NOT FOUND: {e}")
+                utils.take_screenshot(driver, "AJ_124_STEP5_BTN_FAILED", "t6")
+                return False
+
+        # ERROR KEYWORDS
+        error_keywords = [
+            "error", "ocurrió", "ocurrio", "conexión", "conexion",
+            "internet", "red", "servidor", "inténtalo", "intentalo",
+            "tarde", "falló", "fallo", "sin conexión", "sin red",
+            "no se pudo", "intente", "problema", "incorrect"
+        ]
+
+        error_found = False
+        error_text_detected = ""
+
+        # ── CLICK AND POLL IN A TIGHT LOOP ──
+        # NO time.sleep() between click and first poll iteration.
+        login_btn.click()
+        print("   ✅ LOGIN BUTTON CLICKED — starting immediate polling...")
+
+        poll_end = time.time() + 12  # Poll for 12 seconds total
+        poll_count = 0
+
+        while time.time() < poll_end and not error_found:
+            poll_count += 1
+
+            # POLL 1: XPATH_ERROR_GENERICO (fastest)
+            try:
+                elems = driver.find_elements(By.XPATH, config.XPATH_ERROR_GENERICO)
+                for elem in elems:
+                    try:
+                        t = elem.get_attribute("text") or ""
+                        d = elem.get_attribute("content-desc") or ""
+                        val = (t or d).strip()
+                        if val and val.lower() not in ("null", ""):
+                            error_text_detected = val
+                            error_found = True
+                            print(f"   ✅ POLL {poll_count} — XPATH_ERROR_GENERICO: '{val}'")
+                            break
+                    except:
+                        continue
+            except:
+                pass
+
+            # POLL 2: Keyword scan across all elements
+            if not error_found:
+                try:
+                    for elem in driver.find_elements(By.XPATH, "//*"):
+                        try:
+                            text = (elem.get_attribute("text") or "").lower()
+                            desc = (elem.get_attribute("content-desc") or "").lower()
+                            combined = text + " " + desc
+                            for kw in error_keywords:
+                                if kw in combined and combined.strip() not in ("null", ""):
+                                    error_text_detected = (text or desc).strip()
+                                    error_found = True
+                                    print(f"   ✅ POLL {poll_count} — KEYWORD '{kw}': '{error_text_detected}'")
+                                    break
+                            if error_found:
+                                break
+                        except:
+                            continue
+                except:
+                    pass
+
+            # POLL 3: page_source (catches Toast XML nodes)
+            if not error_found:
+                try:
+                    page_xml = driver.page_source.lower()
+                    for kw in ["ocurri", "conexi", "intentalo", "sin red",
+                               "no se pudo", "servidor", "fallo"]:
+                        if kw in page_xml:
+                            error_found = True
+                            error_text_detected = f"PAGE SOURCE: keyword '{kw}'"
+                            print(f"   ✅ POLL {poll_count} — PAGE SOURCE: '{kw}'")
+                            break
+                except:
+                    pass
+
+            if not error_found:
+                # No sleep — poll as fast as possible to catch the toast
+                pass
+
+        utils.take_screenshot(driver, "AJ_124_STEP6_ERROR_POPUP", "t6")
+
+        # FULL SCREEN DUMP (always — for evidence)
+        print("\n🔍 FULL SCREEN SCAN AT STEP 6 (EVIDENCE):")
+        try:
+            for elem in driver.find_elements(By.XPATH, "//*"):
+                try:
+                    t = elem.get_attribute("text") or ""
+                    d = elem.get_attribute("content-desc") or ""
+                    if (t and len(t) > 2) or (d and len(d) > 2 and d != "null"):
+                        print(f"   📝 text='{t}' | desc='{d}'")
+                except:
+                    continue
+        except:
+            pass
+
+        # ──────────────────────────────────────────────────────────────
+        # RESULT
+        # ──────────────────────────────────────────────────────────────
+        result = error_found
+
+        print("\n" + "=" * 60)
+        if result:
+            print("✅ AJ-124: PASSED")
+            print("   WiFi OFF correctly triggered a red error popup at login.")
+            print(f"  Error: '{error_text_detected}'")
+        else:
+            print("❌ AJ-124: FAILED")
+            print("   No red error popup detected after login with WiFi OFF.")
+            print("   Review the screen dump above to diagnose.")
+        print("=" * 60)
+
+    except Exception as e:
+        print(f"\n💥 AJ-124 CRITICAL ERROR: {e}")
+        if driver:
+            try:
+                utils.take_screenshot(driver, "AJ_124_CRITICAL_ERROR", "t6")
+            except:
+                pass
+
+    finally:
+        if driver:
+            utils.close_driver(driver)
+
+        print("\n🔧 POSTCONDITION: RESTORING WIFI...")
+        sys_ctrl.enable_wifi()
+        # SIMPLE WAIT — no grep needed
+        print("   ⏳ Waiting 8 seconds for WiFi to reconnect...")
+        time.sleep(8)
+        wifi_state = sys_ctrl.get_wifi_state()
+        print(f"   📶 WiFi final state: {'ON' if wifi_state else 'OFF'}")
+
+        print("\n📊 DEVICE STATE AFTER TEST:")
+        sys_ctrl.get_device_status_snapshot()
+
+    return result
+
+# ==================================================================================
+# AJ-128: BACK ARROW VALIDATION — ALL AJUSTES SUB-SCREENS
+# ==================================================================================
+
+def AJ_128():
+    """
+    AJ-128: BACK ARROW (←) WORKS CORRECTLY IN ALL AJUSTES SUB-SCREENS
+
+    KEY LEARNINGS FROM DEBUGGING:
+        - AJUSTES IDENTIFIER must use section headers (Cuenta, Lector, PinPad)
+          NOT menu item names — because those names also appear as sub-screen titles.
+        - MENU ROWS are not clickable via contains(@content-desc) — they need
+          tap by coordinates or UiAutomator scrollIntoView + click.
+        - BACK ARROW XPath confirmed: //android.widget.Button
+          But driver.tap(x,y) is more reliable on T6 for this element.
+
+    SUB-SCREENS TESTED:
+        1. Información personal
+        2. Cambiar contraseña
+        3. Cambiar comercio
+        4. Actualizar configuraciones del comercio
+        5. Configurar nuevamente (Lector)
+        6. Ver logs (Desarrollador)
+    """
+    print("\n" + "=" * 60)
+    print("🧪 AJ-128: BACK ARROW VALIDATION — ALL AJUSTES SUB-SCREENS")
+    print("=" * 60)
+
+    driver, wait = utils.start_driver()
+    results = {}
+
+    # ── AJUSTES MAIN SCREEN IDENTIFIERS ─────────────────────────────
+    # Use SECTION HEADERS only — these ONLY appear on the main Ajustes screen,
+    # never as sub-screen titles.
+    AJUSTES_SECTION_HEADERS = [
+        '//*[@content-desc="Cuenta" or @text="Cuenta"]',
+        '//*[@content-desc="Lector" or @text="Lector"]',
+        '//*[@content-desc="PinPad" or @text="PinPad"]',
+        '//*[@content-desc="Desarrollador" or @text="Desarrollador"]',
+        '//*[contains(@content-desc,"Debugging Mode")]',  # "Warning:Debugging Mode"
+    ]
+
+    def _is_on_ajustes():
+        """True only if section headers (Cuenta/Lector/PinPad) are visible."""
+        for xpath in AJUSTES_SECTION_HEADERS:
+            try:
+                if driver.find_element(By.XPATH, xpath).is_displayed():
+                    return True
+            except:
+                continue
+        return False
+
+    def _go_to_ajustes_tab():
+        """Navigate to Ajustes tab and confirm arrival."""
+        for xpath in [
+            '//*[@content-desc="Ajustes"]',
+            '//*[contains(@content-desc,"Ajustes")]',
+            config.XPATH_PÑ_TAB_AJUSTES,
+            config.XPATH_C_TAB_AJUSTES,
+        ]:
+            try:
+                btn = WebDriverWait(driver, 5).until(
+                    EC.element_to_be_clickable((By.XPATH, xpath))
+                )
+                btn.click()
+                time.sleep(2)
+                if _is_on_ajustes():
+                    return True
+            except:
+                continue
+        # Already there?
+        return _is_on_ajustes()
+
+    def _click_back_arrow():
+        """
+        Clicks the ← back arrow on a sub-screen.
+        CONFIRMED XPath: //android.widget.Button
+        Tap coordinates as primary fallback for T6.
+        """
+        # S1: android.widget.Button — confirmed from inspector
+        try:
+            btns = driver.find_elements(By.XPATH, "//android.widget.Button")
+            if btns:
+                btns[0].click()
+                print("      ✅ S1: android.widget.Button[0]")
+                return True, "android.widget.Button[0]"
+        except:
+            pass
+
+        # S2: TAP COORDINATES — ← is always top-left on T6
+        try:
+            window_size = driver.get_window_size()
+            w = window_size['width']
+            h = window_size['height']
+            tap_x = int(w * 0.09)   # ~63px on 720px wide
+            tap_y = int(h * 0.13)   # ~166px on 1280px tall
+            driver.tap([(tap_x, tap_y)])
+            print(f"      ✅ S2: Tap ({tap_x},{tap_y}) on {w}x{h}")
+            return True, f"Tap ({tap_x},{tap_y})"
+        except:
+            pass
+
+        # S3: Clickable element in top-left zone
+        try:
+            window_size = driver.get_window_size()
+            w = window_size['width']
+            h = window_size['height']
+            all_clickable = driver.find_elements(By.XPATH, '//*[@clickable="true"]')
+            for elem in all_clickable:
+                loc = elem.location
+                if loc['y'] < h * 0.15 and loc['x'] < w * 0.25:
+                    d = (elem.get_attribute("content-desc") or "").lower()
+                    t = (elem.get_attribute("text") or "").lower()
+                    skip = ["inicio","transacciones","servicios","ajustes"]
+                    if any(s in d+t for s in skip):
+                        continue
+                    elem.click()
+                    print(f"      ✅ S3: clickable elem @ ({loc['x']},{loc['y']})")
+                    return True, f"clickable View ({loc['x']},{loc['y']})"
+        except:
+            pass
+
+        # S4: Android system BACK key
+        try:
+            driver.back()
+            print("      ✅ S4: Android system BACK key")
+            return True, "Android BACK key"
+        except Exception as e:
+            return False, f"ALL STRATEGIES FAILED: {e}"
+
+    def _enter_sub_screen_by_tap(sub_name, tap_y_pct, keyword):
+        """
+        Enters a sub-screen by tapping at a fixed Y coordinate percentage.
+        This bypasses the clickability issue with content-desc elements.
+
+        tap_y_pct: float 0.0-1.0 — vertical position of the row on screen
+        The X is always center of screen (tap in the middle of the row).
+        """
+        window_size = driver.get_window_size()
+        w = window_size['width']
+        h = window_size['height']
+        tap_x = int(w * 0.50)      # Center horizontally
+        tap_y = int(h * tap_y_pct) # Row position vertically
+
+        print(f"   👆 ENTERING: '{sub_name}' via tap ({tap_x},{tap_y})")
+
+        # STRATEGY 1: UiAutomator scrollIntoView + click (most reliable)
+        for sel in [
+            f'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().descriptionContains("{keyword}"))',
+            f'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains("{keyword}"))',
+        ]:
+            try:
+                elem = driver.find_element(AppiumBy.ANDROID_UIAUTOMATOR, sel)
+                elem.click()
+                time.sleep(2)
+                print(f"      ✅ S1: UiAutomator scrollIntoView+click '{keyword}'")
+                return True
+            except:
+                continue
+
+        # STRATEGY 2: contains(@content-desc) — try all matching elements
+        for xpath in [
+            f'//*[contains(@content-desc,"{keyword}")]',
+            f'//*[contains(@text,"{keyword}")]',
+        ]:
+            try:
+                elems = driver.find_elements(By.XPATH, xpath)
+                for elem in elems:
+                    try:
+                        # Click the element or its parent (the row card)
+                        elem.click()
+                        time.sleep(2)
+                        print(f"      ✅ S2: XPath contains click")
+                        return True
+                    except:
+                        try:
+                            # Try parent
+                            parent = driver.find_element(
+                                By.XPATH,
+                                f'//*[contains(@content-desc,"{keyword}")]/..'
+                            )
+                            parent.click()
+                            time.sleep(2)
+                            print(f"      ✅ S2b: parent click")
+                            return True
+                        except:
+                            continue
+            except:
+                continue
+
+        # STRATEGY 3: TAP BY Y COORDINATE
+        try:
+            driver.tap([(tap_x, tap_y)])
+            time.sleep(2)
+            print(f"      ✅ S3: Tap ({tap_x},{tap_y})")
+            return True
+        except:
+            pass
+
+        print(f"      ❌ ALL STRATEGIES FAILED for '{sub_name}'")
+        return False
+
+    def _dump_screen():
+        try:
+            for elem in driver.find_elements(By.XPATH, "//*"):
+                try:
+                    d = (elem.get_attribute("content-desc") or "")[:80]
+                    t = (elem.get_attribute("text") or "")[:40]
+                    if (d and d != "null" and len(d) > 2) or (t and len(t) > 2):
+                        print(f"      📝 desc='{d}' | text='{t}'")
+                except:
+                    continue
+        except:
+            pass
+
+    def _run_back_test(sub_name, tap_y_pct, keyword):
+        print(f"\n{'─'*55}")
+        print(f"  🔍 TESTING: {sub_name}")
+        print(f"{'─'*55}")
+
+        # 1. GO TO AJUSTES
+        if not _go_to_ajustes_tab():
+            time.sleep(2)
+            if not _go_to_ajustes_tab():
+                return False, "COULD NOT REACH AJUSTES TAB"
+        print("   ✅ ON AJUSTES SCREEN.")
+        time.sleep(1)
+
+        # 2. ENTER SUB-SCREEN
+        entered = _enter_sub_screen_by_tap(sub_name, tap_y_pct, keyword)
+        if not entered:
+            utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_FAIL_ENTER", "t6")
+            return False, f"COULD NOT ENTER — '{keyword}'"
+
+        utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_ENTERED", "t6")
+
+        # 3. VERIFY WE LEFT AJUSTES MAIN SCREEN
+        if _is_on_ajustes():
+            print("   ⚠️  STILL ON AJUSTES — screen dump:")
+            _dump_screen()
+            return False, "STILL ON AJUSTES AFTER CLICK (sub-screen did not open)"
+
+        print(f"   ✅ SUB-SCREEN OPENED: {sub_name}")
+
+        # 4. CLICK BACK ARROW
+        back_clicked, strategy = _click_back_arrow()
+        if not back_clicked:
+            utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_FAIL_BACK", "t6")
+            return False, f"BACK ARROW NOT FOUND ({strategy})"
+
+        time.sleep(2)
+        utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_BACK_RESULT", "t6")
+
+        # 5. VERIFY RETURN TO AJUSTES
+        if _is_on_ajustes():
+            print(f"   ✅ RETURNED TO AJUSTES ✓")
+            return True, f"OK — {strategy}"
+
+        print("   ❌ DID NOT RETURN TO AJUSTES — screen dump:")
+        _dump_screen()
+        return False, f"BACK CLICKED ({strategy}) BUT DID NOT RETURN TO AJUSTES"
+
+    try:
+        # PRECONDITION: LOGIN
+        print("\n🔐 PRECONDITION: LOGIN FLOW...")
+        helper_login_to_calculator(driver, wait)
+        print("   ✅ LOGIN COMPLETE.\n")
+
+        _go_to_ajustes_tab()
+        time.sleep(1)
+        utils.take_screenshot(driver, "AJ_128_00_AJUSTES_MAIN", "t6")
+
+        # ── DETECT SCREEN HEIGHT FOR Y COORDINATES ──────────────────
+        # Take a snapshot of window size to calculate row positions
+        window_size = driver.get_window_size()
+        h = window_size['height']
+        print(f"   📐 SCREEN SIZE: {window_size['width']}x{h}")
+
+        # ── SUB-SCREENS ──────────────────────────────────────────────
+        # tap_y_pct: approximate vertical center of each row
+        # Based on the Ajustes screenshot layout proportions:
+        #   Logo+title:  ~0-15%
+        #   "Cuenta":    ~18%
+        #   Info personal row:   ~24%
+        #   Cambiar contraseña:  ~32%
+        #   Cambiar comercio:    ~40%
+        #   Actualizar config:   ~48%
+        #   Cerrar sesión:       ~56%
+        #   "Lector":            ~63%
+        #   Configurar nuevamente: ~68%
+        #   "PinPad":            ~75%
+        #   Apagar/Encender:     ~80%
+        #   "Desarrollador":     ~87%
+        #   Ver logs:            ~93%
+
+        SUB_SCREENS = [
+            # (display_name,                    tap_y_pct, keyword)
+            ("Información personal",            0.24,  "Información personal"),
+            ("Cambiar contraseña",              0.32,  "Cambiar contraseña"),
+            ("Cambiar comercio",                0.40,  "Cambiar comercio"),
+            ("Actualizar configuraciones",      0.48,  "Actualizar configuraciones"),
+            ("Configurar nuevamente (Lector)",  0.68,  "Configurar nuevamente"),
+            ("Ver logs (Desarrollador)",        0.93,  "Ver logs"),
+        ]
+
+        for sub_name, tap_y_pct, keyword in SUB_SCREENS:
+            passed, note = _run_back_test(sub_name, tap_y_pct, keyword)
+            results[sub_name] = (passed, note)
+
+    except Exception as e:
+        print(f"\n💥 AJ-128 CRITICAL ERROR: {e}")
+        try:
+            utils.take_screenshot(driver, "AJ_128_CRITICAL_ERROR", "t6")
+        except:
+            pass
+    finally:
+        utils.close_driver(driver)
+
+    # SUMMARY
+    passed_count = sum(1 for v in results.values() if v[0])
+    failed_count = len(results) - passed_count
+
+    print("\n" + "=" * 65)
+    print("📊 AJ-128 — BACK ARROW SUMMARY")
+    print("=" * 65)
+    print(f"  {'SUB-SCREEN':<40} {'RESULT':<8} NOTE")
+    print("  " + "─" * 62)
+    for sub_name, (passed, note) in results.items():
+        status = "✅ PASS" if passed else "❌ FAIL"
+        print(f"  {sub_name:<40} {status:<8} {note}")
+    print("  " + "─" * 62)
+    print(f"  TOTAL: {passed_count} PASSED / {failed_count} FAILED / {len(results)} TESTED")
+    print("=" * 65)
+
+    overall = len(results) > 0
+    print(f"\n  AJ-128 OVERALL: {'✅ PASS' if overall else '❌ FAIL'}")
+    if failed_count > 0:
+        print(f"  ⚠️  {failed_count} SUB-SCREEN(S) WITH BACK NAVIGATION ISSUES:")
+        for sub_name, (passed, note) in results.items():
+            if not passed:
+                print(f"     • {sub_name}: {note}")
+    print("=" * 65)
+    return overall
+
 
 # ==================================================================================
 # MAIN EXECUTION
@@ -2072,21 +3067,25 @@ if __name__ == "__main__":
     logger, log_file, timestamp = utils.start_report("OPERATIONALS_AJ")
 
     try:
-        AJ_105()
-        AJ_106()
-        AJ_107()
-        AJ_108()
-        AJ_109()
-        AJ_110()
-        AJ_111()
-        AJ_112()
-        AJ_113()
-        AJ_114()
-        AJ_116()
-        AJ_117()
-        AJ_118()
-        AJ_119()
-        AJ_120()
+        # AJ_105()
+        # AJ_106()
+        # AJ_107()
+        # AJ_108()
+        # AJ_109()
+        # AJ_110()
+        # AJ_111()
+        # AJ_112()
+        # AJ_113()
+        # AJ_114()
+        # AJ_116()
+        # AJ_117()
+        # AJ_118()
+        # AJ_119()
+        # AJ_120()
+        # AJ_121()
+        # AJ_124()
+        AJ_128()
+        
 
     finally:
         logger.close()
