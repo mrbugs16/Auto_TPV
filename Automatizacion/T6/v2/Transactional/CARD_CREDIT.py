@@ -365,26 +365,26 @@ def _run_credit_card_test(card_name, test_id):
         _take_screenshot(driver, f"{test_id}_STEP4_TIPO_OPERACION_POPUP")
 
         # Click "Venta Normal"
-        venta_clicked = False
+        sale_clicked = False
         for xpath in [XPATH_BTN_VENTA_NORMAL]:
             try:
                 btn = WebDriverWait(driver, 6).until(
                     EC.element_to_be_clickable((By.XPATH, xpath))
                 )
                 btn.click()
-                venta_clicked = True
+                sale_clicked = True
                 print("   ✅ 'Venta Normal' CLICKED.")
                 break
             except:
                 continue
 
-        if not venta_clicked:
+        if not sale_clicked:
             try:
                 driver.find_element(
                     AppiumBy.ANDROID_UIAUTOMATOR,
                     'new UiSelector().text("Venta Normal")'
                 ).click()
-                venta_clicked = True
+                sale_clicked = True
                 print("   ✅ 'Venta Normal' CLICKED (UiAutomator).")
             except Exception as e:
                 note = f"COULD NOT CLICK 'Venta Normal': {e}"
@@ -552,26 +552,26 @@ def _run_credit_card_test(card_name, test_id):
         _take_screenshot(driver, f"{test_id}_STEP8_TICKET_SCREEN")
 
         # Now click "Finalizar" on ticket share screen
-        finalizar_clicked = False
+        finalize_clicked = False
         for xpath in [XPATH_BTN_FINALIZAR]:
             try:
                 btn = WebDriverWait(driver, 8).until(
                     EC.element_to_be_clickable((By.XPATH, xpath))
                 )
                 btn.click()
-                finalizar_clicked = True
+                finalize_clicked = True
                 print("   ✅ 'Finalizar' CLICKED.")
                 break
             except:
                 continue
 
-        if not finalizar_clicked:
+        if not finalize_clicked:
             try:
                 driver.find_element(
                     AppiumBy.ANDROID_UIAUTOMATOR,
                     'new UiSelector().text("Finalizar")'
                 ).click()
-                finalizar_clicked = True
+                finalize_clicked = True
                 print("   ✅ 'Finalizar' CLICKED (UiAutomator).")
             except:
                 # Try "Aceptar" as last resort (some flows merge the screens)
@@ -580,7 +580,7 @@ def _run_credit_card_test(card_name, test_id):
                         AppiumBy.ANDROID_UIAUTOMATOR,
                         'new UiSelector().text("Aceptar")'
                     ).click()
-                    finalizar_clicked = True
+                    finalize_clicked = True
                     print("   ✅ 'Aceptar' CLICKED as Finalizar fallback.")
                 except Exception as e:
                     print(f"   ⚠️  Could not click Finalizar: {e}")
@@ -615,7 +615,7 @@ def _run_credit_card_test(card_name, test_id):
         # ──────────────────────────────────────────────────────────────
         result = transaction_approved  # Green screen = success
         note   = (
-            f"APPROVED ✅ | Finalizar: {'OK' if finalizar_clicked else 'SKIP'} | "
+            f"APPROVED ✅ | Finalizar: {'OK' if finalize_clicked else 'SKIP'} | "
             f"Back to calc: {'OK' if returned_to_calculator else 'NOT CONFIRMED'}"
         )
 
