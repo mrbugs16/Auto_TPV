@@ -20,11 +20,6 @@
 import sys
 import os
 import time
-
-# ── PATH SETUP ──────────────────────────────────────────────────────────────────
-# __file__ = .../Automatizacion/T6/v2/Operationals_CONN.py
-# v2_path  = .../Automatizacion/T6/v2/   ← utils.py, utils_system.py, config.py live HERE
-# t6_path  = .../Automatizacion/T6/      ← fallback for any shared v1/v2 modules
 v2_path = os.path.abspath(os.path.dirname(__file__))
 t6_path = os.path.abspath(os.path.join(v2_path, '..'))
 
@@ -35,10 +30,8 @@ for p in [v2_path, t6_path]:
 import config
 import utils
 
-# DIAGNOSTIC — prints which utils.py file Python actually loaded
-print(f"✅ utils loaded from: {utils.__file__}")
 
-# VERIFY iniciar_reporte EXISTS — if not, wrong utils.py was loaded
+print(f"✅ utils loaded from: {utils.__file__}")
 if not hasattr(utils, 'start_report'):
     print("❌ WRONG utils.py LOADED — iniciar_reporte not found.")
     print(f"   Python sys.path: {sys.path[:4]}")
@@ -67,11 +60,6 @@ def _capture_evidence(driver, test_id: str):
 
 
 def _helper_login_and_reach_calculator(driver, wait):
-    """
-    SHARED PRECONDITION: LOGIN + NAVIGATE TO CALCULATOR SCREEN.
-    REUSED ACROSS ALL CONN TESTS.
-    """
-    # ── DISMISS ONBOARDING ──
     for _ in range(3):
         try:
             next_btn = driver.find_element(By.XPATH, '//*[contains(@content-desc, "Siguiente")]')
@@ -80,20 +68,19 @@ def _helper_login_and_reach_calculator(driver, wait):
         except:
             break
 
-    # ── LOGIN ──
+   
     utils.type_text(driver, config.XPATH_INPUT_USUARIO, config.USUARIO_VALIDO)
     utils.type_text(driver, config.XPATH_INPUT_PASS,    config.PASS_VALIDO)
     utils.click_element(driver, config.XPATH_BTN_ACEPTAR)
     time.sleep(3)
 
-    # ── HANDLE 'CONFIGURA TU COMERCIO' (v2) ──
+   
     try:
         driver.find_element(By.XPATH, '//*[contains(@content-desc, "Configurar ahora")]').click()
         time.sleep(2)
     except:
         pass
 
-    # ── VERIFY CALCULATOR SCREEN ──
     try:
         wait.until(EC.presence_of_element_located((By.XPATH, config.XPATH_C_PANTALLA_COBRO)))
         print("   ✅ CALCULATOR SCREEN REACHED.")
@@ -106,18 +93,6 @@ def _helper_login_and_reach_calculator(driver, wait):
 # ==================================================================================
 
 def CONN_01():
-    """
-    VALIDATES THAT THE MEMPHIS APP SHOWS A CONNECTIVITY ERROR WHEN
-    WIFI IS DISABLED WHILE THE USER IS ACTIVELY ON THE CALCULATOR SCREEN.
-
-    PRECONDITION : WiFi is ON, app is on Calculator screen
-    STEPS:
-        1. Login and reach Calculator screen (WiFi is ON)
-        2. Disable WiFi via ADB (sys_ctrl)
-        3. Attempt a charge interaction that requires network
-        4. Verify error message or offline indicator appears
-    POSTCONDITION: WiFi is restored via sys_ctrl.restore_normal_state()
-    """
     print("\n" + "=" * 60)
     print("🧪 CONN-01: WIFI DISABLED DURING APP USE")
     print("=" * 60)
@@ -127,7 +102,6 @@ def CONN_01():
         print("❌ CONN-01 ABORTED: No device found.")
         return False
 
-    # ── SNAPSHOT BEFORE ──
     snapshot_before = sys_ctrl.get_device_status_snapshot()
 
     driver, wait = utils.start_driver()
@@ -153,7 +127,6 @@ def CONN_01():
             "verifica tu conexión", "connection error"
         ]
 
-        # STRATEGY 1: Scan all visible text elements
         try:
             all_elements = driver.find_elements(By.XPATH, "//*")
             for elem in all_elements:
@@ -172,7 +145,6 @@ def CONN_01():
         except Exception as e:
             print(f"   ⚠️  SCAN ERROR: {e}")
 
-        # STRATEGY 2: Wait for known error XPath
         if not error_found:
             try:
                 error_xpath = '//*[contains(@text, "conexión") or contains(@content-desc, "conexión")]'
@@ -186,7 +158,7 @@ def CONN_01():
 
         _capture_evidence(driver, "CONN_01_STEP3_ERROR_CHECK")
 
-        result = True  # Test PASSES even if error_found=False (behavior documented)
+        result = True  
         status = "CONN ERROR SHOWN" if error_found else "APP SILENT (NO EXPLICIT ERROR)"
         print(f"\n✅ CONN-01 COMPLETED — App behavior: {status}")
 
@@ -209,23 +181,7 @@ def CONN_01():
 # ==================================================================================
 # CONN-03: BLUETOOTH OFF → 'LECTOR NO CONFIGURADO' POPUP
 # ==================================================================================
-
 def CONN_03():
-    """
-    VALIDATES THAT THE MEMPHIS APP SHOWS 'LECTOR NO CONFIGURADO' POPUP
-    WHEN BLUETOOTH IS DISABLED BEFORE LAUNCHING THE APP.
-
-    THIS IS A KEY SCENARIO: The Memphis card reader (lector) pairs via BT.
-    When BT is off, the reader cannot connect and the app should inform the user.
-
-    PRECONDITION : Bluetooth is ON (normal state)
-    STEPS:
-        1. Disable Bluetooth via ADB
-        2. Launch Memphis via Appium (fresh start)
-        3. Login and proceed through onboarding
-        4. Verify 'Lector no configurado' popup appears
-    POSTCONDITION: Bluetooth is restored
-    """
     print("\n" + "=" * 60)
     print("🧪 CONN-03: BLUETOOTH OFF → LECTOR NO CONFIGURADO")
     print("=" * 60)
@@ -253,7 +209,6 @@ def CONN_03():
             "bluetooth", "configurar ahora", "después"
         ]
 
-        # STRATEGY 1: Scan for lector popup text
         try:
             all_elements = driver.find_elements(By.XPATH, "//*")
             for elem in all_elements:
@@ -272,7 +227,6 @@ def CONN_03():
         except Exception as e:
             print(f"   ⚠️  SCAN ERROR: {e}")
 
-        # STRATEGY 2: Known XPath for 'Lector no configurado'
         if not lector_popup_found:
             try:
                 popup_xpath = '//*[contains(@text, "Lector") or contains(@content-desc, "Lector")]'
@@ -308,19 +262,7 @@ def CONN_03():
 # ==================================================================================
 # CONN-05: AIRPLANE MODE — FULL RADIO BLACKOUT
 # ==================================================================================
-
 def CONN_05():
-    """
-    VALIDATES MEMPHIS APP BEHAVIOR WHEN ALL RADIOS ARE CUT (AIRPLANE MODE).
-    TESTS THE WORST-CASE CONNECTIVITY SCENARIO.
-
-    STEPS:
-        1. Login and reach Calculator (all radios ON)
-        2. Enable Airplane Mode via ADB
-        3. Screenshot + scan for any error / graceful handling
-        4. Disable Airplane Mode
-        5. Verify app recovers
-    """
     print("\n" + "=" * 60)
     print("🧪 CONN-05: AIRPLANE MODE — FULL RADIO BLACKOUT")
     print("=" * 60)
@@ -393,14 +335,7 @@ def CONN_05():
 # ==================================================================================
 # CONN-06: SLOW NETWORK SIMULATION
 # ==================================================================================
-
 def CONN_06():
-    """
-    VALIDATES THAT THE MEMPHIS APP HANDLES HIGH-LATENCY NETWORKS GRACEFULLY.
-    SIMULATES A SLOW CONNECTION (500ms latency, 256kbps bandwidth).
-
-    USE CASE: Remote merchants in low-connectivity areas (e.g., rural deployments).
-    """
     print("\n" + "=" * 60)
     print("🧪 CONN-06: SLOW NETWORK SIMULATION (HIGH LATENCY)")
     print("=" * 60)
@@ -459,7 +394,7 @@ def CONN_06():
 
 if __name__ == "__main__":
 
-    # INICIAR REPORTE — SAME PATTERN AS ALL OTHER Operationals_*.py FILES
+    
     logger, log_file, timestamp = utils.start_report("CONN")
 
     results = {}

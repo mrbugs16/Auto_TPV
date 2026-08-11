@@ -673,11 +673,38 @@ def generate_zip_report(module_name, logger, log_file, timestamp):
         return None
 
 
+def _classify_log_line(line):
+    """
+    CLASSIFIES A SINGLE LOG LINE AS "pass", "fail" OR "other".
+    SHARED BY THE METRIC COUNTERS AND THE PER-LINE data-status ATTRIBUTE
+    USED BY THE HTML REPORT'S CLICKABLE PASS/FAIL/ALL FILTER, SO THE
+    COUNTERS AND THE FILTERED VIEW ALWAYS AGREE.
+    MATCHES BOTH FORMATS:
+        FORMAT A (result summary): "📊 LG-005 RESULT: SUCCESS" / "RESULT: FAIL"
+        FORMAT B (inline):         "✅ ... : SUCCESS"          / "❌ ... : FAILED"
+    """
+    upper = line.upper()
+    if ("RESULT: SUCCESS" in upper) or ("✅" in line and ": SUCCESS" in upper):
+        return "pass"
+    if ("RESULT: FAIL" in upper and "RESULT: FAILURE" not in upper) or \
+       ("❌" in line and (": FAILED" in upper or "CRITICAL ERROR" in upper)):
+        return "fail"
+    return "other"
+
+
+# LOGO SHOWN CENTERED AT THE TOP OF THE HTML REPORT.
+# EXPECTED AT: <PROJECT_ROOT>/assets/memphis_logo.png
+# IF THE FILE IS MISSING THE REPORT STILL GENERATES NORMALLY, JUST WITHOUT THE LOGO.
+LOGO_PATH = os.path.join("assets", "memphis_logo.png")
+
+
 def generate_html_report(module_name, log_file, timestamp):
     """
     READS THE DUAL-LOGGER TEXT FILE AND GENERATES A PROFESSIONAL HTML REPORT.
     FEATURES:
-        - AUTOMATIC PASS/FAIL METRIC BADGES.
+        - MEMPHIS BRAND PALETTE (NAVY + ORANGE) WITH THE LOGO CENTERED AT THE TOP.
+        - AUTOMATIC PASS/FAIL METRIC BADGES THAT DOUBLE AS CLICKABLE CLASSIFICATION
+          FILTERS (ALL / PASSED / FAILED) FOR THE TERMINAL LOG VIEW.
         - COLOR-CODED LOG LINES (SUCCESS / ERROR / WARNING / INFO / HEADER).
         - SCREENSHOTS EMBEDDED AS BASE64 DIRECTLY IN THE HTML (NO EXTERNAL FILES NEEDED).
     OUTPUT: zip_evidence/{module_name}_REPORT_{timestamp}.html
@@ -689,23 +716,31 @@ def generate_html_report(module_name, log_file, timestamp):
         with open(log_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
 
-        # PASS COUNTER — MATCHES BOTH FORMATS:
-        #   FORMAT A (result summary): "📊 LG-005 RESULT: SUCCESS"
-        #   FORMAT B (inline):         "✅ ... : SUCCESS"
-        total_pass = sum(
-            1 for l in lines
-            if ("RESULT: SUCCESS" in l.upper()) or
-               ("✅" in l and ": SUCCESS" in l.upper())
-        )
-        # FAIL COUNTER — MATCHES BOTH FORMATS:
-        #   FORMAT A (result summary): "📊 LG-005 RESULT: FAIL"
-        #   FORMAT B (inline):         "❌ ... : FAILED"
-        total_fail = sum(
-            1 for l in lines
-            if ("RESULT: FAIL" in l.upper() and "RESULT: FAILURE" not in l.upper()) or
-               ("❌" in l and (": FAILED" in l.upper() or "CRITICAL ERROR" in l.upper()))
-        )
+        total_pass = sum(1 for l in lines if _classify_log_line(l) == "pass")
+        total_fail = sum(1 for l in lines if _classify_log_line(l) == "fail")
         fecha      = datetime.strptime(timestamp, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
+
+        # LINK THE LAST SCREENSHOT TAKEN BEFORE EACH PASS/FAIL MARKER TO THAT
+        # OUTCOME. THIS WAY, FILTERING BY PASSED OR FAILED STILL SHOWS THE FINAL
+        # CAPTURE FOR THAT RESULT AS PROOF THE STEP RAN CORRECTLY, INSTEAD OF AN
+        # EMPTY LOG VIEW (SCREENSHOT LINES THEMSELVES DON'T CONTAIN SUCCESS/FAIL
+        # KEYWORDS, SO THEY'D OTHERWISE ALWAYS CLASSIFY AS "other").
+        screenshot_result = {}
+        pending_idx = None
+        for idx, l in enumerate(lines):
+            if "✔ SCREENSHOT TAKEN:" in l:
+                pending_idx = idx
+            outcome = _classify_log_line(l)
+            if outcome in ("pass", "fail") and pending_idx is not None:
+                screenshot_result[pending_idx] = outcome
+                pending_idx = None
+
+        # LOGO AS BASE64 SO THE REPORT STAYS A SINGLE SELF-CONTAINED HTML FILE.
+        logo_html = ""
+        if os.path.exists(LOGO_PATH):
+            with open(LOGO_PATH, "rb") as img:
+                logo_b64 = base64.b64encode(img.read()).decode()
+            logo_html = f'<div class="brand-logo-wrap"><img class="brand-logo" src="data:image/png;base64,{logo_b64}" alt="Memphis"></div>'
 
         html_content = f"""<!DOCTYPE html>
 <html lang="en">
@@ -714,22 +749,30 @@ def generate_html_report(module_name, log_file, timestamp):
     <title>QA Report | {module_name}</title>
     <style>
         :root {{
-            --bg-main: #f4f7f9; --bg-card: #ffffff;
-            --primary: #1e293b; --secondary: #64748b;
+            --bg-main: #f0f2f8; --bg-card: #ffffff;
+            --navy: #1b2a6b; --navy-dark: #142057; --orange: #ff7a00; --orange-light: #ffb066;
+            --primary: #1b2a6b; --secondary: #5b6b8c;
             --success: #10b981; --danger: #ef4444;
-            --log-bg: #0f172a;  --log-text: #e2e8f0;
+            --log-bg: #0d1333;  --log-text: #e2e6f5;
         }}
         body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); color: var(--primary); margin: 0; padding: 30px; line-height: 1.5; }}
-        .header {{ background: var(--bg-card); padding: 25px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 6px solid var(--primary); }}
-        .header h1 {{ margin: 0 0 5px; font-size: 24px; }}
+        .brand-logo-wrap {{ text-align: center; margin-bottom: 20px; }}
+        .brand-logo {{ max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(27,42,107,.18); }}
+        .header {{ background: var(--bg-card); padding: 25px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 6px solid var(--navy); border-top: 3px solid var(--orange); flex-wrap: wrap; gap: 15px; }}
+        .header h1 {{ margin: 0 0 5px; font-size: 24px; color: var(--navy); }}
         .header p  {{ margin: 0; color: var(--secondary); font-size: 14px; font-weight: 500; }}
-        .metrics   {{ display: flex; gap: 15px; }}
-        .badge     {{ padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; color: #fff; display: flex; flex-direction: column; align-items: center; min-width: 80px; box-shadow: 0 2px 4px rgba(0,0,0,.1); }}
+        .metrics   {{ display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }}
+        .filter-label {{ font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; }}
+        .badge     {{ padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; color: #fff; display: flex; flex-direction: column; align-items: center; min-width: 80px; box-shadow: 0 2px 4px rgba(0,0,0,.1); border: none; cursor: pointer; font-family: inherit; transition: transform .12s ease, box-shadow .12s ease; }}
+        .badge:hover {{ transform: translateY(-2px); }}
         .badge span {{ font-size: 24px; margin-top: 4px; }}
+        .badge-all  {{ background: var(--navy); }}
         .badge-pass {{ background: var(--success); }}
         .badge-fail {{ background: var(--danger); }}
+        .badge.active {{ box-shadow: 0 0 0 3px var(--orange), 0 2px 4px rgba(0,0,0,.1); }}
         .container  {{ background: var(--bg-card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); }}
-        .section-title {{ font-size: 18px; margin: 0 0 15px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }}
+        .section-title {{ font-size: 18px; margin: 0 0 15px; color: var(--navy); border-bottom: 3px solid var(--orange); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }}
+        #current-filter {{ font-size: 12px; font-weight: 600; color: var(--secondary); text-transform: none; border-bottom: none; }}
         .terminal  {{ background: var(--log-bg); color: var(--log-text); padding: 20px; border-radius: 8px; font-family: 'Consolas','Courier New',monospace; font-size: 13px; overflow-x: auto; }}
         .log-line    {{ margin: 3px 0; white-space: pre-wrap; word-wrap: break-word; }}
         .log-success {{ color: #34d399; font-weight: bold; }}
@@ -737,31 +780,41 @@ def generate_html_report(module_name, log_file, timestamp):
         .log-info    {{ color: #38bdf8; }}
         .log-warning {{ color: #facc15; }}
         .log-header  {{ color: #cbd5e1; font-weight: bold; padding-top: 15px; border-bottom: 1px dashed #334155; padding-bottom: 5px; margin-bottom: 5px; }}
-        .evidence-card  {{ background: #1e293b; margin: 20px 0; padding: 15px; border-left: 4px solid #38bdf8; border-radius: 6px; }}
-        .evidence-title {{ color: #7dd3fc; font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; }}
+        .log-line.is-hidden, .evidence-card.is-hidden {{ display: none; }}
+        .empty-state {{ color: var(--secondary); font-style: italic; padding: 10px 2px; display: none; }}
+        .evidence-card  {{ background: #142057; margin: 20px 0; padding: 15px; border-left: 4px solid var(--orange); border-radius: 6px; }}
+        .evidence-title {{ color: var(--orange-light); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; }}
+        .evidence-tag {{ font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; letter-spacing: .3px; color: #fff; }}
+        .evidence-tag-pass {{ background: var(--success); }}
+        .evidence-tag-fail {{ background: var(--danger); }}
         .evidence-img   {{ max-width: 100%; height: auto; border-radius: 4px; display: block; }}
     </style>
 </head>
 <body>
+{logo_html}
 <div class="header">
     <div>
         <h1>📊 Automated Test Execution Report</h1>
         <p>Module: <strong>{module_name}</strong> &nbsp;|&nbsp; Environment: QA &nbsp;|&nbsp; Executed: {fecha}</p>
     </div>
     <div class="metrics">
-        <div class="badge badge-pass">PASSED <span>{total_pass}</span></div>
-        <div class="badge badge-fail">FAILED <span>{total_fail}</span></div>
+        <span class="filter-label">Filter:</span>
+        <button type="button" id="filter-all" class="badge badge-all active" onclick="filterLogs('all')">ALL <span>{len(lines)}</span></button>
+        <button type="button" id="filter-pass" class="badge badge-pass" onclick="filterLogs('pass')">PASSED <span>{total_pass}</span></button>
+        <button type="button" id="filter-fail" class="badge badge-fail" onclick="filterLogs('fail')">FAILED <span>{total_fail}</span></button>
     </div>
 </div>
 <div class="container">
-    <h2 class="section-title">Terminal Logs &amp; Evidence</h2>
-    <div class="terminal">
+    <h2 class="section-title">Terminal Logs &amp; Evidence <span id="current-filter">Showing: ALL</span></h2>
+    <div class="terminal" id="terminal">
 """
-        for line in lines:
+        for idx, line in enumerate(lines):
             clean = line.replace("<", "&lt;").replace(">", "&gt;").strip("\n")
             if not clean.strip():
                 html_content += "<br>\n"
                 continue
+
+            status = _classify_log_line(clean)
 
             css = "log-line"
             if "✅" in clean or "SUCCESS" in clean:            css += " log-success"
@@ -770,7 +823,7 @@ def generate_html_report(module_name, log_file, timestamp):
             elif "⚠️" in clean or "WARNING" in clean:          css += " log-warning"
             elif "===" in clean:                               css += " log-header"
 
-            html_content += f'<div class="{css}">{clean}</div>\n'
+            html_content += f'<div class="{css}" data-status="{status}">{clean}</div>\n'
 
             if "✔ SCREENSHOT TAKEN:" in clean:
                 parts = clean.split("SCREENSHOT TAKEN:")
@@ -780,15 +833,40 @@ def generate_html_report(module_name, log_file, timestamp):
                         with open(img_path, "rb") as img:
                             b64 = base64.b64encode(img.read()).decode()
                         img_name = os.path.basename(img_path)
+                        evidence_status = screenshot_result.get(idx, "other")
+                        tag_html = ""
+                        if evidence_status == "pass":
+                            tag_html = ' <span class="evidence-tag evidence-tag-pass">PASSED</span>'
+                        elif evidence_status == "fail":
+                            tag_html = ' <span class="evidence-tag evidence-tag-fail">FAILED</span>'
                         html_content += f"""
-<div class="evidence-card">
-    <div class="evidence-title">📸 VISUAL EVIDENCE: {img_name}</div>
+<div class="evidence-card" data-status="{evidence_status}">
+    <div class="evidence-title">📸 VISUAL EVIDENCE: {img_name}{tag_html}</div>
     <img class="evidence-img" src="data:image/png;base64,{b64}" alt="QA Evidence">
 </div>
 """
         html_content += """
+    <p class="empty-state" id="empty-state">No log lines match this filter.</p>
     </div>
 </div>
+<script>
+function filterLogs(status) {
+    var items = document.querySelectorAll('#terminal .log-line, #terminal .evidence-card');
+    var visibleCount = 0;
+    items.forEach(function (el) {
+        var match = (status === 'all') || (el.getAttribute('data-status') === status);
+        el.classList.toggle('is-hidden', !match);
+        if (match) visibleCount++;
+    });
+
+    document.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
+    document.getElementById('filter-' + status).classList.add('active');
+
+    var labels = { all: 'ALL', pass: 'PASSED', fail: 'FAILED' };
+    document.getElementById('current-filter').textContent = 'Showing: ' + labels[status];
+    document.getElementById('empty-state').style.display = visibleCount === 0 ? 'block' : 'none';
+}
+</script>
 </body>
 </html>
 """
@@ -801,4 +879,3 @@ def generate_html_report(module_name, log_file, timestamp):
 
     except Exception as e:
         print(f"❌ ERROR GENERATING HTML REPORT: {e}")
-        return None

@@ -53,7 +53,7 @@ CAPABILITIES = {
 # ==================================================================================
 
 USUARIO_VALIDO   = "david.santos@ijuba.solutions"
-PASS_VALIDO      = "Memphis@2021"
+PASS_VALIDO      = "Memphis@2026"
 USUARIO_INVALIDO = "usuario.noexiste@prueba.com"
 PASS_INVALIDO    = "ContrasenaFalsa123"
 

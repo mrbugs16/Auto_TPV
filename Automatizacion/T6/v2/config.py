@@ -42,7 +42,7 @@ CAPABILITIES = {
     "appium:platformVersion"    : "13",
     "appium:deviceName"         : "vnd_tb8766p1_64_bsp",
     "appium:appPackage"         : "com.memphis.app.dev",
-    "appium:appActivity"        : "com.memphis.app.dev/.MainActivity",
+    "appium:appActivity"        : "com.memphis.app.MainActivity",
     "appium:autoGrantPermissions": False,
     "appium:noReset"            : False,
 }
@@ -387,7 +387,7 @@ XPATH_RA_APELLIDO        = '//android.widget.EditText[2]'
 XPATH_RA_SEGUNDOAPELLIDO = '//android.widget.EditText[3]'
 XPATH_RA_EMAIL           = '//android.widget.EditText[4]'
 XPATH_RA_PASS            = '//android.widget.EditText[5]'
-XPATH_RA_CONFIRMAR_PASS  = '//android.widget.EditText[6]'
+XPATH_RA_CONFIRMAR_PASS  = '//android.widget.FrameLayout[@resource-id="android:id/content"]/android.widget.FrameLayout/android.view.View/android.view.View/android.view.View/android.view.View/android.view.View/android.widget.EditText[6]'
 
 # --- BUTTONS ---
 XPATH_RA_BTN_ACEPTAR = '//android.widget.Button[@content-desc="Aceptar"]'
