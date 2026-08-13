@@ -467,7 +467,7 @@ def OC_34():
     print("OC-34: VALIDATION FINAL - OPEN LINK AND CAPTURE SUCCESS")
     print("=" * 60)
     EMAIL_QA = "santiago.tapia@memphis.mx" 
-    PASS_APP_GMAIL = "bpgg sgkz lgpi jvfi" 
+    PASS_APP_GMAIL = "Memphis@2026$y" 
     print("📱 PHASE 1: REQUESTING EMAIL FROM THE APP...")
     driver_mobile, wait_mobile = utils.iniciar_driver()
     try:
@@ -1116,18 +1116,18 @@ def OC_42():
 
 # === EXECUTION === #
 if __name__ == "__main__":
-     OC_25()
-    # OC_26()
-    # #OC_27()
-    # OC_28()
-    # OC_29()
-    # OC_30()
-    # OC_31()
-    # OC_33()
-    # OC_34()
-    # OC_36()
-    # OC_37()
-    # OC_38()
-    # OC_39()
-    # OC_40()
-    # OC_42()
+    OC_25()
+    OC_26()
+    OC_27()
+    OC_28()
+    OC_29()
+    OC_30()
+    OC_31()
+    OC_33()
+    OC_34()
+    OC_36()
+    OC_37()
+    OC_38()
+    OC_39()
+    OC_40()
+    OC_42()

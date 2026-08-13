@@ -34,11 +34,6 @@ from selenium.webdriver.common.by import By
 # INTERNAL HELPER: CALL print_http_evidence_appium WITHOUT SILENCING ERRORS
 # =================================================================================
 def _capture_evidence(driver, nombre_test):
-    """
-    WRAPPER AROUND utils.print_http_evidence_appium THAT REPLACES THE OLD
-    'try: ... except: pass' PATTERN. ERRORS ARE NOW PRINTED INSTEAD OF SWALLOWED,
-    SO MISSING LOGS ARE VISIBLE IN THE CONSOLE OUTPUT DURING DEBUG.
-    """
     try:
         utils.print_http_evidence_appium(driver, nombre_test)
     except Exception as ev_err:
@@ -50,12 +45,6 @@ def _capture_evidence(driver, nombre_test):
 #         (REACHES THE LOCATION PERMISSION SCREEN)
 # =================================================================================
 def helper_login_to_calculator(driver, wait):
-    """
-    EXECUTES THE LOGIN AND REGISTRATION FLOW.
-      1. LOGIN WITH VALID CREDENTIALS.
-      2. BUSINESS REGISTRATION (TOKEN + AFFILIATION NUMBER).
-    """
-
     # PHASE 1: LOGIN
     print("   🔐 [HELPER] PHASE 1: EXECUTING LOGIN...")
     time.sleep(4)
@@ -106,6 +95,7 @@ def helper_login_to_calculator(driver, wait):
     time.sleep(8)
 
     print("   ✅ [HELPER] LOGIN + REGISTRATION COMPLETE. READY FOR LOCATION PERMISSION TESTS.")
+
 
 # =================================================================================
 # UBI-144: VERIFY LOCATION PERMISSION DIALOG LOADS CORRECTLY AFTER REGISTRATION
@@ -221,6 +211,7 @@ def UBI_144():
     finally:
         utils.cerrar_driver(driver)
 
+
 # =================================================================================
 # UBI-145: SELECT 'MIENTRAS LA APP ESTÁ EN USO' + 'PRECISA' AND VERIFY CALCULATOR LOADS
 # =================================================================================
@@ -295,7 +286,7 @@ def UBI_145():
         calculator_loaded = False
         elementos_encontrados = []
 
-        # VERIFY 'COBRAR' BUTTON
+        
         try:
             cobrar = driver.find_element(By.XPATH, config.XPATH_C_PANTALLA_COBRO)
             if cobrar.is_displayed():
@@ -304,7 +295,7 @@ def UBI_145():
         except:
             pass
 
-        # VERIFY AMOUNT DISPLAY (\$0.00)
+        
         try:
             display = driver.find_element(By.XPATH, config.XPATH_C_DISPLAY_MONTO)
             if display.is_displayed():
@@ -313,7 +304,7 @@ def UBI_145():
         except:
             pass
 
-        # VERIFY NO GREEN POPUP APPEARED
+        
         popup_found = False
         try:
             popup = driver.find_element(By.XPATH,
@@ -437,7 +428,7 @@ def UBI_146():
         calculator_loaded = False
         elementos_encontrados = []
 
-        # VERIFY 'COBRAR' BUTTON
+        
         try:
             cobrar = driver.find_element(By.XPATH, config.XPATH_C_PANTALLA_COBRO)
             if cobrar.is_displayed():
@@ -446,7 +437,7 @@ def UBI_146():
         except:
             pass
 
-        # VERIFY AMOUNT DISPLAY (\$0.00)
+        
         try:
             display = driver.find_element(By.XPATH, config.XPATH_C_DISPLAY_MONTO)
             if display.is_displayed():
@@ -455,7 +446,6 @@ def UBI_146():
         except:
             pass
 
-        # VERIFY NO GREEN POPUP APPEARED
         popup_found = False
         try:
             popup = driver.find_element(By.XPATH,
@@ -642,7 +632,7 @@ def UBI_147():
         permiso_requerido = False
         elementos_encontrados = []
 
-        # VERIFY 'Permiso Requerido' TITLE (content-desc)
+        
         try:
             titulo = driver.find_element(By.XPATH,
                 '//*[@content-desc="Permiso Requerido"]'
@@ -653,7 +643,6 @@ def UBI_147():
         except:
             pass
 
-        # VERIFY DESCRIPTION TEXT (content-desc)
         try:
             desc = driver.find_element(By.XPATH,
                 '//*[contains(@content-desc, "permiso de ubicación") or contains(@content-desc, "necesario para realizar")]'
@@ -664,7 +653,6 @@ def UBI_147():
         except:
             pass
 
-        # VERIFY 'Abrir Configuración' BUTTON (content-desc)
         try:
             btn_config = driver.find_element(By.XPATH,
                 '//*[@content-desc="Abrir Configuración"]'
@@ -747,7 +735,6 @@ def UBI_148():
 
         utils.tomar_screenshot(driver, "UBI_148_APROXIMADA_SELECTED")
 
-        # DEBUG: SCAN AFTER SELECTING APROXIMADA
         print("\n   🔍 DEBUG: SCANNING BUTTONS AFTER SELECTING 'APROXIMADA'...")
         try:
             todos = driver.find_elements(By.XPATH, "//*")
@@ -787,7 +774,6 @@ def UBI_148():
             except:
                 pass
 
-        # ATTEMPT 2: BY CONTENT-DESC (multiple variations)
         if not btn_clicked:
             for variation in text_variations:
                 if btn_clicked:
@@ -800,7 +786,6 @@ def UBI_148():
                 except:
                     pass
 
-        # ATTEMPT 3: BY RESOURCE-ID (com.android.permissioncontroller)
         if not btn_clicked:
             try:
                 btn = driver.find_element(By.ID, "com.android.permissioncontroller:id/permission_allow_foreground_only_button")
@@ -892,11 +877,7 @@ def UBI_148():
 # INTERNAL HELPER: APROXIMADA + SOLO ESTA VEZ → COBRAR → PRECISION DIALOG
 # =================================================================================
 def _helper_reach_precision_dialog(driver, wait):
-    """
-    EXECUTES: APROXIMADA → SOLO ESTA VEZ → CALCULATOR → COBRAR → PRECISION DIALOG.
-    RETURNS: True if precision dialog is displayed, False otherwise.
-    """
-
+    
     print("\n👉 STEP 1: VERIFYING LOCATION PERMISSION DIALOG IS DISPLAYED...")
 
     dialog_visible = False

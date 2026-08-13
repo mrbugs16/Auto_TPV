@@ -4,24 +4,6 @@ DESCRIPTION:
     AUTOMATED TEST SUITE — AJUSTES (AJ) MODULE.
     COVERS THE SETTINGS SECTION OF THE NEW MEMPHIS APP v2 (com.memphis.app.dev).
 
-SCREENS COVERED (CONFIRMED FROM SCREENSHOTS):
-    SCREEN 1 — HOME / CALCULATOR
-    SCREEN 2 — AJUSTES (SETTINGS MENU)
-               Cuenta: Info personal | Cambiar contraseña | Cambiar comercio |
-                       Actualizar configuraciones | Cerrar sesión
-               Lector: Configurar nuevamente
-               PinPad: Apagar/Encender servidor PinPad
-               Desarrollador: Ver logs
-    SCREEN 3 — INFORMACIÓN PERSONAL
-               Afiliación | Nombre | Lector asociado | Correo electrónico | UUID | Versión
-    SCREEN 4 — CAMBIAR CONTRASEÑA (empty form)
-               Fields: Contraseña anterior | Nueva contraseña | Confirmar contraseña
-               Button: Actualizar
-    SCREEN 5 — CAMBIAR CONTRASEÑA (filled — valid update)
-    SCREEN 6 — CAMBIAR CONTRASEÑA (error — passwords do not match)
-    SCREEN 7 — CAMBIAR CONTRASEÑA (error — minimum 8 characters)
-    SCREEN 8 — CAMBIAR CONTRASEÑA (visibility icons test)
-
 TEST CASES COVERED:
     · AJ-105 : SETTINGS TAB LOADS CORRECTLY
     · AJ-106 : NAVIGATE TO "INFORMACIÓN PERSONAL" FROM SETTINGS
@@ -32,11 +14,6 @@ TEST CASES COVERED:
     · AJ-111 : FAILED PASSWORD CHANGE — PASSWORDS DO NOT MATCH
     · AJ-112 : FAILED PASSWORD CHANGE — PASSWORD TOO SHORT (< 8 CHARS)
     · AJ-113 : PASSWORD VISIBILITY TOGGLE ICONS WORK CORRECTLY
-
-REQUIREMENTS:
-    - Appium server running on localhost:4723  (appium --relaxed-security)
-    - T6 terminal connected via USB with USB Debugging enabled
-    - config.py and utils.py in the same directory
 """
 
 import sys
@@ -66,16 +43,6 @@ from selenium.common.exceptions import TimeoutException
 # ==================================================================================
 
 def _navigate_to_settings(driver, wait):
-    """
-    NAVIGATES TO THE AJUSTES (SETTINGS) TAB FROM ANY SCREEN.
-    USES BOTTOM NAV BAR TAB [4].
-    STRATEGY 1: EXACT content-desc MATCH
-    STRATEGY 2: PARTIAL content-desc MATCH
-    STRATEGY 3: UIAUTOMATOR TEXT MATCH
-    STRATEGY 4: UIAUTOMATOR DESCRIPTION MATCH
-    STRATEGY 5: INDEX-BASED (4TH TAB IN BOTTOM NAV)
-    RETURNS True ON SUCCESS, False ON FAILURE.
-    """
     print("\n   📍 [NAV] NAVIGATING TO SETTINGS TAB...")
 
     # STRATEGY 1 + 2 + 3: XPATH VARIANTS
@@ -168,14 +135,6 @@ def _back_to_settings(driver):
 # ==================================================================================
 
 def _fill_password_form(driver, current_pass, new_pass, confirm_pass):
-    """
-    FILLS THE 3 FIELDS ON THE "CAMBIAR CONTRASEÑA" SCREEN.
-    PARAMS:
-        current_pass  — field 1: "Contraseña anterior"
-        new_pass      — field 2: "Nueva contraseña"
-        confirm_pass  — field 3: "Confirmar contraseña"
-    RETURNS True IF ALL FIELDS FILLED, False IF ANY FIELD FAILED.
-    """
     fields = [
         (config.XPATH_AJ_INPUT_PASS_CURRENT, current_pass,  "CURRENT PASSWORD"),
         (config.XPATH_AJ_INPUT_PASS_NEW,     new_pass,      "NEW PASSWORD"),
@@ -205,11 +164,6 @@ def _fill_password_form(driver, current_pass, new_pass, confirm_pass):
 # ==================================================================================
 
 def _detect_toast(driver, toast_xpath, label, timeout=5):
-    """
-    POLLS FOR A TOAST/POPUP USING WebDriverWait.
-    TRANSIENT MESSAGES (~2-3s) MUST BE CAUGHT IMMEDIATELY AFTER TRIGGER ACTION.
-    RETURNS (found: bool, text: str)
-    """
     print(f"   🔎 POLLING FOR TOAST: {label} (timeout={timeout}s)...")
     try:
         WebDriverWait(driver, timeout).until(
@@ -232,14 +186,6 @@ def _detect_toast(driver, toast_xpath, label, timeout=5):
 # ==================================================================================
 
 def AJ_105():
-    """
-    AJ-105: SETTINGS TAB LOADS CORRECTLY
-    --------------------------------------
-    PRECONDITIONS : APP OPEN — HOME SCREEN VISIBLE (SCREENSHOT 1)
-    FLOW          : HOME → CLICK TAB "Ajustes" → VERIFY SETTINGS SCREEN LOADED
-    EXPECTED      : Settings menu visible with sections Cuenta, Lector, PinPad
-    SCREENSHOTS   : SCREENSHOT 1 (home) → SCREENSHOT 2 (settings loaded)
-    """
     print("\n" + "=" * 60)
     print("AJ-105: SETTINGS TAB LOADS CORRECTLY")
     print("=" * 60)
@@ -319,13 +265,6 @@ def AJ_105():
 # ==================================================================================
 
 def AJ_106():
-    """
-    AJ-106: NAVIGATE TO "INFORMACIÓN PERSONAL" FROM SETTINGS
-    ----------------------------------------------------------
-    PRECONDITIONS : SETTINGS SCREEN VISIBLE (SCREENSHOT 2)
-    FLOW          : SETTINGS → CLICK "Información personal" → VERIFY SCREEN LOADED
-    EXPECTED      : "Información personal" screen opens (SCREENSHOT 3)
-    """
     print("\n" + "=" * 60)
     print("AJ-106: NAVIGATE TO 'INFORMACIÓN PERSONAL'")
     print("=" * 60)
@@ -418,19 +357,7 @@ def AJ_106():
 # ==================================================================================
 
 def AJ_107():
-    """
-    AJ-107: VERIFY ALL PERSONAL INFO FIELDS ARE DISPLAYED
-    -------------------------------------------------------
-    PRECONDITIONS : "Información personal" SCREEN VISIBLE (SCREENSHOT 3)
-    EXPECTED FIELDS:
-        · Afiliación     → "8920377"
-        · Nombre         → any non-empty value
-        · Lector asociado → any non-empty value
-        · Correo electrónico → "david.santos@ijuba.solutions"
-        · UUID           → any non-empty value
-        · Versión        → contains "Versión"
-    SUCCESS = ALL 6 LABELS ARE VISIBLE ON SCREEN
-    """
+   
     print("\n" + "=" * 60)
     print("AJ-107: VERIFY ALL PERSONAL INFO FIELDS ARE DISPLAYED")
     print("=" * 60)
@@ -540,13 +467,7 @@ def AJ_107():
 # ==================================================================================
 
 def AJ_108():
-    """
-    AJ-108: NAVIGATE TO "CAMBIAR CONTRASEÑA" FROM SETTINGS
-    --------------------------------------------------------
-    PRECONDITIONS : SETTINGS SCREEN VISIBLE
-    FLOW          : SETTINGS → CLICK "Cambiar contraseña" → VERIFY SCREEN LOADED
-    EXPECTED      : Form with 3 password fields + BTN "Actualizar" (SCREENSHOT 4)
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-108: NAVIGATE TO 'CAMBIAR CONTRASEÑA'")
     print("=" * 60)
@@ -663,17 +584,7 @@ def AJ_108():
 # ==================================================================================
 
 def AJ_109():
-    """
-    AJ-109: SUCCESSFUL PASSWORD CHANGE — VALID CREDENTIALS
-    --------------------------------------------------------
-    PRECONDITIONS : "Cambiar contraseña" SCREEN VISIBLE
-    FLOW          : Fill current=Memphis@2021 | new=Memphis@2026 | confirm=Memphis@2026
-                    → CLICK "Actualizar" → EXPECT GREEN SUCCESS TOAST
-    EXPECTED      : Green popup confirming password was changed
-    NOTE          : AFTER SUCCESS THE PASSWORD IS NOW Memphis@2026.
-                    config.PASS_VALIDO MUST BE UPDATED IF RUNNING SUBSEQUENT TESTS.
-    SCREENSHOT 5  : FORM FILLED WITH VALID DATA
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-109: SUCCESSFUL PASSWORD CHANGE")
     print("=" * 60)
@@ -756,15 +667,6 @@ def AJ_109():
 # ==================================================================================
 
 def AJ_110():
-    """
-    AJ-110: FAILED PASSWORD CHANGE — WRONG CURRENT PASSWORD
-    ---------------------------------------------------------
-    PRECONDITIONS : "Cambiar contraseña" SCREEN VISIBLE
-    FLOW          : Fill current=Memphis@2004 (WRONG) | new=Memphis@2026 | confirm=Memphis@2026
-                    → CLICK "Actualizar" → EXPECT RED TOAST (current password incorrect)
-    EXPECTED      : Red popup indicating the current password is wrong
-    SCREENSHOT 8  : FORM FILLED WITH WRONG CURRENT PASSWORD
-    """
     print("\n" + "=" * 60)
     print("AJ-110: FAILED PASSWORD CHANGE — WRONG CURRENT PASSWORD")
     print("=" * 60)
@@ -853,13 +755,7 @@ def AJ_110():
 # ==================================================================================
 
 def AJ_111():
-    """
-    AJ-111: FAILED PASSWORD CHANGE — PASSWORDS DO NOT MATCH
-    ---------------------------------------------------------
-    FLOW          : new=123456$M | confirm=123456$ (DIFFERENT)
-                    → INLINE ERROR "Las contraseñas no coinciden" (SCREENSHOT 6)
-    EXPECTED      : Inline red error below confirm field — submission blocked
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-111: FAILED PASSWORD CHANGE — PASSWORDS DO NOT MATCH")
     print("=" * 60)
@@ -894,8 +790,6 @@ def AJ_111():
         utils.take_screenshot(driver, "AJ111_01_MISMATCH_FORM", "t6")
 
         # ── STEP 2: CHECK FOR INLINE ERROR (MAY APPEAR WITHOUT CLICKING) ──────
-        # INLINE VALIDATION: "Las contraseñas no coinciden" appears as soon as
-        # the CONFIRM field loses focus — before even clicking Actualizar
         print("\n👉 STEP 2: CHECKING FOR INLINE ERROR 'Las contraseñas no coinciden'...")
         error_found = False
 
@@ -959,12 +853,7 @@ def AJ_111():
 # ==================================================================================
 
 def AJ_112():
-    """
-    AJ-112: FAILED PASSWORD CHANGE — PASSWORD TOO SHORT (< 8 CHARS)
-    ----------------------------------------------------------------
-    FLOW          : new=123456$ (7 chars) → INLINE ERROR "Mínimo 8 caracteres" (SCREENSHOT 7)
-    EXPECTED      : Inline red error on the NEW PASSWORD field — submission blocked
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-112: FAILED PASSWORD CHANGE — PASSWORD TOO SHORT")
     print("=" * 60)
@@ -1075,18 +964,7 @@ def AJ_112():
 # ==================================================================================
 
 def AJ_113():
-    """
-    AJ-113: PASSWORD VISIBILITY TOGGLE ICONS WORK CORRECTLY
-    ---------------------------------------------------------
-    FLOW          : Fill all 3 fields → TAP each eye icon → VERIFY text becomes visible
-    EXPECTED      : After tapping eye icon, password text becomes readable (not dots)
-    SCREENSHOT 8  : FORM WITH Memphis@2004 / 123456$M / ........ PARTIALLY FILLED
-    STRATEGY:
-        · FILL the 3 fields
-        · TAP the eye icon on each field
-        · VERIFY field type changes from password to text
-          (attribute "password" = false, or text is not dots)
-    """
+   
     print("\n" + "=" * 60)
     print("AJ-113: PASSWORD VISIBILITY TOGGLE ICONS")
     print("=" * 60)
@@ -1229,10 +1107,7 @@ def AJ_113():
 # ==================================================================================
 
 def helper_login_to_calculator(driver, wait):
-    """
-    FULL LOGIN FLOW FOR NEW APP v2.
-    ONBOARDING → LOGIN → CONFIGURA TU COMERCIO → LECTOR POPUP → HOME
-    """
+    
     from selenium.webdriver.support.ui import WebDriverWait as _WDW
     from selenium.common.exceptions import TimeoutException as _TE
 
@@ -1318,17 +1193,7 @@ def helper_login_to_calculator(driver, wait):
 # ==================================================================================
 
 def AJ_114():
-    """
-    AJ-114: NAVIGATE TO "CAMBIAR COMERCIO" AND VERIFY SCREEN LOADS
-    ---------------------------------------------------------------
-    PRECONDITIONS : SETTINGS SCREEN VISIBLE (SCREENSHOT 1)
-    FLOW          : SETTINGS → CLICK "Cambiar comercio" → VERIFY SCREEN (SCREENSHOT 2)
-    EXPECTED      : Form with:
-                    · Field 1: "Número de afiliación"
-                    · Field 2: "Token de registro"
-                    · Button: "Aceptar"
-    SUCCESS       : SCREENSHOT 2 IS VISIBLE — FORM LOADED CORRECTLY
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-114: NAVIGATE TO 'CAMBIAR COMERCIO'")
     print("=" * 60)
@@ -1442,15 +1307,6 @@ def AJ_114():
 # ==================================================================================
 
 def AJ_116():
-    """
-    AJ-116: FAILED COMMERCE CHANGE — INVALID CREDENTIALS
-    ------------------------------------------------------
-    PRECONDITIONS : "Cambiar comercio" SCREEN VISIBLE
-    FLOW          : Fill Afiliación=2342423 | Token=2343242342343242
-                    → CLICK "Aceptar" → RED TOAST "Error de registro" (SCREENSHOT 3)
-    EXPECTED      : Red error popup appears — commerce change rejected
-    NOTE          : ERROR TYPE TEST — red popup = PASS (system behaved correctly)
-    """
     print("\n" + "=" * 60)
     print("AJ-116: FAILED COMMERCE CHANGE — INVALID CREDENTIALS")
     print("=" * 60)
@@ -1566,16 +1422,6 @@ def AJ_116():
 # ==================================================================================
 
 def AJ_117():
-    """
-    AJ-117: FAILED COMMERCE CHANGE — EMPTY FIELDS
-    -----------------------------------------------
-    PRECONDITIONS : "Cambiar comercio" SCREEN VISIBLE
-    FLOW          : Leave both fields EMPTY → CLICK "Aceptar"
-                    → INLINE ERRORS appear below each field (SCREENSHOT 4):
-                      "Por favor ingresa el número de afiliación"
-                      "Por favor ingresa el token de registro"
-    EXPECTED      : Both inline red errors visible — submission blocked
-    """
     print("\n" + "=" * 60)
     print("AJ-117: FAILED COMMERCE CHANGE — EMPTY FIELDS")
     print("=" * 60)
@@ -1690,16 +1536,7 @@ def AJ_117():
 # ==================================================================================
 
 def AJ_118():
-    """
-    AJ-118: FAILED COMMERCE CHANGE — FORMAT-VALID BUT NON-EXISTENT CREDENTIALS
-    ---------------------------------------------------------------------------
-    PRECONDITIONS : "Cambiar comercio" SCREEN VISIBLE
-    FLOW          : Fill Afiliación=1234567 (7 digits) | Token=1234567891234567
-                    → CLICK "Aceptar" → RED TOAST "Error de registro" (SCREENSHOT 5)
-    EXPECTED      : Values pass field-level format validation but fail on server
-                    → Red error popup appears
-    NOTE          : VALIDATES FIELD LENGTH CONSTRAINTS — 7-digit afiliación, 16-char token
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-118: FAILED COMMERCE CHANGE — FORMAT-VALID WRONG CREDENTIALS")
     print("=" * 60)
@@ -1820,16 +1657,7 @@ def AJ_118():
 # ==================================================================================
 
 def AJ_119():
-    """
-    AJ-119: LOGOUT — CERRAR SESIÓN WORKS CORRECTLY
-    ------------------------------------------------
-    PRECONDITIONS : SETTINGS SCREEN VISIBLE (SCREENSHOT 1)
-    FLOW          : SETTINGS → CLICK "Cerrar sesión"
-                    → CONFIRM if dialog appears
-                    → VERIFY LOGIN SCREEN IS SHOWN (SCREENSHOT 6)
-    EXPECTED      : User is logged out and login screen is displayed
-    SUCCESS       : "Iniciar sesión" screen visible after logout
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-119: LOGOUT — CERRAR SESIÓN")
     print("=" * 60)
@@ -1943,17 +1771,7 @@ def AJ_119():
 # ==================================================================================
 
 def AJ_120():
-    """
-    AJ-120: CONFIGURAR NUEVAMENTE — READER SETUP SCREEN LOADS CORRECTLY
-    --------------------------------------------------------------------
-    PRECONDITIONS : SETTINGS SCREEN VISIBLE (SCREENSHOT 1 — "Lector" SECTION)
-    FLOW          : SETTINGS → CLICK "Configurar nuevamente" (Lector section)
-                    → VERIFY READER SETUP/CONFIGURATION SCREEN APPEARS
-                    → CAPTURE SCREENSHOT AS EVIDENCE
-    EXPECTED      : Reader configuration screen loads — shows lector setup UI
-    NOTE          : THIS TEST DOES NOT COMPLETE READER CONFIGURATION —
-                    IT ONLY VALIDATES THE SCREEN TRANSITION
-    """
+    
     print("\n" + "=" * 60)
     print("AJ-120: CONFIGURAR NUEVAMENTE — READER SETUP SCREEN")
     print("=" * 60)
@@ -2076,41 +1894,6 @@ def AJ_120():
 # ==================================================================================
  
 def AJ_121():
-    """
-    AJ-121: BLUETOOTH DISABLED → LOGIN → VERIFY 'CONFIGURAR LECTOR' OPTION
- 
-    OBJECTIVE:
-        Confirm that when Bluetooth is turned OFF before launching the app,
-        the Memphis app still allows the user to log in successfully and
-        navigate to Settings (Ajustes) where 'Configurar lector' is visible.
- 
-        NOTE: In the current v2 app, the absence of Bluetooth does NOT block
-        login or Settings access. This test documents that behavior and
-        verifies the 'Configurar lector' option is accessible regardless.
- 
-    PRECONDITIONS:
-        - T6 connected via USB with USB Debugging ON
-        - Appium server running with --relaxed-security
-        - ADB available (adb devices shows the T6)
-        - Bluetooth initially ON (normal state)
- 
-    STEPS:
-        1. [ADB]    Disable Bluetooth via ADB
-        2. [APPIUM] Launch app — verify it starts normally (no BT block)
-        3. [APPIUM] Enter credentials + complete login
-        4. [APPIUM] Navigate to Ajustes tab
-        5. [APPIUM] Verify 'Configurar lector' option is present
-        6. [ADB]    Restore Bluetooth to ON
- 
-    EXPECTED RESULT:
-        ✅ App launches normally with BT off
-        ✅ Login succeeds
-        ✅ Ajustes tab is reachable
-        ✅ 'Configurar lector' option is visible
- 
-    TYPE  : FUNCTIONAL
-    STATE : PASS (expected — v2 does not block on BT)
-    """
     print("\n" + "=" * 60)
     print("🧪 AJ-121: BLUETOOTH OFF → LOGIN → CONFIGURAR LECTOR")
     print("=" * 60)
@@ -2339,36 +2122,6 @@ def AJ_121():
 # ==================================================================================
 
 def AJ_124():
-    """
-    AJ-124: WIFI DISABLED → ONBOARDING → LOGIN ATTEMPT → RED ERROR POPUP
-
-    OBJECTIVE:
-        Confirm that when WiFi is turned OFF before launching the app,
-        after navigating through the onboarding slides and reaching the
-        login screen, submitting valid credentials produces a RED ERROR
-        POPUP because there is no network to complete authentication.
-
-        SUCCESS = RED POPUP APPEARS. This means the app handled the
-        network failure correctly instead of crashing.
-
-    PRECONDITIONS:
-        - T6 connected via USB with USB Debugging ON
-        - Appium server running:  appium --relaxed-security
-        - ADB available:          adb devices shows T6
-        - WiFi initially ON
-
-    STEPS:
-        1. [ADB]    Disable WiFi via ADB
-        2. [APPIUM] Launch app
-        3. [APPIUM] Navigate onboarding slides → reach login screen
-        4. [APPIUM] Type valid credentials (email + password)
-        5. [APPIUM] Click login button
-        6. [APPIUM] Verify RED error popup appears
-        7. [ADB]    Restore WiFi to ON
-
-    TYPE  : ERROR — NETWORK FAILURE
-    STATE : PASS when red popup appears
-    """
     print("\n" + "=" * 60)
     print("🧪 AJ-124: WIFI OFF → LOGIN ATTEMPT → RED ERROR POPUP")
     print("=" * 60)
@@ -2535,11 +2288,6 @@ def AJ_124():
         utils.take_screenshot(driver, "AJ_124_STEP4_CREDENTIALS_FILLED", "t6")
         print("   ✅ CREDENTIALS ENTERED.")
 
-        # ──────────────────────────────────────────────────────────────
-        # STEP 5 + 6: CLICK LOGIN AND IMMEDIATELY POLL FOR RED POPUP
-        # KEY INSIGHT: Toasts last only ~2-3 seconds. Polling must start
-        # at the SAME moment as the click — no delay between them.
-        # ──────────────────────────────────────────────────────────────
         print("\n" + "-" * 50)
         print("👉 STEP 5+6: CLICK LOGIN → IMMEDIATELY POLL FOR RED POPUP")
         print("   ℹ️  Toast duration: ~2-3s — polling starts on click.")
@@ -2718,25 +2466,7 @@ def AJ_124():
 # ==================================================================================
 
 def AJ_128():
-    """
-    AJ-128: BACK ARROW (←) WORKS CORRECTLY IN ALL AJUSTES SUB-SCREENS
-
-    KEY LEARNINGS FROM DEBUGGING:
-        - AJUSTES IDENTIFIER must use section headers (Cuenta, Lector, PinPad)
-          NOT menu item names — because those names also appear as sub-screen titles.
-        - MENU ROWS are not clickable via contains(@content-desc) — they need
-          tap by coordinates or UiAutomator scrollIntoView + click.
-        - BACK ARROW XPath confirmed: //android.widget.Button
-          But driver.tap(x,y) is more reliable on T6 for this element.
-
-    SUB-SCREENS TESTED:
-        1. Información personal
-        2. Cambiar contraseña
-        3. Cambiar comercio
-        4. Actualizar configuraciones del comercio
-        5. Configurar nuevamente (Lector)
-        6. Ver logs (Desarrollador)
-    """
+    
     print("\n" + "=" * 60)
     print("🧪 AJ-128: BACK ARROW VALIDATION — ALL AJUSTES SUB-SCREENS")
     print("=" * 60)
@@ -2744,9 +2474,6 @@ def AJ_128():
     driver, wait = utils.start_driver()
     results = {}
 
-    # ── AJUSTES MAIN SCREEN IDENTIFIERS ─────────────────────────────
-    # Use SECTION HEADERS only — these ONLY appear on the main Ajustes screen,
-    # never as sub-screen titles.
     AJUSTES_SECTION_HEADERS = [
         '//*[@content-desc="Cuenta" or @text="Cuenta"]',
         '//*[@content-desc="Lector" or @text="Lector"]',
@@ -2756,7 +2483,7 @@ def AJ_128():
     ]
 
     def _is_on_ajustes():
-        """True only if section headers (Cuenta/Lector/PinPad) are visible."""
+        
         for xpath in AJUSTES_SECTION_HEADERS:
             try:
                 if driver.find_element(By.XPATH, xpath).is_displayed():
@@ -2766,7 +2493,7 @@ def AJ_128():
         return False
 
     def _go_to_ajustes_tab():
-        """Navigate to Ajustes tab and confirm arrival."""
+        
         for xpath in [
             '//*[@content-desc="Ajustes"]',
             '//*[contains(@content-desc,"Ajustes")]',
@@ -2783,16 +2510,11 @@ def AJ_128():
                     return True
             except:
                 continue
-        # Already there?
+        
         return _is_on_ajustes()
 
     def _click_back_arrow():
-        """
-        Clicks the ← back arrow on a sub-screen.
-        CONFIRMED XPath: //android.widget.Button
-        Tap coordinates as primary fallback for T6.
-        """
-        # S1: android.widget.Button — confirmed from inspector
+        
         try:
             btns = driver.find_elements(By.XPATH, "//android.widget.Button")
             if btns:
@@ -2802,7 +2524,7 @@ def AJ_128():
         except:
             pass
 
-        # S2: TAP COORDINATES — ← is always top-left on T6
+        
         try:
             window_size = driver.get_window_size()
             w = window_size['width']
@@ -2815,7 +2537,7 @@ def AJ_128():
         except:
             pass
 
-        # S3: Clickable element in top-left zone
+        
         try:
             window_size = driver.get_window_size()
             w = window_size['width']
@@ -2835,7 +2557,7 @@ def AJ_128():
         except:
             pass
 
-        # S4: Android system BACK key
+        
         try:
             driver.back()
             print("      ✅ S4: Android system BACK key")
@@ -2844,13 +2566,6 @@ def AJ_128():
             return False, f"ALL STRATEGIES FAILED: {e}"
 
     def _enter_sub_screen_by_tap(sub_name, tap_y_pct, keyword):
-        """
-        Enters a sub-screen by tapping at a fixed Y coordinate percentage.
-        This bypasses the clickability issue with content-desc elements.
-
-        tap_y_pct: float 0.0-1.0 — vertical position of the row on screen
-        The X is always center of screen (tap in the middle of the row).
-        """
         window_size = driver.get_window_size()
         w = window_size['width']
         h = window_size['height']
@@ -2859,7 +2574,7 @@ def AJ_128():
 
         print(f"   👆 ENTERING: '{sub_name}' via tap ({tap_x},{tap_y})")
 
-        # STRATEGY 1: UiAutomator scrollIntoView + click (most reliable)
+        
         for sel in [
             f'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().descriptionContains("{keyword}"))',
             f'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains("{keyword}"))',
@@ -2873,7 +2588,7 @@ def AJ_128():
             except:
                 continue
 
-        # STRATEGY 2: contains(@content-desc) — try all matching elements
+        
         for xpath in [
             f'//*[contains(@content-desc,"{keyword}")]',
             f'//*[contains(@text,"{keyword}")]',
@@ -2882,7 +2597,7 @@ def AJ_128():
                 elems = driver.find_elements(By.XPATH, xpath)
                 for elem in elems:
                     try:
-                        # Click the element or its parent (the row card)
+                        
                         elem.click()
                         time.sleep(2)
                         print(f"      ✅ S2: XPath contains click")
@@ -2903,7 +2618,7 @@ def AJ_128():
             except:
                 continue
 
-        # STRATEGY 3: TAP BY Y COORDINATE
+        
         try:
             driver.tap([(tap_x, tap_y)])
             time.sleep(2)
@@ -2933,7 +2648,7 @@ def AJ_128():
         print(f"  🔍 TESTING: {sub_name}")
         print(f"{'─'*55}")
 
-        # 1. GO TO AJUSTES
+        
         if not _go_to_ajustes_tab():
             time.sleep(2)
             if not _go_to_ajustes_tab():
@@ -2941,7 +2656,7 @@ def AJ_128():
         print("   ✅ ON AJUSTES SCREEN.")
         time.sleep(1)
 
-        # 2. ENTER SUB-SCREEN
+        
         entered = _enter_sub_screen_by_tap(sub_name, tap_y_pct, keyword)
         if not entered:
             utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_FAIL_ENTER", "t6")
@@ -2949,7 +2664,7 @@ def AJ_128():
 
         utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_ENTERED", "t6")
 
-        # 3. VERIFY WE LEFT AJUSTES MAIN SCREEN
+        
         if _is_on_ajustes():
             print("   ⚠️  STILL ON AJUSTES — screen dump:")
             _dump_screen()
@@ -2957,7 +2672,7 @@ def AJ_128():
 
         print(f"   ✅ SUB-SCREEN OPENED: {sub_name}")
 
-        # 4. CLICK BACK ARROW
+        
         back_clicked, strategy = _click_back_arrow()
         if not back_clicked:
             utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_FAIL_BACK", "t6")
@@ -2966,7 +2681,7 @@ def AJ_128():
         time.sleep(2)
         utils.take_screenshot(driver, f"AJ128_{keyword[:12].replace(' ','_')}_BACK_RESULT", "t6")
 
-        # 5. VERIFY RETURN TO AJUSTES
+        
         if _is_on_ajustes():
             print(f"   ✅ RETURNED TO AJUSTES ✓")
             return True, f"OK — {strategy}"
@@ -2976,7 +2691,7 @@ def AJ_128():
         return False, f"BACK CLICKED ({strategy}) BUT DID NOT RETURN TO AJUSTES"
 
     try:
-        # PRECONDITION: LOGIN
+        
         print("\n🔐 PRECONDITION: LOGIN FLOW...")
         helper_login_to_calculator(driver, wait)
         print("   ✅ LOGIN COMPLETE.\n")
@@ -2985,31 +2700,11 @@ def AJ_128():
         time.sleep(1)
         utils.take_screenshot(driver, "AJ_128_00_AJUSTES_MAIN", "t6")
 
-        # ── DETECT SCREEN HEIGHT FOR Y COORDINATES ──────────────────
-        # Take a snapshot of window size to calculate row positions
         window_size = driver.get_window_size()
         h = window_size['height']
         print(f"   📐 SCREEN SIZE: {window_size['width']}x{h}")
 
-        # ── SUB-SCREENS ──────────────────────────────────────────────
-        # tap_y_pct: approximate vertical center of each row
-        # Based on the Ajustes screenshot layout proportions:
-        #   Logo+title:  ~0-15%
-        #   "Cuenta":    ~18%
-        #   Info personal row:   ~24%
-        #   Cambiar contraseña:  ~32%
-        #   Cambiar comercio:    ~40%
-        #   Actualizar config:   ~48%
-        #   Cerrar sesión:       ~56%
-        #   "Lector":            ~63%
-        #   Configurar nuevamente: ~68%
-        #   "PinPad":            ~75%
-        #   Apagar/Encender:     ~80%
-        #   "Desarrollador":     ~87%
-        #   Ver logs:            ~93%
-
         SUB_SCREENS = [
-            # (display_name,                    tap_y_pct, keyword)
             ("Información personal",            0.24,  "Información personal"),
             ("Cambiar contraseña",              0.32,  "Cambiar contraseña"),
             ("Cambiar comercio",                0.40,  "Cambiar comercio"),
@@ -3031,7 +2726,7 @@ def AJ_128():
     finally:
         utils.close_driver(driver)
 
-    # SUMMARY
+    
     passed_count = sum(1 for v in results.values() if v[0])
     failed_count = len(results) - passed_count
 
