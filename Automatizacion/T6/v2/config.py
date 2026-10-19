@@ -989,3 +989,119 @@ XPATH_AJ_LECTOR_SETUP_SCREEN = (
     'contains(@text,"configurar") or contains(@content-desc,"configurar") or '
     'contains(@text,"cifrado") or contains(@content-desc,"cifrado")]'
 )
+
+# ==================================================================================
+# [PP] T6 MOBILE — XPATHS & DATA: PINPAD (AJUSTES → SERVIDOR PINPAD)
+# ==================================================================================
+# FLOW   : Ajustes → sección "PinPad" → "Servidor PinPad" → pantalla "PinPad"
+# OPTIONS: Servidor activo (toggle) | Configuración | Protector PinPad |
+#          Comandos recibidos | Horarios de actualizaciones
+
+# --- AJUSTES: PINPAD SECTION ---
+# FLUTTER MERGES THE SECTION HEADER INTO THE ROW:
+#   content-desc = "PinPad\nServidor PinPad\nEnciéndelo para recibir comandos del PinPad"
+XPATH_PP_SECTION_PINPAD = (
+    '//*[@text="PinPad" or @content-desc="PinPad" or '
+    'starts-with(@content-desc,"PinPad")]'
+)
+XPATH_PP_BTN_SERVIDOR_PINPAD = (
+    '//*[contains(@text,"Servidor PinPad") or '
+    'contains(@content-desc,"Servidor PinPad")]'
+)
+# STATUS WHEN THE SERVER IS ON
+XPATH_PP_STATUS_RECIBIENDO = (
+    '//*[contains(@text,"Recibiendo comandos") or '
+    'contains(@content-desc,"Recibiendo comandos")]'
+)
+# STATUS WHEN THE SERVER IS OFF (DEFAULT AFTER A FRESH INSTALL)
+XPATH_PP_STATUS_ENCIENDELO = (
+    '//*[contains(@text,"Enciéndelo") or '
+    'contains(@content-desc,"Enciéndelo")]'
+)
+
+# --- PINPAD SCREEN ---
+# SERVER OFF: ONLY THE SERVER ROW IS SHOWN ("Servidor inactivo").
+# SERVER ON : "Servidor activo" + "Escuchando en <IP>:8080" + 4 OPTIONS.
+XPATH_PP_SCREEN_TITLE = '//*[@text="PinPad" or @content-desc="PinPad"]'
+XPATH_PP_SERVIDOR_ACTIVO = (
+    '//*[contains(@text,"Servidor activo") or '
+    'contains(@content-desc,"Servidor activo")]'
+)
+XPATH_PP_SERVIDOR_INACTIVO = (
+    '//*[contains(@text,"Servidor inactivo") or '
+    'contains(@content-desc,"Servidor inactivo")]'
+)
+XPATH_PP_ESCUCHANDO = (
+    '//*[contains(@text,"Escuchando en") or '
+    'contains(@content-desc,"Escuchando en")]'
+)
+XPATH_PP_BTN_CONFIGURACION = (
+    '//*[@text="Configuración" or @content-desc="Configuración" or '
+    'starts-with(@content-desc,"Configuración")]'
+)
+XPATH_PP_BTN_PROTECTOR = (
+    '//*[contains(@text,"Protector PinPad") or '
+    'contains(@content-desc,"Protector PinPad")]'
+)
+XPATH_PP_BTN_COMANDOS = (
+    '//*[contains(@text,"Comandos recibidos") or '
+    'contains(@content-desc,"Comandos recibidos")]'
+)
+XPATH_PP_BTN_HORARIOS = (
+    '//*[contains(@text,"Horarios de actualizaciones") or '
+    'contains(@content-desc,"Horarios de actualizaciones")]'
+)
+
+# --- CONFIGURACIÓN SCREEN ---
+XPATH_PP_CFG_IMPRESION = (
+    '//*[contains(@text,"Impresión automática") or '
+    'contains(@content-desc,"Impresión automática")]'
+)
+XPATH_PP_CFG_CANCELACIONES = (
+    '//*[contains(@text,"Cancelaciones y devoluciones") or '
+    'contains(@content-desc,"Cancelaciones y devoluciones")]'
+)
+XPATH_PP_CFG_COMPARTIR = (
+    '//*[contains(@text,"Compartir ticket") or '
+    'contains(@content-desc,"Compartir ticket")]'
+)
+XPATH_PP_CFG_INTERNET_USB = (
+    '//*[contains(@text,"Obtener internet por cable USB") or '
+    'contains(@content-desc,"Obtener internet por cable USB")]'
+)
+
+# --- COMANDOS RECIBIDOS SCREEN ---
+XPATH_PP_CMD_SCREEN_TITLE = XPATH_PP_BTN_COMANDOS
+XPATH_PP_CMD_PINPAD_STARTED = (
+    '//*[contains(@text,"PINPAD_STARTED") or '
+    'contains(@content-desc,"PINPAD_STARTED")]'
+)
+XPATH_PP_CMD_BTN_LIMPIAR = '//*[@text="Limpiar" or @content-desc="Limpiar"]'
+
+# --- HORARIOS DE ACTUALIZACIONES SCREEN ---
+XPATH_PP_UPD_SCREEN_TITLE = '//*[@text="Actualizaciones" or @content-desc="Actualizaciones"]'
+XPATH_PP_UPD_DESCRIPCION = (
+    '//*[contains(@text,"Configura los horarios") or '
+    'contains(@content-desc,"Configura los horarios")]'
+)
+XPATH_PP_UPD_HORA_INICIO = (
+    '//*[contains(@text,"Hora de inicio") or '
+    'contains(@content-desc,"Hora de inicio")]'
+)
+XPATH_PP_UPD_HORA_FIN = (
+    '//*[contains(@text,"Hora de fin") or '
+    'contains(@content-desc,"Hora de fin")]'
+)
+XPATH_PP_UPD_BTN_CONFIRMAR = '//*[@text="Confirmar" or @content-desc="Confirmar"]'
+XPATH_PP_UPD_BTN_CANCELAR  = '//*[@text="Cancelar" or @content-desc="Cancelar"]'
+
+# --- TIME PICKER BOTTOM SHEET ---
+XPATH_PP_PICKER_SHEET = (
+    '//*[contains(@text,"Selecciona la hora") or '
+    'contains(@content-desc,"Selecciona la hora")]'
+)
+
+# --- TEST DATA ---
+PP_EXPECTED_PORT       = "8080"
+PP_DEFAULT_HORA_INICIO = "12:00 AM"
+PP_DEFAULT_HORA_FIN    = "02:00 AM"
