@@ -58,6 +58,9 @@ TIME_REGEX = re.compile(r'\d{1,2}:\d{2}\s?[AP]M', re.IGNORECASE)
 # REGEX FOR "Escuchando en 192.168.x.x:8080"
 LISTEN_REGEX = re.compile(r'(\d{1,3}(?:\.\d{1,3}){3}):(\d+)')
 
+# KEYWORDS OF THE "SERVIDOR PINPAD" ROW ON THE PINPAD SCREEN (ON AND OFF STATES)
+SERVER_KEYS = ["Servidor activo", "Servidor inactivo", "Escuchando", "Enciéndelo"]
+
 
 # ==================================================================================
 # HELPER: FULL LOGIN FLOW v2
@@ -295,6 +298,17 @@ def _get_toggle_state(driver, keywords, fallback_index=None):
 def _tap_toggle(driver, keywords, fallback_index=None):
     el = _find_toggle(driver, keywords, fallback_index)
     if el is None:
+        # FALLBACK: TAPPING THE WHOLE ROW ALSO FLIPS A FLUTTER SWITCH TILE
+        for kw in keywords:
+            try:
+                driver.find_element(
+                    By.XPATH, f'//*[contains(@content-desc,"{kw}") or contains(@text,"{kw}")]'
+                ).click()
+                time.sleep(2)
+                print(f"   ℹ️  TOGGLE TAPPED VIA ROW '{kw}'")
+                return True
+            except:
+                continue
         print("   ❌ TOGGLE NOT FOUND")
         return False
     try:
@@ -310,12 +324,47 @@ def _state_label(state):
     return "ON" if state else ("OFF" if state is False else "UNKNOWN")
 
 
+def _server_state(driver):
+    """
+    READS THE PINPAD SERVER STATE FROM THE SCREEN TEXT (MORE RELIABLE THAN THE SWITCH):
+    "Servidor activo" / "Escuchando en" → ON | "Servidor inactivo" → OFF.
+    FALLS BACK TO THE SWITCH "checked" ATTRIBUTE.
+    """
+    if _is_visible(driver, config.XPATH_PP_SERVIDOR_ACTIVO) or _is_visible(driver, config.XPATH_PP_ESCUCHANDO):
+        return True
+    if _is_visible(driver, config.XPATH_PP_SERVIDOR_INACTIVO):
+        return False
+    return _get_toggle_state(driver, SERVER_KEYS, 0)
+
+
+def _set_server(driver, on, timeout=12):
+    """TURNS THE PINPAD SERVER ON/OFF AND WAITS UNTIL THE SCREEN REFLECTS IT."""
+    if _server_state(driver) == on:
+        return True
+    _tap_toggle(driver, SERVER_KEYS, 0)
+    end = time.time() + timeout
+    while time.time() < end:
+        if _server_state(driver) == on:
+            time.sleep(1)  # LET THE OPTIONS LIST RENDER
+            return True
+        time.sleep(1)
+    print(f"   ❌ SERVER DID NOT TURN {'ON' if on else 'OFF'} IN {timeout}s")
+    return False
+
+
 # ==================================================================================
 # INTERNAL HELPER — NAVIGATION
 # ==================================================================================
 
 def _navigate_to_settings(driver, wait):
     print("\n   📍 [NAV] NAVIGATING TO SETTINGS TAB...")
+    # WAIT FOR THE BOTTOM NAV — LOGIN CAN TAKE A FEW EXTRA SECONDS ON THE T6
+    try:
+        WebDriverWait(driver, 15).until(
+            lambda d: d.find_element(By.XPATH, '//*[@content-desc="Ajustes"]')
+        )
+    except TimeoutException:
+        print("   ⚠️  [NAV] BOTTOM NAV NOT VISIBLE AFTER 15s — TRYING ANYWAY")
     for xpath in [
         '//android.widget.ImageView[@content-desc="Ajustes"]',
         '//android.view.View[@content-desc="Ajustes"]',
@@ -378,8 +427,10 @@ def _scroll_to_pinpad_section(driver):
 
 
 def _is_on_pinpad_screen(driver):
+    # "Servidor activo/inactivo" ONLY EXIST ON THE PINPAD SCREEN (NOT ON AJUSTES)
     for xpath in [
         config.XPATH_PP_SERVIDOR_ACTIVO,
+        config.XPATH_PP_SERVIDOR_INACTIVO,
         config.XPATH_PP_ESCUCHANDO,
         config.XPATH_PP_BTN_PROTECTOR,
         config.XPATH_PP_BTN_HORARIOS,
@@ -417,14 +468,28 @@ def _open_pinpad_option(driver, xpath, label):
     return _click_first(driver, [xpath], label, keyword=label)
 
 
-def _setup_until_pinpad(driver, wait, test_id):
-    """PRECONDITION SHARED BY EVERY CASE: LOGIN + NAVIGATE TO PINPAD SCREEN."""
+def _setup_until_pinpad(driver, wait, test_id, server_on=True):
+    """
+    PRECONDITION SHARED BY EVERY CASE: LOGIN + NAVIGATE TO PINPAD SCREEN.
+    AFTER A FRESH INSTALL THE SERVER IS OFF AND THE OPTIONS ARE HIDDEN,
+    SO BY DEFAULT THE SERVER IS TURNED ON TO EXPOSE THEM.
+    """
     print("\n🔐 PRECONDITION: EXECUTING FULL LOGIN FLOW...")
     helper_login_to_calculator(driver, wait)
+    tag = test_id.replace('-', '')
     if not _navigate_to_pinpad(driver, wait):
         print(f"\n💥 {test_id} FAILED — COULD NOT REACH PINPAD SCREEN")
-        utils.take_screenshot(driver, f"{test_id.replace('-', '')}_NAV_FAILED", "t6")
+        utils.take_screenshot(driver, f"{tag}_NAV_FAILED", "t6")
         return False
+
+    print(f"   ℹ️  SERVER STATE ON ARRIVAL: {_state_label(_server_state(driver))}")
+    if server_on and not _set_server(driver, True):
+        print(f"\n💥 {test_id} FAILED — COULD NOT TURN THE PINPAD SERVER ON")
+        utils.take_screenshot(driver, f"{tag}_SERVER_ON_FAILED", "t6")
+        _dump_screen(driver)
+        return False
+    if server_on:
+        print("   ✅ PINPAD SERVER ON — OPTIONS AVAILABLE")
     return True
 
 
@@ -562,17 +627,21 @@ def PP_01():
 
         # ── STEP 3: VERIFY SECTION ELEMENTS ──────────────────────────────────
         print("\n👉 STEP 3: VERIFYING SECTION ELEMENTS...")
+        # STATUS DEPENDS ON THE SERVER: ON → "Recibiendo comandos..." | OFF → "Enciéndelo para..."
+        status_on  = _is_visible(driver, config.XPATH_PP_STATUS_RECIBIENDO)
+        status_off = _is_visible(driver, config.XPATH_PP_STATUS_ENCIENDELO)
         checks = {
-            "SECTION 'PinPad'"           : _is_visible(driver, config.XPATH_PP_SECTION_PINPAD),
-            "ROW 'Servidor PinPad'"      : _is_visible(driver, config.XPATH_PP_BTN_SERVIDOR_PINPAD),
-            "STATUS 'Recibiendo comandos'": _is_visible(driver, config.XPATH_PP_STATUS_RECIBIENDO),
+            "SECTION 'PinPad'"     : _is_visible(driver, config.XPATH_PP_SECTION_PINPAD),
+            "ROW 'Servidor PinPad'": _is_visible(driver, config.XPATH_PP_BTN_SERVIDOR_PINPAD),
+            "SERVER STATUS TEXT"   : status_on or status_off,
         }
         for label, ok in checks.items():
             print(f"   {'✅' if ok else '❌'} {label}")
+        print(f"   ℹ️  STATUS: {'ON — Recibiendo comandos' if status_on else 'OFF — Enciéndelo para recibir comandos' if status_off else 'UNKNOWN'}")
 
-        if checks["ROW 'Servidor PinPad'"] and checks["STATUS 'Recibiendo comandos'"]:
+        if all(checks.values()):
             result = "SUCCESS"
-            print("\n✅ PP-01 RESULT: SUCCESS — PINPAD SECTION VISIBLE WITH ACTIVE STATUS")
+            print("\n✅ PP-01 RESULT: SUCCESS — PINPAD SECTION VISIBLE WITH SERVER STATUS")
         else:
             print(f"\n❌ PP-01 RESULT: FAIL — {checks}")
             _dump_screen(driver)
@@ -600,13 +669,32 @@ def PP_02():
     driver, wait = utils.start_driver()
     result = "FAIL"
 
-    try:
-        if not _setup_until_pinpad(driver, wait, "PP-02"):
-            return False
-        utils.take_screenshot(driver, "PP02_01_PINPAD_SCREEN", "t6")
+    options = {
+        "Configuración"              : config.XPATH_PP_BTN_CONFIGURACION,
+        "Protector PinPad"           : config.XPATH_PP_BTN_PROTECTOR,
+        "Comandos recibidos"         : config.XPATH_PP_BTN_COMANDOS,
+        "Horarios de actualizaciones": config.XPATH_PP_BTN_HORARIOS,
+    }
 
-        # ── STEP 1: VERIFY SERVER ROW ────────────────────────────────────────
-        print("\n👉 STEP 1: VERIFYING 'Servidor activo' ROW...")
+    try:
+        if not _setup_until_pinpad(driver, wait, "PP-02", server_on=False):
+            return False
+
+        # ── STEP 1: SERVER OFF — ONLY THE SERVER ROW, NO OPTIONS ─────────────
+        print("\n👉 STEP 1: VERIFYING SCREEN WITH SERVER OFF...")
+        _set_server(driver, False)
+        utils.take_screenshot(driver, "PP02_01_SERVER_OFF", "t6")
+        off_label = _is_visible(driver, config.XPATH_PP_SERVIDOR_INACTIVO)
+        off_hidden = not any(_is_visible(driver, x) for x in options.values())
+        print(f"   {'✅' if off_label else '❌'} 'Servidor inactivo'")
+        print(f"   {'✅' if off_hidden else '❌'} OPTIONS HIDDEN WHILE SERVER IS OFF")
+
+        # ── STEP 2: TURN SERVER ON ───────────────────────────────────────────
+        print("\n👉 STEP 2: TURNING SERVER ON...")
+        _set_server(driver, True)
+        utils.take_screenshot(driver, "PP02_02_SERVER_ON", "t6")
+
+        print("\n👉 STEP 3: VERIFYING 'Servidor activo' ROW...")
         server_ok = _is_visible(driver, config.XPATH_PP_SERVIDOR_ACTIVO)
         print(f"   {'✅' if server_ok else '❌'} 'Servidor activo'")
 
@@ -625,30 +713,23 @@ def PP_02():
         except:
             print("   ❌ 'Escuchando en' NOT FOUND")
 
-        state = _get_toggle_state(driver, ["Servidor activo", "Escuchando"], 0)
-        print(f"   ℹ️  SERVER TOGGLE STATE: {_state_label(state)}")
-
-        # ── STEP 2: VERIFY OPTIONS ───────────────────────────────────────────
-        print("\n👉 STEP 2: VERIFYING PINPAD OPTIONS...")
-        options = {
-            "Configuración"              : config.XPATH_PP_BTN_CONFIGURACION,
-            "Protector PinPad"           : config.XPATH_PP_BTN_PROTECTOR,
-            "Comandos recibidos"         : config.XPATH_PP_BTN_COMANDOS,
-            "Horarios de actualizaciones": config.XPATH_PP_BTN_HORARIOS,
-        }
+        # ── STEP 4: VERIFY OPTIONS ───────────────────────────────────────────
+        print("\n👉 STEP 4: VERIFYING PINPAD OPTIONS...")
         missing = []
         for label, xpath in options.items():
             ok = _is_visible(driver, xpath)
             print(f"   {'✅' if ok else '❌'} {label}")
             if not ok:
                 missing.append(label)
+        if missing:
+            _dump_screen(driver)
 
-        if server_ok and listen_ok and state is not False and not missing:
+        if off_label and off_hidden and server_ok and listen_ok and not missing:
             result = "SUCCESS"
-            print("\n✅ PP-02 RESULT: SUCCESS — PINPAD SCREEN COMPLETE")
+            print("\n✅ PP-02 RESULT: SUCCESS — PINPAD SCREEN CORRECT IN BOTH SERVER STATES")
         else:
-            print(f"\n❌ PP-02 RESULT: FAIL — server={server_ok} | listen={listen_ok} "
-                  f"| toggle={_state_label(state)} | missing={missing}")
+            print(f"\n❌ PP-02 RESULT: FAIL — off_label={off_label} | off_hidden={off_hidden} | "
+                  f"server_on={server_ok} | listen={listen_ok} | missing={missing}")
 
     except Exception as e:
         print(f"\n💥 PP-02 CRITICAL ERROR: {e}")
@@ -670,8 +751,6 @@ def PP_03():
     print("PP-03: TOGGLE 'SERVIDOR ACTIVO' OFF / ON")
     print("=" * 60)
 
-    SERVER_KEYS = ["Servidor activo", "Servidor inactivo", "Servidor detenido", "Escuchando"]
-
     driver, wait = utils.start_driver()
     result = "FAIL"
     initial = None
@@ -680,23 +759,22 @@ def PP_03():
         if not _setup_until_pinpad(driver, wait, "PP-03"):
             return False
 
-        initial = _get_toggle_state(driver, SERVER_KEYS, 0)
+        initial = _server_state(driver)
         print(f"\n   ℹ️  INITIAL STATE: {_state_label(initial)}")
         utils.take_screenshot(driver, "PP03_01_INITIAL", "t6")
 
         # ── STEP 1: TURN SERVER OFF ──────────────────────────────────────────
         print("\n👉 STEP 1: TURNING SERVER OFF...")
-        _tap_toggle(driver, SERVER_KEYS, 0)
-        off_state   = _get_toggle_state(driver, SERVER_KEYS, 0)
+        _set_server(driver, False)
+        off_state   = _server_state(driver)
         listen_gone = not _is_visible(driver, config.XPATH_PP_ESCUCHANDO)
         print(f"   ℹ️  STATE AFTER TAP: {_state_label(off_state)} | 'Escuchando en' HIDDEN: {listen_gone}")
         utils.take_screenshot(driver, "PP03_02_SERVER_OFF", "t6")
 
         # ── STEP 2: TURN SERVER BACK ON ──────────────────────────────────────
         print("\n👉 STEP 2: TURNING SERVER ON AGAIN...")
-        _tap_toggle(driver, SERVER_KEYS, 0)
-        time.sleep(2)  # SERVER NEEDS A MOMENT TO BIND THE PORT
-        on_state      = _get_toggle_state(driver, SERVER_KEYS, 0)
+        _set_server(driver, True)
+        on_state      = _server_state(driver)
         listen_back   = _is_visible(driver, config.XPATH_PP_ESCUCHANDO)
         print(f"   ℹ️  STATE AFTER TAP: {_state_label(on_state)} | 'Escuchando en' VISIBLE: {listen_back}")
         utils.take_screenshot(driver, "PP03_03_SERVER_ON", "t6")
@@ -715,9 +793,9 @@ def PP_03():
     finally:
         # POSTCONDITION: LEAVE THE SERVER ACTIVE
         try:
-            if _get_toggle_state(driver, SERVER_KEYS, 0) is False:
+            if _server_state(driver) is False:
                 print("\n🔧 POSTCONDITION: RESTORING SERVER TO ON...")
-                _tap_toggle(driver, SERVER_KEYS, 0)
+                _set_server(driver, True)
         except:
             pass
         print("\n" + "-" * 60)
@@ -1147,8 +1225,6 @@ def PP_12():
     print("PP-12: SERVER RESTART LOGS A NEW PINPAD_STARTED")
     print("=" * 60)
 
-    SERVER_KEYS = ["Servidor activo", "Servidor inactivo", "Servidor detenido", "Escuchando"]
-
     driver, wait = utils.start_driver()
     result = "FAIL"
 
@@ -1166,11 +1242,9 @@ def PP_12():
 
         # ── STEP 2: RESTART SERVER (OFF → ON) ────────────────────────────────
         print("\n👉 STEP 2: RESTARTING SERVER (OFF → ON)...")
-        if _get_toggle_state(driver, SERVER_KEYS, 0) is not False:
-            _tap_toggle(driver, SERVER_KEYS, 0)
-        _tap_toggle(driver, SERVER_KEYS, 0)
-        time.sleep(2)
-        server_on = _get_toggle_state(driver, SERVER_KEYS, 0)
+        _set_server(driver, False)
+        _set_server(driver, True)
+        server_on = _server_state(driver)
         print(f"   ℹ️  SERVER STATE: {_state_label(server_on)}")
         utils.take_screenshot(driver, "PP12_01_SERVER_RESTARTED", "t6")
 
@@ -1579,24 +1653,14 @@ if __name__ == "__main__":
     logger, log_file, timestamp = utils.start_report("OPERATIONALS_T6")
 
     try:
-        PP_01()
-        PP_02()
-        PP_03()
-        PP_04()
-        PP_05()
-        PP_06()
-        PP_07()
-        PP_08()
-        PP_09()
-        PP_10()
-        PP_11()
-        PP_12()
-        PP_13()
-        PP_14()
-        PP_15()
-        PP_16()
-        PP_17()
-        PP_18()
+        # EACH CASE RUNS ISOLATED: IF APPIUM DROPS A SESSION THE SUITE CONTINUES
+        for case in [PP_01, PP_02, PP_03, PP_04, PP_05, PP_06, PP_07, PP_08, PP_09,
+                     PP_10, PP_11, PP_12, PP_13, PP_14, PP_15, PP_16, PP_17, PP_18]:
+            try:
+                case()
+            except Exception as e:
+                print(f"\n💥 {case.__name__.replace('_', '-')} ABORTED — SESSION ERROR: {e.__class__.__name__}: {e}")
+                print("   💡 CHECK THAT APPIUM IS RUNNING AND THE T6 IS CONNECTED (adb devices)")
 
     finally:
         logger.close()
