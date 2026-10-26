@@ -585,6 +585,10 @@ def get_recovery_link_imap(usuario_email, password_app):
 # [5] REPORTING ENGINE — DUAL LOGGER, HTML REPORT, ZIP PACKAGER
 # ==================================================================================
 
+# LINE TIMESTAMPS PER LOG FILE, FILLED BY DualLogger AND READ BY generate_html_report
+_LINE_TIMES = {}
+
+
 class DualLogger:
     """
     INTERCEPTS sys.stdout TO WRITE EVERY PRINT STATEMENT TO BOTH:
@@ -600,8 +604,11 @@ class DualLogger:
     def __init__(self, filepath):
         self.terminal = sys.stdout
         self.log_file = open(filepath, "w", encoding="utf-8")
+        # HH:MM:SS OF EVERY LOG LINE (THE HTML REPORT SHOWS THE TIME OF EACH STEP)
+        self.times = _LINE_TIMES.setdefault(filepath, [])
 
     def write(self, message):
+        self.times.extend([datetime.now().strftime("%H:%M:%S")] * message.count("\n"))
         self.terminal.write(message)
         self.log_file.write(message)
         self.log_file.flush()  # FORCE DISK WRITE ON EVERY LINE (SAFE ON CRASH)
@@ -692,188 +699,313 @@ def _classify_log_line(line):
     return "other"
 
 
-# LOGO SHOWN CENTERED AT THE TOP OF THE HTML REPORT.
+# LOGO SHOWN AT THE TOP OF THE HTML REPORT.
 # EXPECTED AT: <PROJECT_ROOT>/assets/memphis_logo.png
 # IF THE FILE IS MISSING THE REPORT STILL GENERATES NORMALLY, JUST WITHOUT THE LOGO.
 LOGO_PATH = os.path.join("assets", "memphis_logo.png")
 
+# TEST MATRICES (EXCEL) USED TO ENRICH EACH CASE: ID → MODULE, STEPS, EXPECTED RESULT...
+MATRICES_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Matrices")
+
+# "TC-MSI-008: TITLE" / "TEST TIP-04: TITLE" — ONLY RIGHT AFTER A ===== OR ----- RULE
+_CASE_HEADER = re.compile(r"^\s*(?:TEST\s+)?([A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+):\s+(.+?)\s*$")
+_CASE_RESULT = re.compile(r"📊\s*(\S+)\s+RESULT:\s*(.+?)\s*$")
+_RULE        = re.compile(r"^\s*[=\-]{20,}\s*$")
+
+
+def _norm(text):
+    """'Opción de Pago' → 'opcion de pago' (MATRIX HEADER MATCHING)."""
+    import unicodedata
+    text = unicodedata.normalize("NFKD", str(text or "")).encode("ascii", "ignore").decode()
+    return " ".join(text.lower().split())
+
+
+def _load_matrices():
+    """
+    READS EVERY Matrices/*.xlsx SHEET WHOSE HEADER ROW STARTS WITH 'ID'.
+    RETURNS {CASE_ID: {normalized_header: value}}. EMPTY IF openpyxl OR THE FOLDER IS MISSING.
+    """
+    rows = {}
+    if not os.path.isdir(MATRICES_DIR):
+        return rows
+    try:
+        import openpyxl
+    except ImportError:
+        print("⚠️ openpyxl NOT INSTALLED — REPORT GENERATED WITHOUT MATRIX DATA")
+        return rows
+    for file in os.listdir(MATRICES_DIR):
+        if not file.lower().endswith(".xlsx") or file.startswith("~$"):
+            continue
+        try:
+            wb = openpyxl.load_workbook(os.path.join(MATRICES_DIR, file), read_only=True, data_only=True)
+            for ws in wb.worksheets:
+                headers = None
+                for row in ws.iter_rows(values_only=True):
+                    if headers is None:
+                        if row and _norm(row[0]) == "id":
+                            headers = [_norm(h) for h in row]
+                        continue
+                    if row and row[0]:
+                        rows[str(row[0]).strip()] = dict(zip(headers, row))
+            wb.close()
+        except Exception as e:
+            print(f"⚠️ COULD NOT READ MATRIX {file}: {e}")
+    return rows
+
+
+def _device_info(log_text):
+    """MODEL / ANDROID / APP FOR THE REPORT HEADER (adb IS BEST EFFORT, NEVER BLOCKS THE REPORT)."""
+    import subprocess
+    caps    = getattr(config, "CAPABILITIES", {})
+    package = caps.get("appium:appPackage", "")
+    match   = re.search(r"DEVICE:\s*(\S+)", log_text)
+    info = {
+        "modelo":  match.group(1) if match else caps.get("appium:deviceName", "T6"),
+        "android": caps.get("appium:platformVersion", ""),
+        "app":     package,
+        "serial":  "",
+    }
+
+    def adb(*args):
+        out = subprocess.run(["adb", *args], capture_output=True, text=True, timeout=4)
+        return out.stdout.strip()
+
+    try:
+        serials = [l.split()[0] for l in adb("devices").splitlines()[1:] if l.strip().endswith("device")]
+        if serials:
+            info["serial"]  = serials[0]
+            info["android"] = adb("shell", "getprop", "ro.build.version.release") or info["android"]
+            version = re.search(r"versionName=(\S+)", adb("shell", "dumpsys", "package", package))
+            if version:
+                info["app"] = f"{package} {version.group(1)}"
+    except Exception:
+        pass
+    return info
+
+
+def _image_data_uri(path):
+    """SCREENSHOT AS BASE64 SO THE REPORT STAYS A SINGLE SELF-CONTAINED HTML FILE."""
+    with open(path, "rb") as img:
+        return "data:image/png;base64," + base64.b64encode(img.read()).decode()
+
+
+def _step_kind(line):
+    """
+    WHICH LOG LINES BECOME TIMELINE STEPS: ok | fallo | info. None = ONLY IN THE CASE LOG.
+    SCREEN DUMPS, COUNTDOWNS AND DECORATION STAY IN THE LOG TO KEEP THE TIMELINE READABLE.
+    """
+    if _classify_log_line(line) == "fail" or any(m in line for m in ("❌", "✘", "💥")):
+        return "fallo"
+    if "✅" in line or line.startswith("✔"):
+        return "ok"
+    if any(m in line for m in ("👉", "⚠️", "⏱️", "ℹ️", "🖐️  ")):
+        return "info"
+    return None
+
+
+def _case_status(result_text, note):
+    upper = result_text.upper()
+    if upper.startswith(("SUCCESS", "PASS")):
+        return "Aprobado"
+    if "SKIP" in upper or "MANUAL" in upper:
+        return "Manual"
+    if "CRITICAL ERROR" in note.upper() or "ERROR" in upper:
+        return "Error"
+    return "Fallido"
+
+
+def _split_cases(lines, times):
+    """
+    SPLITS THE RUN LOG INTO CASES:
+        - A CASE OPENS ON A "<ID>: <TITLE>" LINE THAT FOLLOWS A ===== / ----- RULE.
+        - A CASE CLOSES ON "📊 <ID> RESULT: ...". SUITES WITHOUT A HEADER LINE GET A CASE
+          MADE OF THE LINES SINCE THE PREVIOUS RESULT.
+        - A CASE THAT NEVER PRINTED ITS RESULT IS REPORTED AS "Error" (RUN INTERRUPTED).
+    RETURNS A LIST OF DICTS: id, titulo, lineas [(text, time)], resultado, nota.
+    """
+    cases, current, pending = [], None, []
+    prev = ""
+    for idx, raw in enumerate(lines):
+        line = raw.rstrip("\n")
+        stamp = times[idx] if idx < len(times) else ""
+        header = _CASE_HEADER.match(line) if _RULE.match(prev) else None
+        result = _CASE_RESULT.search(line)
+        if header and not result:
+            if current:
+                cases.append(current)
+            current = {"id": header.group(1), "titulo": header.group(2), "lineas": [],
+                       "resultado": None, "nota": ""}
+            pending = []
+        elif result:
+            if current is None:
+                current = {"id": result.group(1), "titulo": "", "lineas": pending,
+                           "resultado": None, "nota": ""}
+            text = result.group(2)
+            parts = re.split(r"\s+[—–-]\s+", text, maxsplit=1)
+            current["resultado"] = parts[0].strip()
+            current["nota"] = parts[1].strip() if len(parts) > 1 else ""
+            current["lineas"].append((line, stamp))
+            cases.append(current)
+            current, pending = None, []
+        elif current is not None:
+            current["lineas"].append((line, stamp))
+        else:
+            pending.append((line, stamp))
+        if line.strip():
+            prev = line
+    if current:
+        cases.append(current)
+    return cases
+
+
+def _build_case(case, matrix, module_name):
+    """TURNS A PARSED LOG CASE INTO THE DATA THE TEMPLATE EXPECTS."""
+    row   = matrix.get(case["id"], {})
+    steps, log_lines, errors = [], [], []
+    context, shot_times = "", []
+
+    for text, stamp in case["lineas"]:
+        clean = text.strip()
+        log_lines.append(f"[{stamp}] {text}" if stamp and clean else text)
+        if not clean or _RULE.match(clean) or set(clean) <= set("🖐️ ️"):
+            continue
+        if clean.startswith(("Stacktrace:", "at ")) or "📝" in clean:
+            errors.append(clean)
+            continue
+        if "SCREENSHOT TAKEN:" in clean:
+            path = clean.split("SCREENSHOT TAKEN:", 1)[1].strip()
+            name = os.path.splitext(os.path.basename(path))[0]
+            if os.path.exists(path):
+                mtime = datetime.fromtimestamp(os.path.getmtime(path))
+                shot_times.append(mtime)
+                steps.append({
+                    "numero": len(steps) + 1,
+                    "descripcion": "Captura · " + re.sub(r"^[A-Z0-9]+_(?=\d)", "", name).replace("_", " "),
+                    "hora": stamp or mtime.strftime("%H:%M:%S"),
+                    "archivo": _image_data_uri(path),
+                    "estado": "fallo" if re.search(r"FAIL|ERROR", name, re.I) else "info",
+                    "pantalla": context,
+                })
+            continue
+        if "👉" in clean:
+            context = clean.replace("👉", "").strip()
+        kind = _step_kind(clean)
+        if kind == "fallo" and "RESULT:" not in clean:
+            errors.append(clean)
+        if kind and "RESULT:" not in clean:
+            steps.append({"numero": len(steps) + 1, "descripcion": clean, "hora": stamp,
+                          "archivo": None, "estado": kind, "pantalla": ""})
+
+    if case["resultado"] is None:
+        estado, nota = "Error", "EJECUCIÓN INTERRUMPIDA: EL CASO NO IMPRIMIÓ SU LÍNEA 'RESULT'"
+    else:
+        nota   = case["nota"]
+        estado = _case_status(case["resultado"], nota)
+        # AN EXCEPTION INSIDE THE CASE (💥 ... CRITICAL ERROR) IS AN EXECUTION ERROR, NOT A DEFECT
+        if estado == "Fallido" and any("CRITICAL ERROR" in e.upper() for e in errors):
+            estado = "Error"
+        if not nota:
+            nota = next((e for e in reversed(errors) if "📝" not in e), "") if estado != "Aprobado" else ""
+            nota = nota or f"RESULT: {case['resultado']}"
+
+    stamps = [s for _, s in case["lineas"] if s]
+    duracion = None
+    if len(stamps) >= 2:
+        t0, t1 = (datetime.strptime(s, "%H:%M:%S") for s in (stamps[0], stamps[-1]))
+        duracion = (t1 - t0).seconds
+    elif len(shot_times) >= 2:
+        duracion = int((shot_times[-1] - shot_times[0]).total_seconds())
+
+    monto = None
+    raw_monto = row.get("monto")
+    if raw_monto not in (None, ""):
+        try:
+            monto = float(str(raw_monto).replace("$", "").replace(",", ""))
+        except ValueError:
+            pass
+    opcion = str(row.get("opcion de pago") or "")
+
+    return {
+        "id": case["id"],
+        "caso": str(row.get("caso de prueba") or case["titulo"] or case["id"]),
+        "modulo": str(row.get("modulo") or module_name),
+        "escenario": opcion,
+        "tipo_pago": "6 MSI" if "6 MSI" in opcion.upper() else "",
+        "monto": monto,
+        "tipo": str(row.get("tipo") or ""),
+        "prioridad": str(row.get("prioridad") or ""),
+        "automatizacion": str(row.get("ejecucion") or ""),
+        "precondiciones": str(row.get("precondiciones") or ""),
+        "pasos": str(row.get("pasos a seguir") or ""),
+        "datos": str(row.get("datos de prueba") or ""),
+        "esperado": str(row.get("resultado esperado") or ""),
+        "observaciones": str(row.get("observaciones") or ""),
+        "descripcion": case["titulo"] if row else "",
+        "estado": estado,
+        "obtenido": nota,
+        "duracion": duracion,
+        "error": "\n".join(errors) if estado in ("Fallido", "Error") else "",
+        "pasos_evidencia": steps,
+        "log": "\n".join(log_lines).strip("\n"),
+    }
+
 
 def generate_html_report(module_name, log_file, timestamp):
     """
-    READS THE DUAL-LOGGER TEXT FILE AND GENERATES A PROFESSIONAL HTML REPORT.
+    READS THE DUAL-LOGGER TEXT FILE AND GENERATES THE HTML EVIDENCE REPORT
+    (TEMPLATE PORTED FROM Automatization-Rompefilas — SEE reporte_html.py).
     FEATURES:
-        - MEMPHIS BRAND PALETTE (NAVY + ORANGE) WITH THE LOGO CENTERED AT THE TOP.
-        - AUTOMATIC PASS/FAIL METRIC BADGES THAT DOUBLE AS CLICKABLE CLASSIFICATION
-          FILTERS (ALL / PASSED / FAILED) FOR THE TERMINAL LOG VIEW.
-        - COLOR-CODED LOG LINES (SUCCESS / ERROR / WARNING / INFO / HEADER).
-        - SCREENSHOTS EMBEDDED AS BASE64 DIRECTLY IN THE HTML (NO EXTERNAL FILES NEEDED).
+        - RUN SUMMARY: VERDICT, DEVICE, DURATION, COUNT PER STATUS AND PER MODULE.
+        - ONE CARD PER CASE ("📊 <ID> RESULT:" LINES) WITH EXPECTED VS OBTAINED,
+          STEP-BY-STEP TIMELINE (TIME + SCREENSHOT) AND THE FULL CASE LOG.
+        - MATRIX DATA FROM Matrices/*.xlsx WHEN THE CASE ID IS FOUND THERE.
+        - SCREENSHOTS EMBEDDED AS BASE64 (SINGLE FILE, NO EXTERNAL IMAGES NEEDED).
     OUTPUT: zip_evidence/{module_name}_REPORT_{timestamp}.html
     """
+    import reporte_html
+
     html_file = f"zip_evidence/{module_name}_REPORT_{timestamp}.html"
     print(f"\n📄 GENERATING HTML REPORT...")
 
     try:
         with open(log_file, "r", encoding="utf-8") as f:
             lines = f.readlines()
+        times    = _LINE_TIMES.get(log_file, [])
+        log_text = "".join(lines)
+        matrix   = _load_matrices()
 
-        total_pass = sum(1 for l in lines if _classify_log_line(l) == "pass")
-        total_fail = sum(1 for l in lines if _classify_log_line(l) == "fail")
-        fecha      = datetime.strptime(timestamp, "%Y%m%d_%H%M%S").strftime("%Y-%m-%d %H:%M:%S")
+        cases = [_build_case(c, matrix, module_name) for c in _split_cases(lines, times)]
+        if not cases:
+            # SUITE WITHOUT "RESULT:" LINES: THE WHOLE RUN IS ONE CARD
+            fails = sum(1 for l in lines if _classify_log_line(l) == "fail")
+            whole = {"id": module_name, "titulo": "Ejecución completa", "nota": "",
+                     "lineas": [(l.rstrip("\n"), times[i] if i < len(times) else "") for i, l in enumerate(lines)],
+                     "resultado": "FAIL" if fails else "SUCCESS"}
+            cases = [_build_case(whole, matrix, module_name)]
 
-        # LINK THE LAST SCREENSHOT TAKEN BEFORE EACH PASS/FAIL MARKER TO THAT
-        # OUTCOME. THIS WAY, FILTERING BY PASSED OR FAILED STILL SHOWS THE FINAL
-        # CAPTURE FOR THAT RESULT AS PROOF THE STEP RAN CORRECTLY, INSTEAD OF AN
-        # EMPTY LOG VIEW (SCREENSHOT LINES THEMSELVES DON'T CONTAIN SUCCESS/FAIL
-        # KEYWORDS, SO THEY'D OTHERWISE ALWAYS CLASSIFY AS "other").
-        screenshot_result = {}
-        pending_idx = None
-        for idx, l in enumerate(lines):
-            if "✔ SCREENSHOT TAKEN:" in l:
-                pending_idx = idx
-            outcome = _classify_log_line(l)
-            if outcome in ("pass", "fail") and pending_idx is not None:
-                screenshot_result[pending_idx] = outcome
-                pending_idx = None
+        inicio = datetime.strptime(timestamp, "%Y%m%d_%H%M%S")
+        fin    = datetime.now()
+        logo   = _image_data_uri(LOGO_PATH) if os.path.exists(LOGO_PATH) else ""
 
-        # LOGO AS BASE64 SO THE REPORT STAYS A SINGLE SELF-CONTAINED HTML FILE.
-        logo_html = ""
-        if os.path.exists(LOGO_PATH):
-            with open(LOGO_PATH, "rb") as img:
-                logo_b64 = base64.b64encode(img.read()).decode()
-            logo_html = f'<div class="brand-logo-wrap"><img class="brand-logo" src="data:image/png;base64,{logo_b64}" alt="Memphis"></div>'
+        datos = {
+            "modulo": module_name,
+            "ejecucion": timestamp,
+            "inicio": inicio.strftime("%Y-%m-%d %H:%M:%S"),
+            "fin_completo": fin.strftime("%Y-%m-%d %H:%M:%S"),
+            "duracion_total": int((fin - inicio).total_seconds()) if times else None,
+            "dispositivo": _device_info(log_text),
+            "interactivo": "🖐️" in log_text,
+            "log_archivo": os.path.basename(log_file),
+            "logo": logo,
+            "casos": cases,
+        }
+        reporte_html.generar_reporte(datos, html_file)
 
-        html_content = f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>QA Report | {module_name}</title>
-    <style>
-        :root {{
-            --bg-main: #f0f2f8; --bg-card: #ffffff;
-            --navy: #1b2a6b; --navy-dark: #142057; --orange: #ff7a00; --orange-light: #ffb066;
-            --primary: #1b2a6b; --secondary: #5b6b8c;
-            --success: #10b981; --danger: #ef4444;
-            --log-bg: #0d1333;  --log-text: #e2e6f5;
-        }}
-        body {{ font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-main); color: var(--primary); margin: 0; padding: 30px; line-height: 1.5; }}
-        .brand-logo-wrap {{ text-align: center; margin-bottom: 20px; }}
-        .brand-logo {{ max-width: 260px; width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 10px rgba(27,42,107,.18); }}
-        .header {{ background: var(--bg-card); padding: 25px 30px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 6px solid var(--navy); border-top: 3px solid var(--orange); flex-wrap: wrap; gap: 15px; }}
-        .header h1 {{ margin: 0 0 5px; font-size: 24px; color: var(--navy); }}
-        .header p  {{ margin: 0; color: var(--secondary); font-size: 14px; font-weight: 500; }}
-        .metrics   {{ display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }}
-        .filter-label {{ font-size: 11px; font-weight: 700; color: var(--secondary); text-transform: uppercase; letter-spacing: .5px; margin-right: 4px; }}
-        .badge     {{ padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 15px; color: #fff; display: flex; flex-direction: column; align-items: center; min-width: 80px; box-shadow: 0 2px 4px rgba(0,0,0,.1); border: none; cursor: pointer; font-family: inherit; transition: transform .12s ease, box-shadow .12s ease; }}
-        .badge:hover {{ transform: translateY(-2px); }}
-        .badge span {{ font-size: 24px; margin-top: 4px; }}
-        .badge-all  {{ background: var(--navy); }}
-        .badge-pass {{ background: var(--success); }}
-        .badge-fail {{ background: var(--danger); }}
-        .badge.active {{ box-shadow: 0 0 0 3px var(--orange), 0 2px 4px rgba(0,0,0,.1); }}
-        .container  {{ background: var(--bg-card); padding: 25px; border-radius: 10px; box-shadow: 0 4px 6px -1px rgba(0,0,0,.05); }}
-        .section-title {{ font-size: 18px; margin: 0 0 15px; color: var(--navy); border-bottom: 3px solid var(--orange); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }}
-        #current-filter {{ font-size: 12px; font-weight: 600; color: var(--secondary); text-transform: none; border-bottom: none; }}
-        .terminal  {{ background: var(--log-bg); color: var(--log-text); padding: 20px; border-radius: 8px; font-family: 'Consolas','Courier New',monospace; font-size: 13px; overflow-x: auto; }}
-        .log-line    {{ margin: 3px 0; white-space: pre-wrap; word-wrap: break-word; }}
-        .log-success {{ color: #34d399; font-weight: bold; }}
-        .log-error   {{ color: #f87171; font-weight: bold; }}
-        .log-info    {{ color: #38bdf8; }}
-        .log-warning {{ color: #facc15; }}
-        .log-header  {{ color: #cbd5e1; font-weight: bold; padding-top: 15px; border-bottom: 1px dashed #334155; padding-bottom: 5px; margin-bottom: 5px; }}
-        .log-line.is-hidden, .evidence-card.is-hidden {{ display: none; }}
-        .empty-state {{ color: var(--secondary); font-style: italic; padding: 10px 2px; display: none; }}
-        .evidence-card  {{ background: #142057; margin: 20px 0; padding: 15px; border-left: 4px solid var(--orange); border-radius: 6px; }}
-        .evidence-title {{ color: var(--orange-light); font-size: 12px; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: .5px; display: flex; align-items: center; gap: 8px; }}
-        .evidence-tag {{ font-size: 10px; font-weight: 700; padding: 2px 9px; border-radius: 999px; letter-spacing: .3px; color: #fff; }}
-        .evidence-tag-pass {{ background: var(--success); }}
-        .evidence-tag-fail {{ background: var(--danger); }}
-        .evidence-img   {{ max-width: 100%; height: auto; border-radius: 4px; display: block; }}
-    </style>
-</head>
-<body>
-{logo_html}
-<div class="header">
-    <div>
-        <h1>📊 Automated Test Execution Report</h1>
-        <p>Module: <strong>{module_name}</strong> &nbsp;|&nbsp; Environment: QA &nbsp;|&nbsp; Executed: {fecha}</p>
-    </div>
-    <div class="metrics">
-        <span class="filter-label">Filter:</span>
-        <button type="button" id="filter-all" class="badge badge-all active" onclick="filterLogs('all')">ALL <span>{len(lines)}</span></button>
-        <button type="button" id="filter-pass" class="badge badge-pass" onclick="filterLogs('pass')">PASSED <span>{total_pass}</span></button>
-        <button type="button" id="filter-fail" class="badge badge-fail" onclick="filterLogs('fail')">FAILED <span>{total_fail}</span></button>
-    </div>
-</div>
-<div class="container">
-    <h2 class="section-title">Terminal Logs &amp; Evidence <span id="current-filter">Showing: ALL</span></h2>
-    <div class="terminal" id="terminal">
-"""
-        for idx, line in enumerate(lines):
-            clean = line.replace("<", "&lt;").replace(">", "&gt;").strip("\n")
-            if not clean.strip():
-                html_content += "<br>\n"
-                continue
-
-            status = _classify_log_line(clean)
-
-            css = "log-line"
-            if "✅" in clean or "SUCCESS" in clean:            css += " log-success"
-            elif "❌" in clean or "FAILED" in clean or "ERROR" in clean: css += " log-error"
-            elif any(e in clean for e in ["📡","🌐","🚀","👉","✍️"]): css += " log-info"
-            elif "⚠️" in clean or "WARNING" in clean:          css += " log-warning"
-            elif "===" in clean:                               css += " log-header"
-
-            html_content += f'<div class="{css}" data-status="{status}">{clean}</div>\n'
-
-            if "✔ SCREENSHOT TAKEN:" in clean:
-                parts = clean.split("SCREENSHOT TAKEN:")
-                if len(parts) > 1:
-                    img_path = parts[1].strip()
-                    if os.path.exists(img_path):
-                        with open(img_path, "rb") as img:
-                            b64 = base64.b64encode(img.read()).decode()
-                        img_name = os.path.basename(img_path)
-                        evidence_status = screenshot_result.get(idx, "other")
-                        tag_html = ""
-                        if evidence_status == "pass":
-                            tag_html = ' <span class="evidence-tag evidence-tag-pass">PASSED</span>'
-                        elif evidence_status == "fail":
-                            tag_html = ' <span class="evidence-tag evidence-tag-fail">FAILED</span>'
-                        html_content += f"""
-<div class="evidence-card" data-status="{evidence_status}">
-    <div class="evidence-title">📸 VISUAL EVIDENCE: {img_name}{tag_html}</div>
-    <img class="evidence-img" src="data:image/png;base64,{b64}" alt="QA Evidence">
-</div>
-"""
-        html_content += """
-    <p class="empty-state" id="empty-state">No log lines match this filter.</p>
-    </div>
-</div>
-<script>
-function filterLogs(status) {
-    var items = document.querySelectorAll('#terminal .log-line, #terminal .evidence-card');
-    var visibleCount = 0;
-    items.forEach(function (el) {
-        var match = (status === 'all') || (el.getAttribute('data-status') === status);
-        el.classList.toggle('is-hidden', !match);
-        if (match) visibleCount++;
-    });
-
-    document.querySelectorAll('.badge').forEach(function (b) { b.classList.remove('active'); });
-    document.getElementById('filter-' + status).classList.add('active');
-
-    var labels = { all: 'ALL', pass: 'PASSED', fail: 'FAILED' };
-    document.getElementById('current-filter').textContent = 'Showing: ' + labels[status];
-    document.getElementById('empty-state').style.display = visibleCount === 0 ? 'block' : 'none';
-}
-</script>
-</body>
-</html>
-"""
-        with open(html_file, "w", encoding="utf-8") as f:
-            f.write(html_content)
-
+        resumen = {}
+        for c in cases:
+            resumen[c["estado"]] = resumen.get(c["estado"], 0) + 1
         print(f"✅ HTML REPORT GENERATED: {html_file}")
+        print(f"   📊 {len(cases)} CASES — " + " · ".join(f"{k}: {v}" for k, v in resumen.items()))
         print("=" * 70 + "\n")
         return html_file
 

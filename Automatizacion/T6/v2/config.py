@@ -1105,3 +1105,77 @@ XPATH_PP_PICKER_SHEET = (
 PP_EXPECTED_PORT       = "8080"
 PP_DEFAULT_HORA_INICIO = "12:00 AM"
 PP_DEFAULT_HORA_FIN    = "02:00 AM"
+
+
+# ==================================================================================
+# [MSI] T6 MOBILE — XPATHS & DATA: COBRO CON MESES SIN INTERESES (Operationals_MSI)
+# ==================================================================================
+# FLOW: Inicio → monto → "Realizar cobro" → "Leyendo tarjeta..." →
+#       [monto >= umbral] "¿Cuántas mensualidades?" → "Ingresa tu PIN en el lector" →
+#       "Transacción aprobada" → "Aceptar" → Inicio ($0.00)
+# MATRIX: Automatizacion/T6/v2/Matrices/Matriz_Operationals_MSI.xlsx
+
+# --- INICIO / CALCULADORA ---
+XPATH_MSI_BTN_REALIZAR_COBRO = (
+    '//*[contains(@content-desc,"Realizar cobro") or '
+    'contains(@text,"Realizar cobro")]'
+)
+XPATH_MSI_INICIO = (
+    '//*[contains(@content-desc,"INGRESA LA CANTIDAD") or '
+    'contains(@text,"INGRESA LA CANTIDAD")]'
+)
+# OLDER BUILDS ASK "¿Qué tipo de operación?" BEFORE READING THE CARD (OPTIONAL)
+XPATH_MSI_BTN_VENTA_NORMAL = (
+    '//*[contains(@content-desc,"Venta Normal") or contains(@text,"Venta Normal")]'
+)
+
+# --- LECTURA DE TARJETA ---
+XPATH_MSI_LEYENDO_TARJETA = (
+    '//*[contains(@content-desc,"Leyendo tarjeta") or '
+    'contains(@text,"Leyendo tarjeta")]'
+)
+
+# --- HOJA "¿CUÁNTAS MENSUALIDADES?" ---
+# NOTE: LOWERCASE "mensualidades" — THE PIN SUMMARY USES "Mensualidades" (CAPITAL M)
+XPATH_MSI_SHEET_TITULO = (
+    '//*[contains(@content-desc,"ntas mensualidades") or '
+    'contains(@text,"ntas mensualidades") or '
+    'contains(@content-desc,"Selecciona la opci") or '
+    'contains(@text,"Selecciona la opci")]'
+)
+XPATH_MSI_OPC_SIN_MENSUALIDADES = (
+    '//*[contains(@content-desc,"Sin mensualidades") or '
+    'contains(@text,"Sin mensualidades")]'
+)
+XPATH_MSI_OPC_6MSI = (
+    '//*[contains(@content-desc,"6 meses sin intereses") or '
+    'contains(@text,"6 meses sin intereses")]'
+)
+XPATH_MSI_SHEET_CANCELAR = '//*[@content-desc="Cancelar" or @text="Cancelar"]'
+
+# --- PANTALLA DE PIN ---
+XPATH_MSI_PANTALLA_PIN = (
+    '//*[contains(@content-desc,"Ingresa tu PIN") or '
+    'contains(@text,"Ingresa tu PIN")]'
+)
+XPATH_MSI_PIN_BTN_ACEPTAR = '//*[@content-desc="Aceptar" or @text="Aceptar"]'
+
+# --- RESULTADO ---
+XPATH_MSI_APROBADA = (
+    '//*[contains(@content-desc,"Transacción aprobada") or '
+    'contains(@text,"Transacción aprobada")]'
+)
+XPATH_MSI_BTN_ACEPTAR = '//*[@content-desc="Aceptar" or @text="Aceptar"]'
+XPATH_MSI_BTN_FINALIZAR = '//*[@content-desc="Finalizar" or @text="Finalizar"]'
+
+# --- TEST DATA (AMOUNTS IN PESOS; THE KEYPAD FILLS CENTS FIRST: 1000 → $10.00) ---
+MSI_UMBRAL           = "1000.00"   # RULE: 6 MSI OFFERED FROM THIS AMOUNT (TC-MSI-004 CONFIRMS >= vs >)
+MSI_MONTO_CONTADO    = "500.00"    # TC-MSI-001
+MSI_MONTO_UMBRAL     = "1000.00"   # TC-MSI-002 / 004
+MSI_MONTO_DEBAJO     = "999.99"    # TC-MSI-003
+MSI_MONTO_ARRIBA     = "1000.01"   # TC-MSI-005
+MSI_MONTO_ALTO       = "5000.00"   # TC-MSI-006
+MSI_MONTO_SIN_MENS   = "1500.00"   # TC-MSI-008
+MSI_MENSUALIDADES    = "6"
+MSI_TIEMPO_TARJETA   = 90          # SECONDS TO INSERT THE CARD (MANUAL)
+MSI_TIEMPO_NIP       = 180         # SECONDS TO ENTER THE PIN (MANUAL, ~3 MIN)
